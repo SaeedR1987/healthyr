@@ -4,11 +4,48 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Saeed", "Rahman", , "saeed.rahmant@reach-initiative.org", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: Facilitates the analysis of standard nutrition and health technical indicators for REACH Initiative assessment teams globally. 
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Description: Facilitates the analysis of standard nutrition and health technical survey indicators for REACH Initiative assessment teams globally. 
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 URL: https://github.com/SaeedR1987/healthyr
 BugReports: https://github.com/SaeedR1987/healthyr/issues
+Imports: 
+    apyramid,
+    dplyr,
+    epirhandbook (>= 0.0.0.9000),
+    fastDummies,
+    GGally,
+    ggplot2,
+    ggridges,
+    graphics,
+    grDevices,
+    haven,
+    Hmisc,
+    janitor,
+    lubridate,
+    magrittr,
+    methods,
+    nipnTK (>= 0.1.0),
+    praise,
+    readxl,
+    remotes,
+    rlang,
+    runner,
+    scales,
+    srvyr,
+    stats,
+    stringi,
+    stringr,
+    tidyr,
+    varhandle,
+    writexl,
+    zscorer (>= 0.3.1)
+Remotes: 
+    nutriverse/zscorer,
+    nutriverse/nipnTK,
+    appliedepi/epirhandbook
+Depends: 
+    R (>= 2.10)
+LazyData: true
