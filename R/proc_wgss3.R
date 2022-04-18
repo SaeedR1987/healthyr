@@ -1,0 +1,87 @@
+
+#' Multi-Sectoral Needs Assessment Washington Group Short Set - Processed
+#'
+#' A dataset containing individual level Washington Group Short Set data from
+#' a MSNA Houseohld Survey. This data has been processed by healthyr functions.
+#'
+#' @format A data frame with 3578 rows and 17 variables:
+#' \describe{
+#'   \item{X_uuid}{Unique household survey identifier.}
+#'   \item{strata}{Survey strata.}
+#'   \item{svy_weights}{Household level survey weights.}
+#'   \item{sex}{Sex of the individual (male/female/nonconforming).}
+#'   \item{relationship_ind}{The relationship of the individual within the household.}
+#'   \item{nationality_ind}{Nationality of the individual.}
+#'   \item{age_years}{Age in years of the individual.}
+#'   \item{wgss1_seeing}{Washington Group Short Set SEEING domain - No difficulty (none), Some difficulty (some),
+#'   a lot of difficulty (a_lot), or cannot do at all (cannot). }
+#'   \item{wgss2_hearing}{Washington Group Short Set HEARING domain - No difficulty (none), Some difficulty (some),
+#'   a lot of difficulty (a_lot), or cannot do at all (cannot). }
+#'   \item{wgss3_walking}{Washington Group Short Set WALKING domain - No difficulty (none), Some difficulty (some),
+#'   a lot of difficulty (a_lot), or cannot do at all (cannot). }
+#'   \item{wgss4_remembering}{Washington Group Short Set REMEMBERING domain - No difficulty (none), Some difficulty (some),
+#'   a lot of difficulty (a_lot), or cannot do at all (cannot). }
+#'   \item{wgss5_selfcare}{Washington Group Short Set SELFCARE domain - No difficulty (none), Some difficulty (some),
+#'   a lot of difficulty (a_lot), or cannot do at all (cannot). }
+#'   \item{wgss6_communicating}{Washington Group Short Set COMMUNICATING domain - No difficulty (none), Some difficulty (some),
+#'   a lot of difficulty (a_lot), or cannot do at all (cannot). }
+#'   \item{population_group}{Population group.}
+#'   \item{region}{Region admin level 1.}
+#'   \item{governorate}{Governate admin level 2.}
+#'   \item{district}{District admin level 3.}
+#'   \item{age_months}{Age of the individual in months.}
+#'   \item{wg_sum_seeing_234}{Yes (1) / No (0) if individual has some difficulty, a lot of difficulty or cannot at all for the seeing domain. }
+#'   \item{wg_sum_hearing_234}{Yes (1) / No (0) if individual has some difficulty, a lot of difficulty or cannot at all for the hearing domain. }
+#'   \item{wg_sum_communication_234}{Yes (1) / No (0) if individual has some difficulty, a lot of difficulty or cannot at all for the communication domain. }
+#'   \item{wg_sum_walking_234}{Yes (1) / No (0) if individual has some difficulty, a lot of difficulty or cannot at all for the walking domain. }
+#'   \item{wg_sum_selfcare_234}{Yes (1) / No (0) if individual has some difficulty, a lot of difficulty or cannot at all for the selfcare domain. }
+#'   \item{wg_sum_remembering_234}{Yes (1) / No (0) if individual has some difficulty, a lot of difficulty or cannot at all for the remembering domain. }
+#'   \item{wg_sum_seeing_34}{Yes (1) / No (0) if individual has a lot of difficulty or cannot at all for the seeing domain. }
+#'   \item{wg_sum_hearing_34}{Yes (1) / No (0) if individual has a lot of difficulty or cannot at all for the hearing domain. }
+#'   \item{wg_sum_communication_34}{Yes (1) / No (0) if individual has a lot of difficulty or cannot at all for the communication domain. }
+#'   \item{wg_sum_walking_34}{Yes (1) / No (0) if individual has a lot of difficulty or cannot at all for the walking domain. }
+#'   \item{wg_sum_selfcare_34}{Yes (1) / No (0) if individual has a lot of difficulty or cannot at all for the selfcare domain. }
+#'   \item{wg_sum_remembering_34}{Yes (1) / No (0) if individual has a lot of difficulty or cannot at all for the remembering domain. }
+#'   \item{wg_sum_seeing_4}{Yes (1) / No (0) if individual has cannot do at all for the seeing domain. }
+#'   \item{wg_sum_hearing_4}{Yes (1) / No (0) if individual has cannot do at all for the hearing domain. }
+#'   \item{wg_sum_communication_4}{Yes (1) / No (0) if individual has cannot do at all for the communication domain. }
+#'   \item{wg_sum_walking_4}{Yes (1) / No (0) if individual has cannot do at all for the walking domain. }
+#'   \item{wg_sum_selfcare_4}{Yes (1) / No (0) if individual has cannot do at all for the selfcare domain. }
+#'   \item{wg_sum_remembering_4}{Yes (1) / No (0) if individual has cannot do at all for the remembering domain. }
+#'   \item{wg_sco_score_seeing}{Washington Group Short Set Severity Continuum (SCo) score for SEEING domain.
+#'   Severity score for seeing domain is none (0), some difficulty (1), a lot of difficulty (6), or cannot do at all (36).}
+#'   \item{wg_sco_score_hearing}{Washington Group Short Set Severity Continuum (SCo) score for HEARING domain.
+#'   Severity score for seeing domain is none (0), some difficulty (1), a lot of difficulty (6), or cannot do at all (36).}
+#'   \item{wg_sco_score_communication}{Washington Group Short Set Severity Continuum (SCo) score for COMMUNICATION domain.
+#'   Severity score for seeing domain is none (0), some difficulty (1), a lot of difficulty (6), or cannot do at all (36).}
+#'   \item{wg_sco_score_walking}{Washington Group Short Set Severity Continuum (SCo) score for WALKING domain.
+#'   Severity score for seeing domain is none (0), some difficulty (1), a lot of difficulty (6), or cannot do at all (36).}
+#'   \item{wg_sco_score_selfcare}{Washington Group Short Set Severity Continuum (SCo) score for SELFCARE domain.
+#'   Severity score for seeing domain is none (0), some difficulty (1), a lot of difficulty (6), or cannot do at all (36).}
+#'   \item{wg_sco_score_remembering}{Washington Group Short Set Severity Continuum (SCo) score for REMEMBERING domain.
+#'   Severity score for seeing domain is none (0), some difficulty (1), a lot of difficulty (6), or cannot do at all (36).}
+#'   \item{wgss_sco_score}{Sum of all WG-SS SCo scores across the 6 functioning domains.}
+#'   \item{wg_sum_234}{Count of WG functional domains reporting some difficulty, a lot of difficulty, or cannot do at all difficulty (0-6).}
+#'   \item{wg_sum_34}{Count of WG functional domains reporting a lot of difficulty or cannot do at all difficulty (0-6).}
+#'   \item{wg_sum_4}{Count of WG functional domains reporting cannot do at all difficulty (0-6).}
+#'   \item{wgss_hd_score}{WG Highest Difficulty (HD) severity score. If all six domains are 'cannot do at all', then (9). Else if
+#'   if at least one domain is 'cannot do at all', then (4). Else if any domain is at least one 'lot of difficulty', then (3). Else if any
+#'   domain has at least some difficulty, then (2). Else (1)}
+#'   \item{disability1}{Yes (1)/ No (2) if some difficulty, a lot of difficulty, or cannot do at all reported in at least one of the six functional WG domains}
+#'   \item{disability2}{Yes (1)/ No (2) if some difficult reported in at least two of the six functional WG domains, or a lot of difficulty
+#'   or cannot do at all in any one functional domain.}
+#'   \item{disability3}{Yes (1)/ No (2) if a lot of difficulty or cannot do at all reported in at least one of six functional WG domains.}
+#'   \item{disability4}{Yes (1)/ No (2) if cannot do at all reported in at least one of six functional WG domains}
+#'   \item{flag_wgss_age}{Data quality flag if Washington Group Short Set questions recorded for a child under 5 years of age.}
+#'   \item{flag_missing_sex}{Data quality flag if sex of the individual is missing.}
+#'   \item{flag_missing_age_years}{Data quality flag if age in years is missing. }
+#'   \item{flag_wgss_sco_score}{Data quality flag if WG-SS SCo score is high (above 20).}
+#'   \item{flag_wgss_extreme}{Data quality flag if WG-SS HD score is high/extreme (greater than or equal to 9)}
+#'
+#' }
+#'
+#' @source Multi-Sectoral Needs Assessment October 2021
+#'
+#' @examples
+#' data(proc_wgss3)
+"proc_wgss3"

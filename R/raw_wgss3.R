@@ -1,0 +1,39 @@
+
+#' Multi-Sectoral Needs Assessment Washington Group Short Set - Processed
+#'
+#' A dataset containing individual level Washington Group Short Set data from
+#' a MSNA Houseohld Survey. This data has not been processed by healthyr functions.
+#'
+#' @format A data frame with 3578 rows and 17 variables:
+#' \describe{
+#'   \item{X_uuid}{Unique household survey identifier.}
+#'   \item{strata}{Survey strata.}
+#'   \item{svy_weights}{Household level survey weights.}
+#'   \item{gender_ind}{Sex of the individual (male/female/nonconforming).}
+#'   \item{relationship_ind}{The relationship of the individual within the household.}
+#'   \item{nationality_ind}{Nationality of the individual.}
+#'   \item{age_yrs_ind}{Age in years of the individual.}
+#'   \item{wgss_seeing}{Washington Group Short Set SEEING domain - No difficulty (none), Some difficulty (some),
+#'   a lot of difficulty (a_lot), or cannot do at all (cannot). }
+#'   \item{wgss_hearing}{Washington Group Short Set HEARING domain - No difficulty (none), Some difficulty (some),
+#'   a lot of difficulty (a_lot), or cannot do at all (cannot). }
+#'   \item{wgss_walking}{Washington Group Short Set WALKING domain - No difficulty (none), Some difficulty (some),
+#'   a lot of difficulty (a_lot), or cannot do at all (cannot). }
+#'   \item{wgss_remembering}{Washington Group Short Set REMEMBERING domain - No difficulty (none), Some difficulty (some),
+#'   a lot of difficulty (a_lot), or cannot do at all (cannot). }
+#'   \item{wgss_selfcare}{Washington Group Short Set SELFCARE domain - No difficulty (none), Some difficulty (some),
+#'   a lot of difficulty (a_lot), or cannot do at all (cannot). }
+#'   \item{wgss_communicating}{Washington Group Short Set COMMUNICATING domain - No difficulty (none), Some difficulty (some),
+#'   a lot of difficulty (a_lot), or cannot do at all (cannot). }
+#'   \item{population_group}{Population group.}
+#'   \item{region}{Region admin level 1}
+#'   \item{governorate}{Governate admin level 2}
+#'   \item{district}{District admin level 3}
+#'
+#' }
+#'
+#' @source Multi-Sectoral Needs Assessment October 2021
+#'
+#' @examples
+#' data(raw_wgss3)
+"raw_wgss3"

@@ -1,0 +1,237 @@
+
+#' Food Security and Nutrition Household Survey Data - Processed
+#'
+#' A dataset containing household anthropometric and infant young child feeding practices
+#' data for children under-5 years of age. Has been processed by the healthyr functions.
+#'
+#' @format A data frame with 1284 rows and 197 variables:
+#' \describe{
+#'   \item{hh_id}{Unique household survey identifier.}
+#'   \item{date_dc}{The date of data collection.}
+#'   \item{sex}{Sex of the child}
+#'   \item{dob}{Date of birth of the child, if known}
+#'   \item{age_months}{Age in months of the child, from dat of birth or estimate from a
+#'   local events calendar.}
+#'   \item{age_days}{Age in days of the child, from the day of birth or estimate from age in months.}
+#'   \item{iycf_1}{(Yes)/(No) if the child was ever breastfed}
+#'   \item{iycf_2}{If the child was put to the breast after birth in (Less than 1 hour),
+#'   (Between 1 and 23 hours), (More than 24 hours), (Never breastfed), or (Don't know) }
+#'   \item{iycf_3}{(Yes)/(No) if the child was given anything OTHER than breastmilk in the
+#'   first two days.}
+#'   \item{iycf_4}{(Yes)/(No) if the child was breastfed yesterday during the day or night.}
+#'   \item{iycf_5}{(Yes)/(No) if the child drank anything from a bottle with a nipple
+#'   yesterday during the day or night}
+#'   \item{iycf_6a}{(Yes)/(No) if the child consumed plain water yesterday during the day or night}
+#'   \item{iycf_6b}{(Yes)/(No) if the child consumed any infant formula yesterday during the day or night}
+#'   \item{iycf_6b_num}{Number of times consumed infant formula yesterday during the day or night.}
+#'   \item{iycf_6c}{(Yes)/(No) if the child consumed any animal milk, tinned milk, or canned
+#'   milk yesterday during the day or night}
+#'   \item{iycf_6c_num}{Number of times consumed animal, tinned or canned milk yesterday during the day or night.}
+#'   \item{iycf_6c_swt}{(Yes)/(No) if the milk was sweetened or flavoured.}
+#'   \item{iycf_6d}{(Yes)/(No) if the child consumed any yoghurt drinks yesterday during the day or night}
+#'   \item{iycf_6d_num}{Number of times consumed yoghurt drinks yesterday during the day or night}
+#'   \item{iycf_6d_swt}{(Yes)/(No) if the yoghurt drink was sweet or flavoured.}
+#'   \item{iycf_6e}{(Yes)/(No) if the child consumed any chocolate flavoured drinks yesterday
+#'   during the day or night}
+#'   \item{iycf_6f}{(Yes)/(No) if the child consumed any fruit juice or fruit flavoured drinks yesterday
+#'   during the day or night.}
+#'   \item{iycf_6g}{(Yes)/(No) if the child consumed any sodas, malt drinks, sports drinks or energy
+#'   drinks yesterday during the day or night.}
+#'   \item{iycf_6h}{(Yes)/(No) if the child consumed any tea, coffee, or herbal drinks yesterday
+#'   during the day or night.}
+#'   \item{iycf_6h_swt}{(Yes)/(No) if the tea, coffee or herbal drinks were sweetened or not.}
+#'   \item{iycf_6i}{(Yes)/(No) if the child consumed any clear broth or soup yesterday during the day or night.}
+#'   \item{iycf_6j}{(Yes)/(No) if the child consumed any other liquids yesterday during the day or night.}
+#'   \item{iycf_6j_swt}{(Yes)/(No) if any of these other liquids were sweetened.}
+#'   \item{iycf_7a}{(Yes)/(No) if child consumed any yoghurt that was not a drink, yesterday
+#'   during the day or night.}
+#'   \item{iycf_7a_num}{Number of times consumed non-drink yoghurt yesterday during the day or night.}
+#'   \item{iycf_7b}{(Yes)/(No) if the child consumed any porridge, bread,
+#'   rice, noodles, pasta, asida, kisra and such staple cereal foods yesterday during the day or night.}
+#'   \item{iycf_7c}{(Yes)/(No) if the child consumed any pumpkin,
+#'   carrots, sweet red peppers, squash, red/orange sweet potatoes or such vitamin A rich vegetables yesterday during the day or night.}
+#'   \item{iycf_7d}{(Yes)/(No) if the child consumed plantains, white potatoes,
+#'   white yams, manioc, cassava or other white starcy tubers yesterday during the day or night.}
+#'   \item{iycf_7e}{(Yes)/(No) if the child consumed dark green leafy vegetables yesterday during
+#'   the or night.}
+#'   \item{iycf_7f}{(Yes)/(No) if the child consumed any other vegetables yesterday during the day or night.}
+#'   \item{iycf_7g}{(Yes)/(No) if the child consumed ripe mango, papaya or other vitamin A rich
+#'   fruits yesterday during the day or night.}
+#'   \item{iycf_7h}{(Yes)/(No) if the child consumed any other fruits yesterday during hte day or night.}
+#'   \item{iycf_7i}{(Yes)/(No) if the child consumed any liver, kidney, heart or other animal organs
+#'   yesterday during the day or night.}
+#'   \item{iycf_7j}{(Yes)/(No) if the child consumed any sausages,
+#'   hot dogs, ham, bacon, salami, canned meats, or other processed meats yesterday during the day or night.}
+#'   \item{iycf_7k}{(Yes)/(No) if the child consumed any beef, pork, lamb, goat,
+#'   chicken, duck or other meats yesterday during the day or night.}
+#'   \item{iycf_7l}{(Yes)/(No) if the child consumed any eggs yesterday during the day or night.}
+#'   \item{iycf_7m}{(Yes)/(No) if the child consumed any fish yesterday during the day or night.}
+#'   \item{iycf_7n}{(Yes)/(No) if the child consumed beans, peas, lentils, nuts, seeds or
+#'   other legumes yesterday during the day or night.}
+#'   \item{iycf_7o}{(Yes)/(No) if the child consumed any cheeses yesterday during the day or night.}
+#'   \item{iycf_7p}{(Yes)/(No) if the child consumed any
+#'   chocolates, candy, pastries, cakes, biscuits, ice cream or other sweets yesterday during the day or night.}
+#'   \item{iycf_7q}{(Yes)/(No) if the child consumed any chips,
+#'   crisps, puffs, french fries, fried dough, instant noodles, or other fried carbohydrayes yesterday during the
+#'   day or night.}
+#'   \item{iycf_7r}{(Yes)/(No) if the child consumed any other food yesterday during the day or night.}
+#'   \item{iycf_7s}{(Yes)/(No) if the child consumed any other food yesterday during the day or night, as asked
+#'   in list-based questionnaires.}
+#'   \item{iycf_8}{Number of times the child ate solid, semi-solid, or soft foods
+#'   yesterday during the day or night.}
+#'   \item{weight}{Weight of the child in kilograms.}
+#'   \item{muac}{Mid-upper arm circumference (MUAC) of the child in cm.}
+#'   \item{oedema}{(Yes)/(No) if the child has bilateral pitting oedema.}
+#'   \item{is_the_child_enrolled_in_nutrition_programme_otp_tsfp}{(Yes)/(No) if the child is enrolled in any nutrition
+#'   program such as OTP or TSFP at the time of interview.}
+#'   \item{height}{Length or Height of the childin cm.}
+#'   \item{enum}{The survey team or enumerator ID.}
+#'   \item{state_admin1}{The administrative level 1 name of the county where the survey took place.}
+#'   \item{county_admin2}{The administrative level 2 name of the county where the survey took place.}
+#'   \item{residency_status}{Residency status of the household as Resident, IDP, IDP Returnee, or Refugee Returnee.}
+#'   \item{cluster_id}{The cluster id.}
+#'   \item{date_dc_date}{Date of data collection, as a date type variable.}
+#'   \item{date_dc_month}{Month of data collection.}
+#'   \item{date_dc_day}{Day of the month of data collection.}
+#'   \item{date_dc_year}{Year of data collection.}
+#'   \item{date_dc_char}{Date of data collection, as a character type variable.}
+#'   \item{dob_date}{Date of birth, as a date type variable.}
+#'   \item{dob_month}{Month of date of birth.}
+#'   \item{dob_day}{Day of date of birth.}
+#'   \item{dob_year}{Year of date of birth.}
+#'   \item{dob_char}{Date of birth, as a character type variable.}
+#'   \item{age_years}{Age in completed years.}
+#'   \item{age_group}{Age group in groups of 5 years.}
+#'   \item{age_proxy}{Age group if the child is less than 2 years or greater than equal to 2 years of age.}
+#'   \item{measured}{If the child was measured by Length (1) or by Height (2)}
+#'   \item{wfhz}{Weight-for-height z-score}
+#'   \item{sam_wfhz}{Yes (1)/No (0) if child has severe acute malnutrition by weight for height z-score.}
+#'   \item{mam_wfhz}{Yes (1)/No (0) if child has moderate acute malnutrition by weight for height z-score.}
+#'   \item{gam_wfhz}{Yes (1)/No (0) if child has global acute malnutrition by weight for height z-score.}
+#'   \item{hfaz}{Height-for-age z-score}
+#'   \item{severe_stunting}{Yes (1)/No (0) if child has severe stunting by height-for-age z-score of less than -3 and/or nutritional oedema.}
+#'   \item{moderate_stunting}{Yes (1)/No (0) if child has moderate stunting by height-for-age z-score greater than or equal to -3 and less than -2.}
+#'   \item{global_stunting}{Yes (1)/No (0) if child has global stunting by height-for-age z-score of less than -2 and/or nutritional oedema.}
+#'   \item{wfaz}{Weight-for-age z-score}
+#'   \item{severe_underweight}{Yes (1)/No (0) if child has severe underweight by weight-for-age z-score of less than -3.}
+#'   \item{moderate_underweight}{Yes (1)/No (0) if child has moderate underweight by weight-for-age z-score greater than or equal to -3 and less than -2.}
+#'   \item{global_underweight}{Yes (1)/No (0) if child has global underweight by weight-for-age z-score of less than -2.}
+#'   \item{mfaz}{MUAC-for-age z-score}
+#'   \item{severe_mfaz}{Yes (1)/No (0) if child has severe acute malnutrition by MUAC-for-age z-score of less than -3.}
+#'   \item{moderate_mfaz}{Yes (1)/No (0) if child has moderate acute malnutrition by MUAC-for-age z-score greater than or equal to -3 and less than -2.}
+#'   \item{global_mfaz}{Yes (1)/No (0) if child has global acute malnutrition by MUAC-for-age z-score of less than -2.}
+#'   \item{sam_muac}{Yes (1)/No (0) if child has severe acute malnutrition by MUAC less than 115mm and/or nutritional oedema}
+#'   \item{mam_muac}{Yes (1)/No (0) if child has severe acute malnutrition by MUAC greater than or equal to 115mm and less than 125mm}
+#'   \item{gam_muac}{Yes (1)/No (0) if child has severe acute malnutrition by MUAC less than 125mm and/or nutritional oedema}
+#'   \item{iycf_evbf}{IYCF Indicator for Ever Breastfed for children 0-23 months (EvBF) - use for analysis}
+#'   \item{iycf_eibf}{IYCF Indicator for Early Initiation of Breastfeeding for children 0-23 months (EIBF) - use or analysis}
+#'   \item{iycf_ebf2d}{IYCF Indicator for Exclusively Breastfed for First Two Days After Birth for children 0-23 months (EBF2D) - use for analysis)}
+#'   \item{iycf_ebf}{IYCF Indicator for Exclusive Breastfeeding for children 0-5 months (EBF) - use for analysis}
+#'   \item{iycf_mixmf}{IYCF Indicator for Mixed Milk Feeding for children 0-5 months (MixMF) - use for analysis}
+#'   \item{iycf_cbf}{IYCF Inidcator for Continued Breastfeeding for children 12-23 months (CBF) - use for analysis}
+#'   \item{iycf_isssf}{IYCF Indicator for Introduction of Solid, Semi-Solid or Soft Foods for children 6-8 months (ISSSF) - use for analysis}
+#'   \item{mdd1}{Minimum Dietary Diversity Food Group 1 - Breastmilk}
+#'   \item{mdd2}{Minimum Dietary Diversity Food Group 2 - Grains, Roots, Tubers, Plaintains}
+#'   \item{mdd3}{Minimum Dietary Diversity Food Group 3 - Legumes}
+#'   \item{mdd4}{Minimum Dietary Diversity Food Group 4 - Dairy}
+#'   \item{mdd5}{Minimum Dietary Diversity Food Group 5 - Flesh foods}
+#'   \item{mdd6}{Minimum Dietary Diversity Food Group 6 - Eggs}
+#'   \item{mdd7}{Minimum Dietary Diversity Food Group 7 - Vitamin A rich fruits and vegetables}
+#'   \item{mdd8}{Minimum Dietary Diversity Food Group 8 - Other fruit and vegetables}
+#'   \item{iycf_mdd_score}{IYCF Indicator for Minimum Dietary Diversity Score for children 6-23 months}
+#'   \item{iycf_mdd_cat}{IYCF Indicator for Minimum Dietary Diversity for children 6-23 months (MDD) - use for analysis}
+#'   \item{mmf_bf_6to8months}{IYCF Indicator for Minimum Meal Frequency for Breastfed children 6-8 months}
+#'   \item{mmf_bf_9to23months}{IYCF Indicator for Minimum Meal Frequency for Breastfed children 9-23 months}
+#'   \item{count_6b_6c_6d_8}{Count of milk and/or dairy feeds, and solid, semi-solid, or soft meals the previous day.}
+#'   \item{mmf_nonbf_6to23months}{IYCF Indicator for Minimum Meal Frequency for Non-Breastfed children 6-23 months}
+#'   \item{iycf_mmf}{IYCF Indicator for Minimum Meal Frequecny for children 6-23 months (MMF) - use for analysis}
+#'   \item{count_dairy}{Count of milk, formula, or yoghurt feeds from yesterday during the day or night.}
+#'   \item{iycf_mmff}{IYCF Indicator for Minimum Milk Feeding Frequency for Non-Breastfed Children 6-23 months (MMFF) - use for analysis}
+#'   \item{iycf_mad}{IYCF Indicator for Minimum Acceptable Diet for children 6-23 months (MAD) - use for analysis}
+#'   \item{iycf_eff}{IYCF Indicator for Egg and/or Flesh Food Consumption for children 6-23 months (EFF) - use for analysis}
+#'   \item{iycf_ufc}{IYCF Indicator for Unhealthy Food Consumption for childrne 6-23 months (UFC)}
+#'   \item{zvf1}{No (1)/Yes(0) if child consumed Vitamin A rich vegetables the previous day}
+#'   \item{zvf2}{No (1)/Yes(0) if child consumed dark green leafy vegetables the previous day}
+#'   \item{zvf3}{No (1)/Yes(0) if child consumed other vegetables the previous day}
+#'   \item{zvf4}{No (1)/Yes(0) if child consumed vitamin A rich fruits the previous day}
+#'   \item{zvf5}{No (1)/Yes(0) if child consumed other fruits the previous day}
+#'   \item{zvf_sum}{Count of fruit and vegetable groups NOT-consumed the previous day (0-5)}
+#'   \item{iycf_zvf}{IYCF Indicator for Zero Vegetable or Fruit Consumption for childrne 6-23 months (ZVF) - use for analysis}
+#'   \item{iycf_bof}{IYCF Indicator for Bottle Feeding 0-23 months (BoF) - use for analysis}
+#'   \item{flag_missing_sex}{Yes (1)/No (0) Data quality flag if sex is missing/NA.}
+#'   \item{flag_missing_age_years}{Yes (1)/No (0)  Data quality flag if age_years is missing/NA.}
+#'   \item{foods_all_same}{Data quality check, if all food variables were marked the same as either all yes or all no.}
+#'   \item{foods_all_no}{Data quality check, if all food variables were marked the same as all no.}
+#'   \item{foods_all_yes}{Data quality check, if all food variables were marked the same as all no.}
+#'   \item{flag_yes_foods}{Data quality check, if all food variables were marked the same as either all yes or all no.}
+#'   \item{liquids_all_same}{Data quality check, if all liquids variables were marked the same as either all yes or all no.}
+#'   \item{liquids_all_no}{Data quality check, if all liquids variables were marked the same as all no.}
+#'   \item{liquids_all_yes}{Data quality check, if all liquids variables were marked the same as all yes.}
+#'   \item{flag_yes_liquids}{Data quality flag if all liquids variables were marked as yes.}
+#'   \item{flag_no_anything}{Data quality flag if no liquids or foods were reported consumed at all.}
+#'   \item{flag_no_foods}{Data quality flag if no foods were reported consumed at all for children 6-23 months of age.}
+#'   \item{flag_all_foods_no_meal}{Data quality flag if all foods were reported consumed for children 6-23 months of age,
+#'   and 0 solid, semi-solid or soft meals reported consumed.}
+#'   \item{flag_some_foods_no_meal}{Data quality flag if some food groups were reported consumed for children 6-23 months of age,
+#'   and 0 solid, semi-solid or soft meals reported consumed.}
+#'   \item{flag_high_mdd_low_mmf}{Data quality flag if 6 or more food groups were reported consumed for children 6-23 months of age, and 1 or fewer
+#'   solid, semi-solid or soft meals reported consumed.}
+#'   \item{flag_under6_nobf_nomilk}{Data quality flag if no breastfeeding, infant formula, milk or yoghurt reported consumed at all for a child less than 6 months of age.}
+#'   \item{flag_meats_nostaples}{Data quality flag if a child reportedly consumed meat or flesh foods, but no cereals or tubers the previous day.}
+#'   \item{mean_wfhz}{Mean weight-for-height z-score for the specified grouping or strata.}
+#'   \item{sd_wfhz}{Standard deviation for weight-for-height z-score for the specified grouping or strata.}
+#'   \item{wfhz_smart_flag}{Yes (1)/No (0) Data quality flag if wfh z-score exceeds +/- 3 from the mean wfh z-score.}
+#'   \item{wfhz_who_flag}{Yes (1)/No (0) Data quality flag if wfh z-score exceeds +/- 5. }
+#'   \item{wfhz_noflag}{Weight-for-height z-score with flagged values set to missing.}
+#'   \item{mean_wfhz_noflag}{Mean weight-for-height z-score for the specified grouping or strata, calculated without SMART flagged values.}
+#'   \item{sd_wfhz_noflag}{Standard deviation for weight-for-height z-score for the specified grouping or strata, calculated without SMART flagged values.}
+#'   \item{gam_wfhz_noflag}{Yes (1)/No (0) if child has global acute malnutrition by weight for height z-score, with SMART flagged values excluded.}
+#'   \item{mam_wfhz_noflag}{Yes (1)/No (0) if child has moderate acute malnutrition by weight for height z-score, with SMART flagged values excluded.}
+#'   \item{sam_wfhz_noflag}{Yes (1)/No (0) if child has severe acute malnutrition by weight for height z-score, with SMART flagged values excluded.}
+#'   \item{mean_hfaz}{Mean height-for-age z-score for the specified grouping or strata.}
+#'   \item{sd_hfaz}{Standard deviation for height-for-age z-score for the specified grouping or strata.}
+#'   \item{hfaz_smart_flag}{Yes (1)/No (0) Data quality flag if hfa z-score exceeds +/- 3 from the mean hfa z-score.}
+#'   \item{hfaz_who_flag}{Yes (1)/No (0) Data quality flag if hfa z-score exceeds +/- 5. }
+#'   \item{hfaz_noflag}{Height-for-age z-score with flagged values set to missing.}
+#'   \item{mean_hfaz_noflag}{Mean height-for-age z-score for the specified grouping or strata, calculated without SMART flagged values.}
+#'   \item{sd_hfaz_noflag}{Standard deviation for height-for-age z-score for the specified grouping or strata, calculated without SMART flagged values.}
+#'   \item{global_stunting_noflag}{Yes (1)/No (0) if child has global stunting by height for age z-score, with SMART flagged values excluded.}
+#'   \item{moderate_stunting_noflag}{Yes (1)/No (0) if child has moderate stunting by height for age z-score, with SMART flagged values excluded.}
+#'   \item{severe_stunting_noflag}{Yes (1)/No (0) if child has severe stunting by height for age z-score, with SMART flagged values excluded.}
+#'   \item{mean_wfaz}{Mean weight-for-age z-score for the specified grouping or strata.}
+#'   \item{sd_wfaz}{Standard deviation for weight-for-age z-score for the specified grouping or strata.}
+#'   \item{wfaz_smart_flag}{Yes (1)/No (0) Data quality flag if wfa z-score exceeds +/- 3 from the mean wfa z-score.}
+#'   \item{wfaz_who_flag}{Yes (1)/No (0) Data quality flag if wfa z-score exceeds +/- 5. }
+#'   \item{wfaz_noflag}{Weight-for-age z-score with flagged values set to missing.}
+#'   \item{mean_wfaz_noflag}{Mean weight-for-age z-score for the specified grouping or strata, calculated without SMART flagged values.}
+#'   \item{sd_wfaz_noflag}{Standard deviation for weight-for-age z-score for the specified grouping or strata, calculated without SMART flagged values.}
+#'   \item{global_underweight_noflag}{Yes (1)/No (0) if child has global stunting by weight for age z-score, with SMART flagged values excluded.}
+#'   \item{moderate_underweight_noflag}{Yes (1)/No (0) if child has moderate stunting by weight for age z-score, with SMART flagged values excluded.}
+#'   \item{severe_underweight_noflag}{Yes (1)/No (0) if child has severe stunting by weight for age z-score, with SMART flagged values excluded.}
+#'   \item{mean_mfaz}{Mean MUAC-for-age z-score for the specified grouping or strata.}
+#'   \item{sd_mfaz}{Standard deviation for MUAC-for-age z-score for the specified grouping or strata.}
+#'   \item{mfaz_smart_flag}{Yes (1)/No (0) Data quality flag if mfa z-score exceeds +/- 3 from the mean wfa z-score.}
+#'   \item{mfaz_who_flag}{Yes (1)/No (0) Data quality flag if mfa z-score exceeds +/- 5. }
+#'   \item{mfaz_noflag}{MUAC-for-age z-score with flagged values set to missing.}
+#'   \item{mean_mfaz_noflag}{Mean MUAC-for-age z-score for the specified grouping or strata, calculated without SMART flagged values.}
+#'   \item{sd_mfaz_noflag}{Standard deviation for MUAC-for-age z-score for the specified grouping or strata, calculated without SMART flagged values.}
+#'   \item{global_mfaz_noflag}{Yes (1)/No (0) if child has global acute malnutrition by MUAC for age z-score, with SMART flagged values excluded.}
+#'   \item{moderate_mfaz_noflag}{Yes (1)/No (0) if child has moderate acute malnutrition by MUAC for age z-score, with SMART flagged values excluded.}
+#'   \item{severe_mfaz_noflag}{Yes (1)/No (0) if child has severe acute malnutrition by MUAC for age z-score, with SMART flagged values excluded.}
+#'   \item{muac_flag}{Yes (1)/No (0) Data quality flag if MUAC is an extreme value less than 8cm or greater than 22cm for a child under-5 years of age.}
+#'   \item{muac_noflag}{MUAC measurement with extreme values excluded/set to missing.}
+#'   \item{gam_muac_noflag}{Yes (1)/No (0) if child has global acute malnutrition by MUAC, with extreme values excluded.}
+#'   \item{mam_muac_noflag}{Yes (1)/No (0) if child has moderate acute malnutrition by MUAC, with extreme values excluded.}
+#'   \item{sam_muac_noflag}{Yes (1)/No (0) if child has severe acute malnutrition by MUAC, with extreme values excluded.}
+#'   \item{c_gam}{Yes (1)/No (0) if child has global acute malnutrition by MUAC, wfh z-score less than -2, or presence of nutritional oedema,
+#'    with SMART flagged and extreme values excluded.}
+#'   \item{c_sam}{Yes (1)/No (0) if child has severe acute malnutrition by MUAC, wfh z-score less than -2, or presence of nutritional oedema,
+#'    with SMART flagged and extreme values excluded.}
+#'
+#' }
+#'
+#' @source A food security and nutrition monitoring survey.
+#'
+#' @examples
+#' data(proc_anthro_iycf2)
+"proc_anthro_iycf2"

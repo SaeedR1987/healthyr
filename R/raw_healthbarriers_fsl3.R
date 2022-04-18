@@ -1,0 +1,58 @@
+
+#' Multi-Sectoral Needs Assessment FSL and Health Barriers - Unprocessed
+#'
+#' A dataset containing household surveys from an MSNA. Has Food Consumption Scores,
+#' and Health Barriers indicators.
+#'
+#' @format A data frame with 950 rows and 52 variables:
+#' \describe{
+#'   \item{X_uuid}{Unique household survey identifier.}
+#'   \item{strata}{Survey strata.}
+#'   \item{svy_weight}{Household level survey weights.}
+#'   \item{population_group}{Population group of the household.}
+#'   \item{region}{Region admin level 1}
+#'   \item{governorate}{Governate admin level 2}
+#'   \item{district}{District admin level 3}
+#'   \item{cereals}{Input for fcs_cereals. Number of days consumed cereals or tubers in the past 7 days.}
+#'   \item{nuts_seed}{Input for fcs_legumes Number of days consumed nuts, seeds, legumes in the past 7 days.}
+#'   \item{milk_dairy}{Input for fcs_dairy Number of days consumed milk or dairy products in the past 7 days.}
+#'   \item{meat}{Input for fcs_meat. Number of days consumed meats, fish, eggs in the past 7 days.}
+#'   \item{vegetables}{Input for fcs_veg. Number of days consumed vegetables in the past 7 days.}
+#'   \item{fruits}{Input for fcs_fruit. Number of days consumed fruits in the past 7 days.}
+#'   \item{oil_fats}{Input for fcs_oil. Number of days consumed oils or fats in the past 7 days.}
+#'   \item{sweets}{Input for fcs_sugar. Number of days consumed sugar or sweets in the past 7 days.}
+#'   \item{spices_condiments}{Number of days consumed any condiments like salt, tea, coffee in the past 7 days.}
+#'   \item{barrier.none}{Household self-reported health barriers - None (1)/(0)}
+#'   \item{barrier.no_facility_nearby}{Household self-reported health barriers - No facility nearby (1)/(0)}
+#'   \item{barrier.hours_inconvenient}{Household self-reported health barriers - Service hours inconvenient (1)/(0)}
+#'   \item{barrier.service_unavailable}{Household self-reported health barriers - Service unavailable (1)/(0)}
+#'   \item{barrier.long_wait}{Household self-reported health barriers - Long waiting time for service (1)/(0)}
+#'   \item{barrier.cost_consultation}{Household self-reported health barriers - Cannot afford cost of consultation (1)/(0)}
+#'   \item{barrier.cost_treatment}{Household self-reported health barriers - Cannot afford cost of treatment (1)/(0)}
+#'   \item{barrier.cost_transportation}{Household self-reported health barriers - Cannot afford cost of transportation (1)/(0)}
+#'   \item{barrier.medication_issues}{Household self-reported health barriers - Inappropriate medication (1)/(0)}
+#'   \item{barrier.distance}{Household self-reported health barriers - Far distance to health facility (1)/(0)}
+#'   \item{barrier.disability}{Household self-reported health barriers - Limited or no access for disabled at facility (1)/(0)}
+#'   \item{barrier.no_transportation}{Household self-reported health barriers - No transport to facility (1)/(0)}
+#'   \item{barrier.insecurity_at_facility}{Household self-reported health barriers - Insecurity at facility (1)/(0)}
+#'   \item{barrier.insecurity_traveling}{Household self-reported health barriers - Insecurity en route to facility. (1)/(0)}
+#'   \item{barrier.fear_covid}{Household self-reported health barriers - Afraid of getting COVID-19 (1)/(0)}
+#'   \item{barrier.no_trained_staff}{Household self-reported health barriers - No trained staff at facility (1)/(0)}
+#'   \item{barrier.insufficient_staff}{Household self-reported health barriers - Not enough staff at facility (1)/(0)}
+#'   \item{barrier.no_female_staff}{Household self-reported health barriers - No female staff at facility (1)/(0)}
+#'   \item{barrier.distrust}{Household self-reported health barriers - Lack of trust with facility staff (1)/(0)}
+#'   \item{barrier.no_free_time}{Household self-reported health barriers - No free time to go to facility (1)/(0)}
+#'   \item{barrier.language_communication}{Household self-reported health barriers - Facility staff don't speak my language (1)/(0)}
+#'   \item{barrier.lack_docs}{Household self-reported health barriers - Lack legal documentation (1)/(0)}
+#'   \item{barrier.employer_prevented}{Household self-reported health barriers - Employer prevented going to facility (1)/(0)}
+#'   \item{barrier.other}{Household self-reported health barriers - Other barrier (1)/(0)}
+#'   \item{barrier.dk}{Household self-reported health barriers - Don't know (1)/(0)}
+#'   \item{barrier.decline}{Household self-reported health barriers - Declined/Refused to answer (1)/(0)}
+#'
+#' }
+#'
+#' @source Multi-Sectoral Needs Assessment October 2021
+#'
+#' @examples
+#' data(raw_healthbarriers_fsl3)
+"raw_healthbarriers_fsl3"
