@@ -108,7 +108,7 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
              dob_day = lubridate::day(.data$dob_date),
              dob_year = lubridate::year(.data$dob_date)) %>%
       dplyr::mutate(dob_char = paste(.data$dob_month, .data$dob_day, .data$dob_year, sep = "/"),
-             dob_char = ifelse(is.na(.data$dob_char), NA, ifelse(.data$ob_char == "NA/NA/NA", NA, .data$dob_char)))
+             dob_char = ifelse(is.na(.data$dob_char), NA, ifelse(.data$dob_char == "NA/NA/NA", NA, .data$dob_char)))
 
   }
 
