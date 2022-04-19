@@ -22,8 +22,9 @@
 #' \dontrun{plot_zscore_distribution(df, index = "wfhz", file_path = "myplots/wfhz_plot.jpg",
 #' wdth = 10, hght = 8, title_name = "Distribution of WFH Z-scores, County X")}
 #' @importFrom rlang .data
+#' @importFrom stats density
 plot_zscore_distribution <- function(df, index, flags, file_path = NULL, wdth = NULL, hght = NULL, title_name = NULL) {
-
+  options(warn = -1)
   anthro_cols <- c("wfhz_noflag", "hfaz_noflag", "wfaz_noflag", "mfaz_noflag")
   valid_indexes <- c("wfhz", "hfaz", "wfaz", "mfaz")
 
@@ -43,10 +44,10 @@ plot_zscore_distribution <- function(df, index, flags, file_path = NULL, wdth = 
 
   if(length(setdiff(var, colnames(df)))!=0) {stop("The specific anthropometric column indicated is not in your dataframe. Please check your input.")}
 
-  data_norm <- as.data.frame(graphics::curve(stats::dnorm(.data$x, mean = 0, sd = 1), from = -6, to = 6))
+  data_norm <- as.data.frame(graphics::curve(stats::dnorm(x, mean = 0, sd = 1), from = -6, to = 6))
 
   g <- ggplot2::ggplot(df, ggplot2::aes(get(var))) +
-    ggplot2::geom_histogram(ggplot2::aes(x=get(var), y=ggplot2::after_stat(stats::density)), bins=100, fill="#d3d3d3", color="gray", alpha = 0.8) +
+    ggplot2::geom_histogram(ggplot2::aes(x=get(var), y=ggplot2::after_stat(density)), bins=100, fill="#d3d3d3", color="gray", alpha = 0.8) +
     ggplot2::geom_density(color="blue", size = 1) +  ggplot2::xlim(c(-6, 5)) +
     ggplot2::geom_line(data = data_norm, ggplot2::aes(x = .data$x, y = .data$y), color = "darkred", size = 1.2) +
     ggplot2::geom_vline(xintercept = c(-3, 3), color = "red", size = 0.5) +
@@ -58,6 +59,7 @@ plot_zscore_distribution <- function(df, index, flags, file_path = NULL, wdth = 
   if(is.null(hght)) {hght <- 5}
 
   if(!is.null(file_path)) {ggplot2::ggsave(filename = file_path, width = wdth, height = hght)}
+  options(warn = 0)
 
   return(g)
 

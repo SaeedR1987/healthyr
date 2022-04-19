@@ -219,6 +219,8 @@ format_nut_health_indicators <- function(df, #dataframe
                                          lcs_variables = NULL
 ) {
 
+  options(warn=-1)
+
   # Rename Columns
 
   df <- df %>%
@@ -658,10 +660,10 @@ format_nut_health_indicators <- function(df, #dataframe
 
   df <- reformat_nut_health_indicators(df, health_barriers = health_barriers, lcs_variables = lcs_variables)
 
-  if(!exists("use_flags_yn")) {use_flags_yn <- "no"} else {use_flags_yn <- use_flags_yn}
+  if(is.null(use_flags_yn)) {use_flags_yn <- "no"} else {use_flags_yn <- use_flags_yn}
 
-  df <- healthyr::calculate_nut_health_indicators(df, monthly_expenditures = period_expenditures, period_expenditures = period_expenditures, num_period_months = num_period_months, use_flags = use_flags_yn)
-  df <- healthyr::flag_nut_health_issues(df)
+  df <- healthyr::calculate_nut_health_indicators(df, monthly_expenditures = period_expenditures, period_expenditures = period_expenditures, num_period_months = num_period_months)
+  df <- healthyr::flag_nut_health_issues(df, use_flags = use_flags_yn)
 
   new_names <- setdiff(names(df), original_names)
   print(paste0("The following columns have been added to the dataset:"))
@@ -669,6 +671,8 @@ format_nut_health_indicators <- function(df, #dataframe
 
   # Saving the new dataframe to a xlsx, if specified
   if(!is.null(file_path)) {writexl::write_xlsx(df, file_path)}
+
+  options(warn=0)
 
   return(df)
 

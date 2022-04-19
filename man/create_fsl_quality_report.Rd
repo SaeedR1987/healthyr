@@ -4,7 +4,12 @@
 \alias{create_fsl_quality_report}
 \title{Create FSL Quality Report}
 \usage{
-create_fsl_quality_report(df, grouping = NULL, file_path = NULL)
+create_fsl_quality_report(
+  df,
+  grouping = NULL,
+  short_report = NULL,
+  file_path = NULL
+)
 }
 \arguments{
 \item{df}{Inputs a data frame that includes FSL outcome data that has already been
@@ -12,6 +17,9 @@ processed and standardized by the format_nut_health_indicators function.}
 
 \item{grouping}{Inputs an optional character value specifying a column by which to
 group or aggregate the results by.}
+
+\item{short_report}{Inputs a boolean value TRUE or FALSE to return just key variables. If FALSE,
+returns a dataframe of all the variables calculated.}
 
 \item{file_path}{Inputs an optional character value specifying the file location to save a copy
 of the results.}

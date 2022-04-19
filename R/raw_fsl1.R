@@ -4,7 +4,7 @@
 #' A dataset containing household food security and livelihood coping strategy data from a SMART Survey.
 #' Data has not been processed by the healthyr functions.
 #'
-#' @format A data frame with 509 rows and 47 variables:
+#' @format A data frame with 507 rows and 47 variables:
 #' \describe{
 #'   \item{today}{Date of data collection}
 #'   \item{enum}{The survey team or enumerator ID.}

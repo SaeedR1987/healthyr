@@ -10,6 +10,8 @@
 #' processed and standardized by the format_nut_health_indicators function.
 #' @param grouping Inputs an optional character value specifying a column by which to
 #' group or aggregate the results by.
+#' @param short_report Inputs a boolean value TRUE or FALSE to return just key variables. If FALSE,
+#' returns a dataframe of all the variables calculated.
 #' @param file_path Inputs an optional character value specifying the file location to save a copy
 #' of the results.
 #'
@@ -20,7 +22,11 @@
 #'\dontrun{create_fsl_report(df = proc_fsl1, grouping = "enum",
 #' file_path = "folder/qualityreport.xlsx")}
 #' @importFrom rlang .data
-create_fsl_quality_report <- function(df, grouping = NULL, file_path = NULL) {
+create_fsl_quality_report <- function(df, grouping = NULL, short_report = NULL, file_path = NULL) {
+
+  options(warn=-1)
+
+  if(is.null(short_report)) {short_report <- FALSE}
 
   if(!methods::hasArg(grouping)) {
     df <- df %>% dplyr::mutate(group = "All")
@@ -197,8 +203,24 @@ create_fsl_quality_report <- function(df, grouping = NULL, file_path = NULL) {
 
   results <- healthyr::calculate_plausibility_report(df = results)
 
+  a <- c("n",
+         "fews_p1", "fews_p2", "fews_p3", "fews_4", "fews_p5",
+         "prop_fc_flags", "flag_severe_hhs",
+         "fsl_plaus_score", "fsl_plaus_cat")
+
+  b <- intersect(a, colnames(results))
+
+  if(short_report == TRUE & length(setdiff(b, colnames(results)))==0) {
+
+    results <- results %>%
+      dplyr::select(1, b)
+
+  }
+
   # Saving the new dataframe to a xlsx, if specified
   if(!is.null(file_path)) {writexl::write_xlsx(results, file_path)}
+
+  options(warn=0)
 
   return(results)
 

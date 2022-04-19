@@ -4,6 +4,7 @@
 #' @param df Inputs a dataframe which has already been processed by the format_nut_health_indicators, reformat_nut_health_indicators, and
 #' calculate_nut_health_indicators functions. This function is not intended to be run directly, and instead is called automatically
 #' within the format_nut_health_indicators function.
+#' @param use_flags Optional input to specify if IYCF flags should be automatically blanked in the numerator.
 #'
 #' @return Returns a dataframe with additional columns of flags/data quality checks for individual records.
 #' @export
@@ -12,7 +13,7 @@
 #' \dontrun{flag_nut_health_issues(df)}
 #'
 #' @importFrom rlang .data
-flag_nut_health_issues <- function(df) {
+flag_nut_health_issues <- function(df, use_flags = NULL) {
 
     # Washington Group Flags
 
@@ -57,6 +58,8 @@ flag_nut_health_issues <- function(df) {
     df <- df %>%
       dplyr::mutate(flag_yes_foods = ifelse(.data$foods_all_yes == TRUE, 1, 0))
 
+
+
   }
   if(length(liquids_to_check) > 0) {
 
@@ -67,8 +70,9 @@ flag_nut_health_issues <- function(df) {
     df <- df %>%
       dplyr::mutate(flag_yes_liquids = ifelse(.data$liquids_all_yes == TRUE, 1, 0))
 
+
   }
-  if(length(setdiff(c("iycf_4", "age_months"), colnames(df)))==0 & length(.data$foods_to_check) > 0 & length(.data$liquids_to_check) > 0) {
+  if(length(setdiff(c("iycf_4", "age_months"), colnames(df)))==0 & length(foods_to_check) > 0 & length(liquids_to_check) > 0) {
 
     df <- df %>%
       dplyr::mutate(flag_no_anything = ifelse(is.na(.data$iycf_4), NA, ifelse(.data$iycf_4 != 1 & .data$foods_all_no == TRUE & .data$liquids_all_no == TRUE & .data$age_months > 5, 1, 0)))
@@ -88,6 +92,8 @@ flag_nut_health_issues <- function(df) {
       dplyr::mutate(flag_high_mdd_low_mmf = ifelse(is.na(.data$iycf_mdd_score), NA,
                                             ifelse(is.na(.data$iycf_8), NA,
                                                    ifelse(.data$iycf_mdd_score >= 6 & .data$iycf_8 <= 1, 1, 0))))
+
+
   }
 
   if(length(setdiff(c("age_months", "iycf_4", "iycf_6b_num", "iycf_6c_num", "iycf_6d_num"), colnames(df)))==0) {
@@ -99,6 +105,8 @@ flag_nut_health_issues <- function(df) {
                                                             ifelse(is.na(.data$iycf_6c_num), NA,
                                                                    ifelse(is.na(.data$iycf_6d_num), NA,
                                                                           ifelse(.data$age_months < 6 & .data$iycf_4 != 1 & .data$iycf_6b_num == 0 & .data$iycf_6c_num == 0 & .data$iycf_6d_num == 0, 1, 0)))))))
+
+
 
   }
 
@@ -115,6 +123,56 @@ flag_nut_health_issues <- function(df) {
                                                                                      ifelse( .data$iycf_7b != 1 & .data$iycf_7d != 1 & (.data$iycf_7i == 1 | .data$iycf_7j == 1 | .data$iycf_7k == 1 | .data$iycf_7l == 1 | .data$iycf_7m == 1), 1 , 0 )))))))))
 
   }
+
+
+  if(use_flags == "yes" & (c("iycf_ufc") %in% colnames(df))) {
+    df <- df %>% dplyr::mutate(iycf_ufc = ifelse(is.na(.data$flag_yes_foods), .data$iycf_ufc, ifelse(.data$flag_yes_foods == 1, 0, .data$iycf_ufc)))
+  }
+
+  if(use_flags == "yes" & (c("iycf_zvf") %in% colnames(df))) {
+    df <- df %>% dplyr::mutate(iycf_zvf = ifelse(is.na(.data$flag_no_foods), .data$iycf_zvf, ifelse(.data$flag_no_foods == 1, 0, .data$iycf_zvf)),
+                               iycf_zvf = ifelse(is.na(.data$flag_yes_foods), .data$iycf_zvf, ifelse(.data$flag_yes_foods == 1, 0, .data$iycf_zvf)))
+  }
+
+  if(use_flags == "yes" & (c("iycf_eff") %in% colnames(df))) {
+    df <- df %>% dplyr::mutate(iycf_eff = ifelse(is.na(.data$flag_no_foods), .data$iycf_eff, ifelse(.data$flag_no_foods == 1, 0 , .data$iycf_eff)),
+                               iycf_eff = ifelse(is.na(.data$flag_yes_foods), .data$iycf_eff, ifelse(.data$flag_yes_foods == 1, 0, .data$iycf_eff)))
+  }
+
+  if(use_flags == "yes" & (c("iycf_ebf") %in% colnames(df))) {
+    df <- df %>% dplyr::mutate(iycf_ebf = ifelse(is.na(.data$flag_yes_liquids), .data$iycf_ebf, ifelse(.data$flag_yes_liquids == 1, 0, .data$iycf_ebf)))
+    }
+
+  if(use_flags == "yes" & (c("iycf_swb") %in% colnames(df))) {
+    df <- df %>% dplyr::mutate(iycf_swb = ifelse(is.na(.data$flag_yes_liquids), .data$iycf_swb, ifelse(.data$flag_yes_liquids == 1, 0, .data$iycf_swb)))
+  }
+
+  if(use_flags == "yes" & (c("iycf_mad") %in% colnames(df))) {
+    df <- df %>%
+      dplyr::mutate(iycf_mad = ifelse(is.na(.data$flag_no_foods), .data$iycf_mad, ifelse(.data$flag_no_foods == 1, 0, .data$iycf_mad)),
+                    iycf_mad = ifelse(is.na(.data$flag_yes_foods), .data$iycf_mad, ifelse(.data$flag_yes_foods == 1, 0, .data$iycf_mad)),
+                    iycf_mad = ifelse(is.na(.data$flag_some_foods_no_meal), .data$iycf_mad, ifelse(.data$flag_some_foods_no_meal == 1, 0, .data$iycf_mad)))
+  }
+
+  if(use_flags == "yes" & (c("iycf_mdd_score") %in% colnames(df))) {
+    df <- df %>%
+      dplyr::mutate(iycf_mdd_score = ifelse(is.na(.data$flag_yes_foods), .data$iycf_mdd_score, ifelse(.data$flag_yes_foods == 1, NA, .data$iycf_mdd_score)),
+                    iycf_mdd_score = ifelse(is.na(.data$flag_no_foods), .data$iycf_mdd_score, ifelse(.data$flag_no_foods == 1, NA, .data$iycf_mdd_score)))
+  }
+
+  if(use_flags == "yes" & (c("iycf_mdd_cat") %in% colnames(df))) {
+    df <- df %>%
+      dplyr::mutate(iycf_mdd_cat = ifelse(is.na(.data$flag_no_foods), .data$iycf_mdd_cat, ifelse(.data$flag_no_foods == 1, 0, .data$iycf_mdd_cat)),
+                    iycf_mdd_cat = ifelse(is.na(.data$flag_yes_foods), .data$iycf_mdd_cat, ifelse(.data$flag_yes_foods == 1, 0, .data$iycf_mdd_cat)))
+  }
+
+  if(use_flags == "yes" & (c("iycf_mmf") %in% colnames(df))) {
+    df <- df %>%
+      dplyr::mutate(iycf_mmf = ifelse(is.na(.data$flag_no_foods), .data$iycf_mmf, ifelse(.data$flag_no_foods == 1, 0, .data$iycf_mmf)),
+                    iycf_mmf = ifelse(is.na(.data$flag_yes_foods), .data$iycf_mmf, ifelse(.data$flag_yes_foods == 1, 0, .data$iycf_mmf)),
+                    iycf_mmf = ifelse(is.na(.data$flag_some_foods_no_meal), .data$iycf_mmf, ifelse(.data$flag_some_foods_no_meal == 1, 0, .data$iycf_mmf)))
+  }
+
 
 
   # FSL flags

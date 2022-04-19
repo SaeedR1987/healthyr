@@ -6,6 +6,8 @@
 #' @param df Inputs a dataframe that has been standardized by the format_mortality_current_census function.
 #' @param grouping A character value specifying the column name by which you want to generate disaggregated results for
 #' for the mortality quality summary.
+#' @param short_report Inputs a boolean value TRUE or FALSE to return just key variables. If FALSE,
+#' returns a dataframe of all the variables calculated.
 #' @param file_path Inputs an optional character value specifying the file location to save a copy
 #' of the results.
 #' @param exp_sex_ratio Inputs a numeric value specifying the expected sex ratio in the population.
@@ -33,11 +35,15 @@
 #' \dontrun{create_mortality_quality_report(df)}
 #'
 #' @importFrom rlang .data
-create_mortality_quality_report <- function(df, grouping = NULL, file_path = NULL, exp_sex_ratio = NULL, exp_ratio_0_4 = NULL, exp_ratio_2_5 = NULL, exp_ratio_5_10 = NULL, exp_hh_size = NULL) {
+create_mortality_quality_report <- function(df, grouping = NULL, file_path = NULL, short_report = NULL, exp_sex_ratio = NULL, exp_ratio_0_4 = NULL, exp_ratio_2_5 = NULL, exp_ratio_5_10 = NULL, exp_hh_size = NULL) {
+
+  options(warn=-1)
 
   if(length(setdiff(c("sex", "age_years", "join", "left", "birth", "death", "date_dc", "date_recall"), colnames(df)))>0) {
     stop("It does not appear that the dataset has been formatted yet by the format_mortality_current_census function, as it is missing at least one of the column names of sex, age_years, join, left, birth, death, date_dc, date_recall. Please standardize the data before using this function.")
   }
+
+  if(is.null(short_report)) {short_report <- FALSE}
 
   if(!is.null(exp_sex_ratio)) {
     if(!is.numeric(exp_sex_ratio) & length(exp_sex_ratio)==1) {stop("Invalid input for exp_sex_ratio. Please put a single numeric value for the expected sex ratio in the population of male:female...or leave blank to assume a 1:1 male to female ratio (or 1).")}
@@ -46,11 +52,11 @@ create_mortality_quality_report <- function(df, grouping = NULL, file_path = NUL
     left <- (100*exp_sex_ratio) / tot
     right <- (100) / tot
 
-    sex_ratio <- c(left, right)
+    sx_ratio <- c(left, right)
 
   } else {
     print("No expected sex ratio given, defaulting to 1:1 (male:female).")
-    sex_ratio <- c(1,1)
+    sx_ratio <- c(1,1)
   }
 
   if(!is.null(exp_ratio_0_4)) {
@@ -130,8 +136,8 @@ create_mortality_quality_report <- function(df, grouping = NULL, file_path = NUL
                      births_under5 = sum(!is.na(.data$birth_under5), na.rm = TRUE),
                      deaths = sum(!is.na(.data$death), na.rm = TRUE),
                      deaths_under5 = sum(!is.na(.data$death_under5), na.rm = TRUE),
-                     sex_ratio = round(as.numeric(nipnTK::sexRatioTest(.data$sex, codes = c("1", "2"), pop = sex_ratio)[1]),3),
-                     sex_ratio.pvalue = round(as.numeric(nipnTK::sexRatioTest(.data$sex, codes = c("1", "2"), pop = sex_ratio)[5]),2),
+                     sex_ratio = round(as.numeric(nipnTK::sexRatioTest(.data$sex, codes = c("1", "2"), pop = sx_ratio)[1]),3),
+                     sex_ratio.pvalue = round(as.numeric(nipnTK::sexRatioTest(.data$sex, codes = c("1", "2"), pop = sx_ratio)[5]),2),
                      age_ratio_0_5 = sum(!is.na(.data$age_0to5)) / sum(!is.na(.data$age_5plus)),
                      age_ratio_0_5.pvalue = stats::chisq.test(x = c(sum(!is.na(.data$age_0to5)), sum(!is.na(.data$age_5plus))), p = age_under5_ratio)[3],
                      age_ratio_2_5 = sum(!is.na(.data$age_0to2)) / sum(!is.na(.data$age_2to5)),
@@ -202,9 +208,17 @@ create_mortality_quality_report <- function(df, grouping = NULL, file_path = NUL
 
   df4 <- healthyr::calculate_plausibility_report(df4)
 
+  if(short_report == TRUE) {
+
+    df4 <- df4 %>%
+      dplyr::select(1, .data$cdr_ci,.data$u5dr_ci,.data$deaths, .data$deaths_under5, .data$prop_hh_flag_deaths,
+                    .data$sex_ratio.pvalue, .data$age_ratio_0_5.pvalue,.data$prop_join_people,.data$prop_left_people,
+                    .data$poisson_pvalues.deaths, .data$mort_plaus_score, .data$mort_plaus_score)
+  }
+
   # Saving the new dataframe to a xlsx, if specified
   if(!is.null(file_path)) {writexl::write_xlsx(df4, file_path)}
-
+  options(warn=0)
   return(df4)
 
 

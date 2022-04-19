@@ -8,6 +8,7 @@ create_mortality_quality_report(
   df,
   grouping = NULL,
   file_path = NULL,
+  short_report = NULL,
   exp_sex_ratio = NULL,
   exp_ratio_0_4 = NULL,
   exp_ratio_2_5 = NULL,
@@ -23,6 +24,9 @@ for the mortality quality summary.}
 
 \item{file_path}{Inputs an optional character value specifying the file location to save a copy
 of the results.}
+
+\item{short_report}{Inputs a boolean value TRUE or FALSE to return just key variables. If FALSE,
+returns a dataframe of all the variables calculated.}
 
 \item{exp_sex_ratio}{Inputs a numeric value specifying the expected sex ratio in the population.
 If no value is given, a default value of 1:1 is used.}

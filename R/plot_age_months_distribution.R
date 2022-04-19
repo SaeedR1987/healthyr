@@ -24,7 +24,7 @@ plot_age_months_distribution <- function(df, by_group = NULL, file_path = NULL, 
 
   if( !(c("age_months") %in% colnames(df))) {stop("There is no age_months column in your dataframe. Please check your inputs.")}
 
-  if(max(df$age_months>59)) {
+  if(max(df$age_months, na.rm = TRUE)>59) {
     print("Ages >59 months detected, removed for this graph.")
     df <- df %>% dplyr::filter(.data$age_months <60)
   }

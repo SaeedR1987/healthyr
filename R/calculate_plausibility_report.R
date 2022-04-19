@@ -332,9 +332,6 @@ calculate_plausibility_report <- function(df) {
                                                     ifelse(.data$mad_ratio.pvalue > 0.0001, 10,
                                                            ifelse(.data$mad_ratio.pvalue <= 0.0001, 20, 0)))))
 
-
-
-
   }
 
   if(c("prop_flag_high_mdd_low_mmf") %in% colnames(df)) {
@@ -347,15 +344,15 @@ calculate_plausibility_report <- function(df) {
 
   }
 
-  if(length(setdiff(c("sex_ratio.pvalue", "mad_ratio.pvalue"), names(df)))==0) {
-
-    df <- df %>%
-      dplyr::mutate(plaus_sex_ratio.pvalue = ifelse(.data$sex_ratio.pvalue > 0.05, 0,
-                                             ifelse(.data$sex_ratio.pvalue > 0.01, 2,
-                                                    ifelse(.data$sex_ratio.pvalue > 0.001, 5,
-                                                           ifelse(.data$sex_ratio.pvalue <= 0.001, 10, 0)))))
-
-  }
+  # if(length(setdiff(c("sex_ratio.pvalue", "mad_ratio.pvalue"), names(df)))==0) {
+  #
+  #   df <- df %>%
+  #     dplyr::mutate(plaus_sex_ratio.pvalue = ifelse(.data$sex_ratio.pvalue > 0.05, 0,
+  #                                            ifelse(.data$sex_ratio.pvalue > 0.01, 2,
+  #                                                   ifelse(.data$sex_ratio.pvalue > 0.001, 5,
+  #                                                          ifelse(.data$sex_ratio.pvalue <= 0.001, 10, 0)))))
+  #
+  # }
 
   if(c("age_ratio_under6m_6to23m.pvalue") %in% colnames(df)) {
 
@@ -379,16 +376,16 @@ calculate_plausibility_report <- function(df) {
   if(c("prop_iycf_caregiver" %in% colnames(df))) {
 
     df <- df %>%
-      dplyr::mutate(plaus_prop_iycf_caregiver = ifelse(.data$prop_iycf_caregiver <0.1, 0,
-                                                ifelse(.data$prop_iycf_caregiver < .2, 2,
-                                                       ifelse(.data$prop_iycf_caregiver < 0.3, 5,
-                                                              ifelse(.data$prop_iycf_caregiver <0.4, 10, 5)))))
+      dplyr::mutate(plaus_prop_iycf_caregiver = ifelse(.data$prop_iycf_caregiver >= 0.9, 0,
+                                                ifelse(.data$prop_iycf_caregiver >= .8, 2,
+                                                       ifelse(.data$prop_iycf_caregiver >= 0.7, 5,
+                                                              ifelse(.data$prop_iycf_caregiver >=0.5, 10, 10)))))
 
   }
 
   # IYCF Plausibility Score and Classification
 
-  iycf_plaus_vars <- c("plaus_sdd_mdd", "plaus_age_ratio_under6m_6to23m.pvalue", "plaus_sex_ratio.pvalue",
+  iycf_plaus_vars <- c("plaus_sdd_mdd", "plaus_age_ratio_under6m_6to23m.pvalue", "plaus_sexratio",
                        "plaus_prop_flag_high_mdd_low_mmf", "plaus_mad_ratio.pvalue")
 
   if(length(setdiff(iycf_plaus_vars, colnames(df)))==0) {
@@ -399,7 +396,7 @@ calculate_plausibility_report <- function(df) {
     }
 
     df <- df %>%
-      dplyr::mutate(iycf_plaus_score = .data$plaus_prop_iycf_caregiver + .data$plaus_sdd_mdd + .data$plaus_age_ratio_under6m_6to23m.pvalue + .data$plaus_sex_ratio.pvalue + .data$plaus_prop_flag_high_mdd_low_mmf + .data$plaus_mad_ratio.pvalue,
+      dplyr::mutate(iycf_plaus_score = .data$plaus_prop_iycf_caregiver + .data$plaus_sdd_mdd + .data$plaus_age_ratio_under6m_6to23m.pvalue + .data$plaus_sexratio + .data$plaus_prop_flag_high_mdd_low_mmf + .data$plaus_mad_ratio.pvalue,
              iycf_plaus_cat = ifelse(.data$iycf_plaus_score >=0 & .data$iycf_plaus_score < 10, "Excellent (0-<10)",
                                      ifelse(.data$iycf_plaus_score >= 10 & .data$iycf_plaus_score < 15, "Good (10-<15)",
                                             ifelse(.data$iycf_plaus_score >= 15 & .data$iycf_plaus_score < 25, "Acceptable (15 - <25)",

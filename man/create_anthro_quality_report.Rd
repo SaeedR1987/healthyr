@@ -4,7 +4,12 @@
 \alias{create_anthro_quality_report}
 \title{Create Anthro Quality Report}
 \usage{
-create_anthro_quality_report(df, grouping = NULL, file_path = NULL)
+create_anthro_quality_report(
+  df,
+  grouping = NULL,
+  file_path = NULL,
+  short_report = NULL
+)
 }
 \arguments{
 \item{df}{Inputs a dataframe that has been standardized/formatted y the format_nut_health_indicators function.}
@@ -12,6 +17,9 @@ create_anthro_quality_report(df, grouping = NULL, file_path = NULL)
 \item{grouping}{Inputs an optional character value as a grouping var. If included, results will be grouped by this variable}
 
 \item{file_path}{Inputs an optional character value specifying a file location and name to save a copy of the output.}
+
+\item{short_report}{Inputs a boolean value TRUE or FALSE to return just key variables. If FALSE,
+returns a dataframe of all the variables calculated.}
 }
 \value{
 Returns a dataframe with a results table for the anthropometric indicators.

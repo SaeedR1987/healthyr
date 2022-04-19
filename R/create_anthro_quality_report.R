@@ -6,6 +6,8 @@
 #' @param df Inputs a dataframe that has been standardized/formatted y the format_nut_health_indicators function.
 #' @param grouping Inputs an optional character value as a grouping var. If included, results will be grouped by this variable
 #' @param file_path Inputs an optional character value specifying a file location and name to save a copy of the output.
+#' @param short_report Inputs a boolean value TRUE or FALSE to return just key variables. If FALSE,
+#' returns a dataframe of all the variables calculated.
 #'
 #' @return Returns a dataframe with a results table for the anthropometric indicators.
 #' @export
@@ -13,7 +15,10 @@
 #' @examples
 #' \dontrun{create_anthro_quality_report(df = myanthrodata, index = "wfhz")}
 #' @importFrom rlang .data
-create_anthro_quality_report <- function(df, grouping = NULL, file_path = NULL) {
+create_anthro_quality_report <- function(df, grouping = NULL, file_path = NULL, short_report = NULL) {
+
+  options(warn=-1)
+  if(is.null(short_report)) {short_report <- FALSE}
 
   # check which indexes are present
 
@@ -337,13 +342,23 @@ create_anthro_quality_report <- function(df, grouping = NULL, file_path = NULL) 
     if(!exists("results.table")) {results.table <- df2} else {results.table <- merge(results.table, df2)}
   }
 
-  print(results.table)
-
   if(length(indexes) != 0) {results.table <- healthyr::calculate_plausibility_report(results.table)}
+
+  a <- c("n_clusters", "n_children_wfhz", "prop_smart_flags", "mean_sd", "gam_results", "sam_results",
+         "n_children_muac", "mean_sd_muac", "gam_muac_results", "sam_muac_results",
+         "anthro_plaus_score", "anthro_plaus_cat")
+
+  b <- intersect(a, colnames(results.table))
+
+  if(short_report == TRUE & length(setdiff(b, colnames(results.table)))==0) {
+
+    results.table <- results.table %>%
+      dplyr::select(1, b)
+  }
 
   # Saving the new dataframe to a xlsx, if specified
   if(!is.null(file_path)) {writexl::write_xlsx(results.table, file_path)}
-
+  options(warn=0)
   return(results.table)
 
 }

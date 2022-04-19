@@ -23,6 +23,7 @@ cleaning_log_helper <- function(df, uuid, flag, cols, description = NULL) {
 
   if(is.null(description)) {description = ""}
 
+
   df <- df %>% dplyr::mutate(n = dplyr::row_number())
 
   df <- df %>%
@@ -31,7 +32,7 @@ cleaning_log_helper <- function(df, uuid, flag, cols, description = NULL) {
     tidyr::gather(key = "question.name", value = "old.value", cols) %>%
     dplyr::rename(drop = {{flag}}) %>%
     dplyr::filter(drop != 0) %>%
-    dplyr::mutate(drop = NULL, issue = .data$flag) %>%
+    dplyr::mutate(drop = NULL, issue = flag) %>%
     dplyr::mutate(new.value = "", feedback = "", changed = "") %>%
     dplyr::select(.data$uuid, .data$question.name, .data$issue, .data$feedback, .data$changed, .data$old.value, .data$new.value) %>%
     dplyr::mutate(description = description)

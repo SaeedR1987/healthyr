@@ -5,7 +5,7 @@
 \alias{raw_fsl1}
 \title{SMART Survey Food Security Data - Unprocessed}
 \format{
-A data frame with 509 rows and 47 variables:
+A data frame with 507 rows and 47 variables:
 \describe{
 \item{today}{Date of data collection}
 \item{enum}{The survey team or enumerator ID.}

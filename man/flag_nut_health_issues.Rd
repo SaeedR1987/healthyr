@@ -4,12 +4,14 @@
 \alias{flag_nut_health_issues}
 \title{Flag Nutrition Health Issues}
 \usage{
-flag_nut_health_issues(df)
+flag_nut_health_issues(df, use_flags = NULL)
 }
 \arguments{
 \item{df}{Inputs a dataframe which has already been processed by the format_nut_health_indicators, reformat_nut_health_indicators, and
 calculate_nut_health_indicators functions. This function is not intended to be run directly, and instead is called automatically
 within the format_nut_health_indicators function.}
+
+\item{use_flags}{Optional input to specify if IYCF flags should be automatically blanked in the numerator.}
 }
 \value{
 Returns a dataframe with additional columns of flags/data quality checks for individual records.

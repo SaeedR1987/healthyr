@@ -7,6 +7,7 @@
 create_iycf_quality_report(
   df,
   grouping = NULL,
+  short_report = NULL,
   file_path = NULL,
   exp_prevalence_mad = NULL,
   exp_sex_ratio = NULL,
@@ -19,6 +20,9 @@ the healthyr::format_nut_health_indicators function.}
 
 \item{grouping}{Inputs an optional character value specifying a column name by which
 to group the results.}
+
+\item{short_report}{Inputs a boolean value TRUE or FALSE to return just key variables. If FALSE,
+returns a dataframe of all the variables calculated.}
 
 \item{file_path}{Inputs an optional character value specifying a file_path to save
 an xlsx copy of the results.}

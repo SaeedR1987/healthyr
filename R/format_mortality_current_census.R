@@ -74,9 +74,9 @@
 #'
 #' @importFrom rlang .data
 
-format_mortality_current_census <- function(df_roster, file_path = NULL,  date_dc_roster, enum_roster, cluster_roster, admin1_roster, admin2_roster, hh_id_roster, sex_roster, age_roster, joined_roster, birth_roster,
-                                            df_left, date_dc_left, enum_left, cluster_left, admin1_left, admin2_left, hh_id_left, sex_left, age_left, birth_left, joined_left,
-                                            df_died, date_dc_died, enum_died, cluster_died,admin1_died, admin2_died, hh_id_died, sex_died, age_died, birth_died, joined_died, death_cause, death_location,
+format_mortality_current_census <- function(df_roster, file_path = NULL,  date_dc_roster, enum_roster, cluster_roster, admin1_roster = NULL, admin2_roster = NULL, hh_id_roster, sex_roster, age_roster, joined_roster, birth_roster,
+                                            df_left, date_dc_left, enum_left, cluster_left, admin1_left = NULL, admin2_left = NULL, hh_id_left, sex_left, age_left, birth_left, joined_left,
+                                            df_died, date_dc_died, enum_died, cluster_died, admin1_died = NULL, admin2_died = NULL, hh_id_died, sex_died, age_died, birth_died, joined_died, death_cause, death_location,
                                             date_recall_event) {
 
   if(!methods::hasArg(date_recall_event)) {stop("A date for recall event is required. Please input a character date with a format like dd/mm/yyyy. E.g 28/12/2020. Please check your input.")}
@@ -218,7 +218,7 @@ format_mortality_current_census <- function(df_roster, file_path = NULL,  date_d
   df_mortality <- dplyr::bind_rows(df_roster, df_left)
   df_mortality <- dplyr::bind_rows(df_mortality, df_died)
 
-  df_mortality <- reformat_mortality_current_census(df_mortality)
+  df_mortality <- healthyr::reformat_mortality_current_census(df_mortality)
 
   df_mortality <- df_mortality %>%
     dplyr::mutate(

@@ -9,7 +9,6 @@
 #' @param monthly_expenditures Inputs a character vector of column names for columns of various household expenses in the previous 30 days.
 #' @param period_expenditures Inputs a character vector of column names for columns of various household expenses in a previous, recall period, specified in the num_period_months paramater.
 #' @param num_period_months Inputs a whole integer for the number of months of the period expenditures reported.
-#' @param use_flags Optional input to specify if IYCF flags should be automatically blanked in the numerator.
 #'
 #' @return Returns a data frame with additional columns for new nutrition and health indicators.
 #' @export
@@ -18,7 +17,7 @@
 #' \dontrun{calculate_nut_health_indicators(df)}
 #'
 #' #' @importFrom rlang .data
-calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, period_expenditures = NULL, num_period_months = NULL, use_flags = NULL) {
+calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, period_expenditures = NULL, num_period_months = NULL) {
 
   # Calculating Anthropometric Indices
 
@@ -163,7 +162,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
                mam_muac = ifelse(is.na(.data$muac), NA, ifelse(.data$muac >= 11.5 & .data$muac < 12.5, 1, 0)),
                gam_muac = ifelse(is.na(.data$muac), NA, ifelse(.data$muac < 12.5, 1, 0)),
                sam_muac = ifelse(is.na(.data$oedema), .data$sam_muac, ifelse(.data$oedema == "y", 1, .data$sam_muac)),
-               gam_muac = ifelse(is.na(.data$edema), .data$gam_muac, ifelse(.data$oedema == "y", 1, .data$gam_muac)),
+               gam_muac = ifelse(is.na(.data$oedema), .data$gam_muac, ifelse(.data$oedema == "y", 1, .data$gam_muac)),
                sam_muac = ifelse(.data$age_months < 6 | .data$age_months >=60, NA, .data$sam_muac),
                mam_muac = ifelse(.data$age_months < 6 | .data$age_months >=60, NA, .data$mam_muac),
                gam_muac = ifelse(.data$age_months < 6 | .data$age_months >=60, NA, .data$gam_muac))
@@ -306,7 +305,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
                                       ifelse(.data$iycf_6a == 2 & .data$iycf_6b == 2 & .data$iycf_6c == 2 & .data$iycf_6d == 2 & .data$iycf_6e == 2 & .data$iycf_6f == 2 & .data$iycf_6g == 2 & .data$iycf_6h == 2 & .data$iycf_6i == 2 & .data$iycf_6j == 2 & .data$iycf_7a == 2 & .data$iycf_7b == 2 & .data$iycf_7c == 2 & .data$iycf_7d == 2 & .data$iycf_7e == 2 & .data$iycf_7f == 2 & .data$iycf_7g == 2 & .data$iycf_7h == 2 & .data$iycf_7i == 2 & .data$iycf_7j == 2 & .data$iycf_7k== 2 & .data$iycf_7l == 2 & .data$iycf_7m == 2 & .data$iycf_7n == 2 & .data$iycf_7o == 2 & .data$iycf_7p == 2 & .data$iycf_7q == 2 & .data$iycf_7r == 2, 1, 0))),
       )
 
-    if(!is.null(use_flags) & use_flags == "yes") {df <- df %>% dplyr::mutate(iycf_ebf = ifelse(is.na(.data$flag_all_liquids), .data$iycf_ebf, ifelse(.data$flag_all_liquids == 1, 0, .data$iycf_ebf)))}
+
 
   }
 
@@ -376,13 +375,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       dplyr::mutate(iycf_mdd_cat = ifelse(is.na(.data$age_months) | .data$age_months <6 | .data$age_months >23, NA, ifelse(.data$iycf_mdd_score >=5 & .data$iycf_mdd_score <10, 1, 0)),
       )
 
-    if(!is.null(use_flags) & use_flags == "yes") {
-      df <- df %>%
-        dplyr::mutate(iycf_mdd_score = ifelse(is.na(.data$flag_yes_foods), .data$iycf_mdd_score, ifelse(.data$flag_yes_foods == 1, NA, .data$iycf_mdd_score)),
-               iycf_mdd_score = ifelse(is.na(.data$flag_no_foods), .data$iycf_mdd_score, ifelse(.data$flag_no_foods == 1, NA, .data$iycf_mdd_score)),
-               iycf_mdd_cat = ifelse(is.na(.data$flag_no_foods), .data$iycf_mdd_cat, ifelse(.data$flag_no_foods == 1, 0, .data$iycf_mdd_cat)),
-               iycf_mdd_cat = ifelse(is.na(.data$flag_yes_foods), .data$iycf_mdd_cat, ifelse(.data$flag_yes_foods == 1, 0, .data$iycf_mdd_cat)))
-    }
+
 
   }
 
@@ -406,12 +399,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       )
 
 
-    if(!is.null(use_flags) & use_flags == "yes") {
-      df <- df %>%
-        dplyr::mutate(iycf_mmf = ifelse(is.na(.data$flag_no_foods), .data$iycf_mmf, ifelse(.data$flag_no_foods == 1, 0, .data$iycf_mmf)),
-               iycf_mmf = ifelse(is.na(.data$flag_yes_foods), .data$iycf_mmf, ifelse(.data$flag_yes_foods == 1, 0, .data$iycf_mmf)),
-               iycf_mmf = ifelse(is.na(.data$flag_some_foods_no_meal), .data$iycf_mmf, ifelse(.data$flag_some_foods_no_meal == 1, 0, .data$iycf_mmf)))
-    }
+
 
 
   }
@@ -441,14 +429,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
 
       )
 
-    if(!is.null(use_flags) & use_flags == "yes") {
 
-      df <- df %>%
-        dplyr::mutate(iycf_mad = ifelse(is.na(.data$flag_no_foods), .data$iycf_mad, ifelse(.data$flag_no_foods == 1, 0, .data$iycf_mad)),
-               iycf_mad = ifelse(is.na(.data$flag_yes_foods), .data$iycf_mad, ifelse(.data$flag_yes_foods == 1, 0, .data$iycf_mad)),
-               iycf_mad = ifelse(is.na(.data$lag_some_foods_no_meal), .data$iycf_mad, ifelse(.data$flag_some_foods_no_meal == 1, 0, .data$iycf_mad)))
-
-    }
 
 
   }
@@ -463,10 +444,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       dplyr::mutate(iycf_eff = ifelse(is.na(.data$age_months) | .data$age_months < 6 | .data$age_months > 23, NA, ifelse(.data$iycf_7i == 1 | .data$iycf_7j == 1 | .data$iycf_7k == 1 | .data$iycf_7l == 1 | .data$iycf_7m == 1, 1, 0)),
       )
 
-    if(!is.null(use_flags) & use_flags == "yes") {
-      df <- df %>% dplyr::mutate(iycf_eff = ifelse(is.na(.data$flag_no_foods), .data$iycf_eff, ifelse(.data$flag_no_foods == 1, 0 , .data$iycf_eff)),
-                          iycf_eff = ifelse(is.na(.data$flag_yes_foods), .data$iycf_eff, ifelse(.data$flag_yes_foods == 1, 0, .data$iycf_eff)))
-    }
+
 
   }
 
@@ -480,9 +458,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       dplyr::mutate(iycf_swb = ifelse(is.na(.data$iycf_6c_swt) | is.na(.data$iycf_6d_swt) | is.na(.data$iycf_6e) | is.na(.data$iycf_6f) | is.na(.data$iycf_6g) | is.na(.data$iycf_6h_swt) | is.na(.data$iycf_6j_swt) | .data$age_months < 6 | .data$age_months > 23, NA, ifelse(.data$iycf_6c_swt == 1 | .data$iycf_6d_swt == 1 | .data$iycf_6e == 1 | .data$iycf_6f == 1 | .data$iycf_6g == 1 | .data$iycf_6h_swt == 1 | .data$iycf_6j_swt == 1, 1, 0)),
       )
 
-    if(!is.null(use_flags) & use_flags == "yes") {
-      df <- df %>% dplyr::mutate(iycf_swb = ifelse(is.na(.data$flag_yes_liquids), .data$iycf_swb, ifelse(.data$flag_yes_liquids == 1, 0, .data$iycf_swb)))
-    }
+
 
   }
 
@@ -496,9 +472,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       dplyr::mutate(iycf_ufc = ifelse(is.na(.data$iycf_7p) | is.na(.data$iycf_7q) | .data$age_months < 6 | .data$age_months > 23, NA, ifelse(.data$iycf_7p == 1 | .data$iycf_7q == 1, 1, 0)),
       )
 
-    if(!is.null(use_flags) & use_flags == "yes") {
-      df <- df %>% dplyr::mutate(iycf_ufc = ifelse(is.na(.data$flag_yes_foods), .data$iycf_ufc, ifelse(.data$flag_yes_foods == 1, 0, .data$iycf_ufc)))
-    }
+
 
   }
 
@@ -520,10 +494,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       dplyr::mutate(iycf_zvf = ifelse(is.na(.data$zvf_sum), 0, ifelse(.data$zvf_sum == 5, 1, 0)),
              iycf_zvf = ifelse(is.na(.data$age_months) | .data$age_months <6 | .data$age_months >23, NA, .data$iycf_zvf))
 
-    if(!is.null(use_flags) & use_flags == "yes") {
-      df <- df %>% dplyr::mutate(iycf_zvf = ifelse(is.na(.data$flag_no_foods), .data$iycf_zvf, ifelse(.data$flag_no_foods == 1, 0, .data$iycf_zvf)),
-                          iycf_zvf = ifelse(is.na(.data$flag_yes_foods), .data$iycf_zvf, ifelse(.data$flag_yes_foods == 1, 0, .data$iycf_zvf)))
-    }
+
 
   }
 

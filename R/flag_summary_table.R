@@ -22,7 +22,7 @@ flag_summary_table <- function(df, grouping = NULL) {
   if(is.null(grouping)) {
 
     df1 <- df %>%
-      dplyr::select(c(dplyr::starts_with('flag'))) %>%
+      dplyr::select(c(dplyr::contains('flag_'), dplyr::contains('_flag'))) %>%
       dplyr::summarise_all(sum, na.rm = TRUE)
 
     df1 <- as.data.frame(t(df1))
@@ -33,7 +33,7 @@ flag_summary_table <- function(df, grouping = NULL) {
   } else if(!is.null(grouping)) {
 
     df1 <- df %>%
-      dplyr::select(c(grouping, dplyr::starts_with('flag'))) %>%
+      dplyr::select(c(grouping, dplyr::contains('flag_'), dplyr::contains('_flag'))) %>%
       dplyr::rename(group = {{grouping}}) %>%
       dplyr::group_by(.data$group) %>%
       dplyr::summarise_all(sum, na.rm = TRUE)

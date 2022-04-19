@@ -10,6 +10,8 @@
 #' the healthyr::format_nut_health_indicators function.
 #' @param grouping Inputs an optional character value specifying a column name by which
 #' to group the results.
+#' @param short_report Inputs a boolean value TRUE or FALSE to return just key variables. If FALSE,
+#' returns a dataframe of all the variables calculated.
 #' @param file_path Inputs an optional character value specifying a file_path to save
 #' an xlsx copy of the results.
 #' @param exp_prevalence_mad Input for a numeric value on the expected prevalence of the
@@ -31,7 +33,10 @@
 #' \dontrun{create_iycf_quality_report(df, grouping = "enum",
 #' file_path = "myreports/iycf_report.xlsx", exp_prevalence_mad = 0.12, exp_sex_ratio = 1.1)}
 #' @importFrom rlang .data
-create_iycf_quality_report <- function(df, grouping = NULL, file_path = NULL, exp_prevalence_mad = NULL, exp_sex_ratio = NULL, exp_ratio_under6m_6to23m = NULL) {
+create_iycf_quality_report <- function(df, grouping = NULL, short_report = NULL, file_path = NULL, exp_prevalence_mad = NULL, exp_sex_ratio = NULL, exp_ratio_under6m_6to23m = NULL) {
+  options(warn=-1)
+
+  if(is.null(short_report)) {short_report <- FALSE}
 
   if(!methods::hasArg(grouping)) {
     df <- df %>% dplyr::mutate(group = "All")
@@ -60,11 +65,11 @@ create_iycf_quality_report <- function(df, grouping = NULL, file_path = NULL, ex
     left <- (100*exp_sex_ratio) / tot
     right <- (100) / tot
 
-    sex_ratio <- c(left, right)
+    sx_ratio <- c(left, right)
 
   } else {
     print("No expected sex ratio given, defaulting to 1:1 (male:female).")
-    sex_ratio <- c(1,1)
+    sx_ratio <- c(1,1)
   }
 
   if(!is.null(exp_ratio_under6m_6to23m)) {
@@ -139,8 +144,8 @@ create_iycf_quality_report <- function(df, grouping = NULL, file_path = NULL, ex
 
     df2 <- df %>%
       dplyr::group_by(!!rlang::sym(grouping)) %>%
-      dplyr::summarize(sex_ratio = round(as.numeric(nipnTK::sexRatioTest(.data$sex, codes = c("1", "2"), pop = sex_ratio)[1]),3),
-                       sex_ratio.pvalue = round(as.numeric(nipnTK::sexRatioTest(.data$sex, codes = c("1", "2"), pop = sex_ratio)[5]),2))
+      dplyr::summarize(sex_ratio = round(as.numeric(nipnTK::sexRatioTest(.data$sex, codes = c("1", "2"), pop = sx_ratio)[1]),3),
+                       sex_ratio.pvalue = round(as.numeric(nipnTK::sexRatioTest(.data$sex, codes = c("1", "2"), pop = sx_ratio)[5]),2))
 
     if(!exists("results")) {results <- df2} else {results <- merge(results, df2)}
 
@@ -250,14 +255,35 @@ create_iycf_quality_report <- function(df, grouping = NULL, file_path = NULL, ex
 
     if(!exists("results")) {results <- df2} else {results <- merge(results, df2)}
 
+  } else {
+
+    df2 <- df %>%
+      dplyr::group_by(!!rlang::sym(grouping)) %>%
+      dplyr::summarise(prop_iycf_caregiver = 0)
+
+    if(!exists("results")) {results <- df2} else {results <- merge(results, df2)}
+
   }
 
   results <- healthyr::calculate_plausibility_report(df = results)
-  print(results)
+
+  a <- c("n", "prop_mad_obs", "mad_ratio.pvalue", "age_ratio_under6m_6to23m",
+         "sex_ratio", "sex_ratio.pvalue",
+         "age_ratio_under6m_6to23m.pvalue", "prop_iycf_caregiver", "prop_flag_high_mdd_low_mmf",
+         "iycf_plaus_score", "iycf_plaus_cat")
+
+  b <- intersect(a, colnames(results))
+
+  if(short_report == TRUE & length(setdiff(b, colnames(results)))==0) {
+
+    results <- results %>%
+      dplyr::select(1, b)
+
+  }
 
   # Saving the new dataframe to a xlsx, if specified
   if(!is.null(file_path)) {writexl::write_xlsx(results, file_path)}
-
+  options(warn=0)
   return(results)
 
 }

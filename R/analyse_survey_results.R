@@ -36,13 +36,16 @@ analyse_survey_results <- function(df, file_path = NULL,
                                    ratios_rates.denominators = NULL,
                                    ratios_rates.multiplier = NULL) {
 
+  if(dplyr::is_grouped_df(df)) {df <- df %>% dplyr::ungroup()}
+
+
   # Check if proportions coded as 0 / 1
 
   if(!is.null(proportions)) {
 
     proportion_values <- df %>% dplyr::select(proportions) %>% t %>% c %>% unique
 
-    if(length(setdiff(proportion_values, c(1, 0, NA)))==0) {
+    if(length(setdiff(proportion_values, c(1, 0)))==0) {
 
       print("Good - proportion values are coded as 1/0 for yes/no")
 
@@ -53,6 +56,8 @@ analyse_survey_results <- function(df, file_path = NULL,
       for (i in 1:length(proportions_list)) {
 
         col_values <- df %>% dplyr::select(proportions_list[[i]]) %>% t %>% c %>% unique
+        print(col_values)
+
 
         if(length(setdiff(col_values, c(1,0,NA)))==0) {
 
@@ -150,11 +155,12 @@ analyse_survey_results <- function(df, file_path = NULL,
 
     }
 
+    df[ratios_rates.numerators] <- lapply(df[ratios_rates.numerators], as.numeric)
+    df[ratios_rates.denominators] <- lapply(df[ratios_rates.denominators], as.numeric)
     # df <- df %>% mutate_at(.vars = c(ratios_rates.numerators, ratios_rates.denominators))
     df <- df %>% dplyr::mutate(dplyr::across(c(ratios_rates.numerators, ratios_rates.denominators), ~replace_na(.x, 0)))
 
-    df[ratios_rates.numerators] <- lapply(df[ratios_rates.numerators], as.numeric)
-    df[ratios_rates.denominators] <- lapply(df[ratios_rates.denominators], as.numeric)
+
 
     # change all NA values to 0s
 
@@ -268,5 +274,10 @@ analyse_survey_results <- function(df, file_path = NULL,
 
   if(!is.null(file_path)) {writexl::write_xlsx(results, file_path)}
 
+  print(cat("\n Please note, if there were missing values in one of your categorical variables, it will be included in the results as  he proportion out of the total. The rest of the categorical values will be calculated out of the total of non-NA values \n"))
+
   return(results)
 }
+
+
+

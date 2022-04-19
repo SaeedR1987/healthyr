@@ -8,7 +8,7 @@
 #'
 #' @usage data(proc_fsl1)
 #'
-#' @format A data frame with 509 rows and 47 variables:
+#' @format A data frame with 507 rows and 47 variables:
 #' \describe{
 #'   \item{today}{Date of data collection}
 #'   \item{enum}{The survey team or enumerator ID.}

@@ -8,8 +8,7 @@ calculate_nut_health_indicators(
   df,
   monthly_expenditures = NULL,
   period_expenditures = NULL,
-  num_period_months = NULL,
-  use_flags = NULL
+  num_period_months = NULL
 )
 }
 \arguments{
@@ -20,8 +19,6 @@ calculate_nut_health_indicators(
 \item{period_expenditures}{Inputs a character vector of column names for columns of various household expenses in a previous, recall period, specified in the num_period_months paramater.}
 
 \item{num_period_months}{Inputs a whole integer for the number of months of the period expenditures reported.}
-
-\item{use_flags}{Optional input to specify if IYCF flags should be automatically blanked in the numerator.}
 }
 \value{
 Returns a data frame with additional columns for new nutrition and health indicators.

@@ -22,6 +22,7 @@
 create_cleaning_log_flags <- function(df, uuid_col, file_path = NULL) {
 
   if(is.null(uuid_col)) { stop("Must specify a uuid_col, or any column that is specific for each record in the dataset. Please revise your input.")}
+  if(dplyr::is_grouped_df(df)) {df <- df %>% dplyr::ungroup()}
 
   uuid <- c("")
   question.name <- c("")
@@ -106,7 +107,9 @@ create_cleaning_log_flags <- function(df, uuid_col, file_path = NULL) {
   #
   # #anthropometric flags
   if(length(setdiff(c("wfhz_smart_flag", "weight", "height"), names(df)))==0) {
+    print((names(cl)))
     cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "wfhz_smart_flag", cols = c("weight", "height"), description = "Extreme weight-for-height z-score detected. Check weight and height inputs for data entry errors, or check with enuemrator for measurement errors.")
+    print((names(cl2)))
     cl <- rbind(cl, cl2)
   }
   if(length(setdiff(c("hfaz_smart_flag", "height", "age_months"), names(df)))==0) {
