@@ -9,6 +9,7 @@
 #' 'hfaz' for height-for-age, 'wfaz' for weight-for-age, or 'mfaz' for MUAC-for-age.
 #' @param flags Inputs a character value of 'yes' or 'no'. Yes specifies to include flagged values in the plot. No specifies
 #' to exclude flagged values in the plot.
+#' @param grouping Inputs an optional character value to facet the plot by.
 #' @param file_path Inputs an optional character value specifying the file path location to save
 #' an image of the plot. Recommended to specify as a .jpg or .png file.
 #' @param wdth Inputs an optional numeric value for the width of the image.
@@ -23,7 +24,7 @@
 #' wdth = 10, hght = 8, title_name = "Distribution of WFH Z-scores, County X")}
 #' @importFrom rlang .data
 #' @importFrom stats density
-plot_zscore_distribution <- function(df, index, flags, file_path = NULL, wdth = NULL, hght = NULL, title_name = NULL) {
+plot_zscore_distribution <- function(df, index, flags, grouping = NULL, file_path = NULL, wdth = NULL, hght = NULL, title_name = NULL) {
   options(warn = -1)
   anthro_cols <- c("wfhz_noflag", "hfaz_noflag", "wfaz_noflag", "mfaz_noflag")
   valid_indexes <- c("wfhz", "hfaz", "wfaz", "mfaz")
@@ -44,14 +45,32 @@ plot_zscore_distribution <- function(df, index, flags, file_path = NULL, wdth = 
 
   if(length(setdiff(var, colnames(df)))!=0) {stop("The specific anthropometric column indicated is not in your dataframe. Please check your input.")}
 
-  data_norm <- as.data.frame(graphics::curve(stats::dnorm(x, mean = 0, sd = 1), from = -6, to = 6))
+  if(is.null(grouping)) {
 
-  g <- ggplot2::ggplot(df, ggplot2::aes(get(var))) +
-    ggplot2::geom_histogram(ggplot2::aes(x=get(var), y=ggplot2::after_stat(density)), bins=100, fill="#d3d3d3", color="gray", alpha = 0.8) +
-    ggplot2::geom_density(color="blue", size = 1) +  ggplot2::xlim(c(-6, 5)) +
-    ggplot2::geom_line(data = data_norm, ggplot2::aes(x = .data$x, y = .data$y), color = "darkred", size = 1.2) +
-    ggplot2::geom_vline(xintercept = c(-3, 3), color = "red", size = 0.5) +
-    ggplot2::geom_vline(xintercept = c(-2, 2), color = "orange") + ggplot2::xlab(index) + ggplot2::theme_minimal()
+    data_norm <- as.data.frame(graphics::curve(stats::dnorm(x, mean = 0, sd = 1), from = -6, to = 6))
+
+    g <- ggplot2::ggplot(df, ggplot2::aes(get(var))) +
+      ggplot2::geom_histogram(ggplot2::aes(x=get(var), y=ggplot2::after_stat(density)), bins=100, fill="#d3d3d3", color="gray", alpha = 0.8) +
+      ggplot2::geom_density(color="blue", size = 1) +  ggplot2::xlim(c(-6, 5)) +
+      ggplot2::geom_line(data = data_norm, ggplot2::aes(x = .data$x, y = .data$y), color = "darkred", size = 1.2) +
+      ggplot2::geom_vline(xintercept = c(-3, 3), color = "red", size = 0.5) +
+      ggplot2::geom_vline(xintercept = c(-2, 2), color = "orange") + ggplot2::xlab(index) + ggplot2::theme_minimal()
+
+  }
+
+  if(!is.null(grouping)) {
+
+    data_norm <- as.data.frame(graphics::curve(stats::dnorm(x, mean = 0, sd = 1), from = -6, to = 6))
+
+    df <- df %>% dplyr::rename(group_var = {{grouping}})
+
+    g <- ggplot2::ggplot(df, ggplot2::aes(x = get(var), color = as.factor(get("group_var")))) +
+      ggplot2::geom_density(size = 1) +  ggplot2::xlim(c(-6, 5)) +
+      ggplot2::geom_line(data = data_norm, ggplot2::aes(x = .data$x, y = .data$y), color = "darkred", size = 1.2) +
+      ggplot2::geom_vline(xintercept = c(-3, 3), color = "red", size = 0.5) +
+      ggplot2::geom_vline(xintercept = c(-2, 2), color = "orange") + ggplot2::xlab(index) + ggplot2::theme_minimal() + ggplot2::labs(color=paste0(grouping))
+
+  }
 
   if(!is.null(title_name)) {g <- g + ggplot2::ggtitle(title_name)}
 

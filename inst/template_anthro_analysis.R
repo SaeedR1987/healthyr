@@ -43,6 +43,10 @@ df3 <- flag_anthro_issues(df2, grouping = "enum")
 (create_anthro_quality_report(df = df3, grouping = "enum", short_report = FALSE))
 
 # Step 4: Evaluate Data with Visualizations ####
+# Use 'wfhz' for index for Weight for Height z-score
+# Use 'hfaz' for index for Height for Age z-score
+# Use 'wfaz' for index for Weight for Age z-score
+# Use 'mfaz' for index for MUAC for Age z-score
 
 (plot_age_months_distribution(df3))
 
@@ -52,7 +56,17 @@ df3 <- flag_anthro_issues(df2, grouping = "enum")
 
 (plot_zscore_distribution(df = df3, index = "wfhz", flags = "yes"))
 
+(plot_zscore_distribution(df = df3, index = "wfhz", flags = "no", grouping = "enum"))
+
 (plot_anthro_age_distribution(df = df3, index = "wfhz"))
+
+(plot_cumulative_distribution(df = df3, index = "muac", flags = "no"))
+
+(plot_cumulative_distribution(df = df3, index = "muac", flags = "yes", grouping = "enum"))
+
+(plot_cumulative_distribution(df = df3, index = "wfhz", flags = "no"))
+
+(plot_cumulative_distribution(df = df3, index = "wfhz", flags = "no", grouping = "enum"))
 
 # Step 5: Export Flagged Records to Cleaning Log + Cleaning ####
 

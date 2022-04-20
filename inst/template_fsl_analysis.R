@@ -45,7 +45,6 @@ df2 <- format_nut_health_indicators(df = df,
 (plot_ridge_distribution(df2, numeric_cols = c("fcs_cereal", "fcs_dairy", "fcs_veg", "fcs_fruit", "fcs_legumes", "fcs_sugar", "fcs_oil"),
                          name_groups = "Food Groups", name_units = "Days", grouping = "enum"))
 
-
 (plot_ridge_distribution(df2, numeric_cols = c("rcsi_lesspreferred_1", "rcsi_borrowfood_2", "rcsi_limitportion_3","rcsi_restrict_4", "rcsi_reducemeals5"),
                          name_groups = "Food Coping Strategy", name_units = "Days"))
 
