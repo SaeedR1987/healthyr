@@ -90,7 +90,7 @@ program such as OTP or TSFP at the time of interview.}
 \item{state_admin1}{The administrative level 1 name of the county where the survey took place.}
 \item{county_admin2}{The administrative level 2 name of the county where the survey took place.}
 \item{residency_status}{Residency status of the household as Resident, IDP, IDP Returnee, or Refugee Returnee.}
-\item{cluster_id}{The cluster id.}
+\item{cluster}{The cluster id.}
 \item{date_dc_date}{Date of data collection, as a date type variable.}
 \item{date_dc_month}{Month of data collection.}
 \item{date_dc_day}{Day of the month of data collection.}

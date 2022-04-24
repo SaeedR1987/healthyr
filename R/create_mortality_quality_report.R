@@ -213,7 +213,7 @@ create_mortality_quality_report <- function(df, grouping = NULL, file_path = NUL
     df4 <- df4 %>%
       dplyr::select(1, .data$cdr_ci,.data$u5dr_ci,.data$deaths, .data$deaths_under5, .data$prop_hh_flag_deaths,
                     .data$sex_ratio.pvalue, .data$age_ratio_0_5.pvalue,.data$prop_join_people,.data$prop_left_people,
-                    .data$poisson_pvalues.deaths, .data$mort_plaus_score, .data$mort_plaus_score)
+                    .data$poisson_pvalues.deaths, .data$mort_plaus_score, .data$mort_plaus_cat)
   }
 
   # Saving the new dataframe to a xlsx, if specified

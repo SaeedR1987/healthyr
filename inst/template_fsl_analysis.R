@@ -33,6 +33,8 @@ df2 <- format_nut_health_indicators(df = df,
 
 (create_fsl_quality_report(df = df2, short_report = TRUE))
 
+(create_fsl_quality_report(df = df2, short_report = FALSE))
+
 (create_fsl_quality_report(df = df2, grouping = "enum", short_report = TRUE))
 
 (create_fsl_quality_report(df = df2, grouping = "enum", short_report = FALSE))
@@ -51,7 +53,7 @@ df2 <- format_nut_health_indicators(df = df,
 (plot_ridge_distribution(df2, numeric_cols = c("rcsi_lesspreferred_1", "rcsi_borrowfood_2", "rcsi_limitportion_3","rcsi_restrict_4", "rcsi_reducemeals5"),
                          name_groups = "Food Coping Strategy", name_units = "Days", grouping = "enum"))
 
-(plot_correlogram(df2, numeric_cols = c("fcs_score", "hhs_score", "rcsi_score", "hdds_score")))
+(plot_correlogram(df2, numeric_cols = c("fcs_score", "hdds_score", "rcsi_score",  "hhs_score")))
 
 # Step 5: Export Flagged Records to Cleaning Log + Cleaning ####
 

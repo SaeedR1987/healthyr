@@ -9,6 +9,7 @@ plot_age_years_distribution(
   by_group = NULL,
   min_age = NULL,
   max_age = NULL,
+  breaks = NULL,
   file_path = NULL,
   wdth = NULL,
   hght = NULL,
@@ -25,6 +26,8 @@ to facet the plot.}
 \item{min_age}{Inputs a numeric value for the minimum age in years to include in the plot.}
 
 \item{max_age}{Inputs a numeric value for the maximum age in years to include in the plot.}
+
+\item{breaks}{Inputs a numeric value for how many years between ticks to plot.}
 
 \item{file_path}{Inputs an optional character value specifying the file path location to save
 an image of the plot. Recommended to specify as a .jpg or .png file.}

@@ -28,6 +28,7 @@ plot_agepyramid <- function(df, age_grouping = NULL, filtering = NULL, file_path
 
   if(is.null(age_grouping)) {age_grouping <- "age_group"}
 
+
   if(!is.null(filtering)) {
     print("Please note, if using filtering the variable must be coded numerically by 0s and 1s")
     df <- df %>%
