@@ -273,10 +273,10 @@ calculate_plausibility_report <- function(df) {
 
     df <- df %>%
       dplyr::mutate(plaus_corr.fcs_rcsi = ifelse(.data$corr.fcs_rcsi < -0.2 & .data$corr.fcs_rcsi.pvalue < 0.05, 0,
-                                                 ifelse(.data$corr_rcsi < -0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 3,
+                                                 ifelse(.data$corr.fcs_rcsi < -0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 3,
                                                         ifelse(.data$corr.fcs_rcsi >= -0.2 & .data$corr.fcs_rcsi < 0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 5,
                                                                ifelse(.data$corr.fcs_rcsi >= -0.2 & .data$corr.fcs_rcsi < 0.2 & .data$corr.fcs_rcsi.pvalue < 0.05, 10,
-                                                                      ifelse(.data$fcs_rcsi >= 0.2 & .data$corr.fcs_rcsi >= 0.05, 12,
+                                                                      ifelse(.data$corr.fcs_rcsi >= 0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 12,
                                                                              ifelse(.data$corr.fcs_rcsi >= 0.2 & .data$corr.fcs_rcsi.pvalue < 0.05, 15, 0)))))))
   }
   if(length(setdiff(c("corr.fcs_hhs", "corr.fcs_hhs.pvalue"), names(df)))==0) {
@@ -286,17 +286,17 @@ calculate_plausibility_report <- function(df) {
                                                 ifelse(.data$corr.fcs_hhs < -0.2 & .data$corr.fcs_hhs.pvalue >= 0.05, 1,
                                                        ifelse(.data$corr.fcs_hhs >= -0.2 & .data$corr.fcs_hhs < 0.2 & .data$corr.fcs_hhs.pvalue >= 0.05, 2,
                                                               ifelse(.data$corr.fcs_hhs >= -0.2 & .data$corr.fcs_hhs < 0.2 & .data$corr.fcs_hhs.pvalue < 0.05, 3,
-                                                                     ifelse(.data$corr_fcs_hhs >= 0.2 & .data$corr.fcs_hhs.pvalue >= 0.05, 4,
+                                                                     ifelse(.data$corr.fcs_hhs >= 0.2 & .data$corr.fcs_hhs.pvalue >= 0.05, 4,
                                                                             ifelse(.data$corr.fcs_hhs >= 0.2 & .data$corr.fcs_hhs.pvalue < 0.05, 5, 0)))))))
   }
   if(length(setdiff(c("corr.hhs_rcsi", "corr.hhs_rcsi.pvalue"), names(df)))==0) {
 
     df <- df %>%
       dplyr::mutate(plaus_corr.hhs_rcsi = ifelse(.data$corr.hhs_rcsi > 0.2 & .data$corr.hhs_rcsi.pvalue < 0.05, 0,
-                                                 ifelse(.data$corr.hhs_rcsi > 0.2 & .data$corr_hhs.rcsi.pvalue >= 0.05, 1,
+                                                 ifelse(.data$corr.hhs_rcsi > 0.2 & .data$corr.hhs_rcsi.pvalue >= 0.05, 1,
                                                         ifelse(.data$corr.hhs_rcsi > -0.2 & .data$corr.hhs_rcsi <= 0.2 & .data$corr.hhs_rcsi.pvalue < 0.05, 2,
                                                                ifelse(.data$corr.hhs_rcsi > -0.2 & .data$corr.hhs_rcsi <= 0.2 & .data$corr.hhs_rcsi.pvalue >= 0.05, 3,
-                                                                      ifelse(.data$hhs_rcsi <= -0.2 & .data$corr.hhs_rcsi.pvalue >= 0.05, 4,
+                                                                      ifelse(.data$corr.hhs_rcsi <= -0.2 & .data$corr.hhs_rcsi.pvalue >= 0.05, 4,
                                                                              ifelse(.data$corr.hhs_rcsi <= -0.2 & .data$corr.hhs_rcsi.pvalue < 0.05, 5, 0)))))))
   }
   if(length(setdiff(c("poisson_pvalues.hhs_very_severe"), names(df)))==0) {

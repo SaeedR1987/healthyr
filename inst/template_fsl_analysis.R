@@ -18,6 +18,8 @@ library(healthyr)
 
 df <- raw_fsl1
 
+?raw_fsl1
+
 # Step 2: Format Your Dataset ####
 
 df2 <- format_nut_health_indicators(df = df,
@@ -65,8 +67,10 @@ View(cl)
 # Step 6: Analyse Survey Results ####
 
 (res <- analyse_survey_results(df = df2,
+                               aggregation = "enum",
                                   sample_design = "two_stage_cluster",
                                   cluster = "cluster",
+
                                   proportions = c("fcs_cat", "hhs_cat", "hdds_cat", "rcsi_cat", "lcs_cat",
                                                   "fc_phase", "fclc_phase"),
                                   means = c("fcs_score", "hhs_score", "rcsi_score")))
