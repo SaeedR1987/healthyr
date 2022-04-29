@@ -171,12 +171,6 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
       df <- df %>% dplyr::mutate(age_days = ifelse(is.na(.data$age_months), NA, floor(.data$age_months*(365.25/12))))
     }
 
-    df$age_group <- cut(as.numeric(df$age_years),
-                        breaks = c(-1,4,9,14,19,24,29,34,39,44,49,54,59,64,69,74,79,84, Inf),
-                        labels = c("0-4", "5-9", "10-14", "15-19",
-                                   "20-24", "25-29", "30-34", "35-39","40-44", "45-49", "50-54", "55-59",
-                                   "60-64", "65-69", "70-74", "75-79", "80-84", "85+"))
-
     if(c("age_proxy") %in% names(df)) {
 
       df <- df %>%
@@ -209,6 +203,12 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
     } else {
       df <- df %>% dplyr::mutate(age_months = ifelse(is.na(.data$age_years), NA, .data$age_years*12))
     }
+
+    df$age_group <- cut(as.numeric(df$age_years),
+                        breaks = c(-1,4,9,14,19,24,29,34,39,44,49,54,59,64,69,74,79,84, Inf),
+                        labels = c("0-4", "5-9", "10-14", "15-19",
+                                   "20-24", "25-29", "30-34", "35-39","40-44", "45-49", "50-54", "55-59",
+                                   "60-64", "65-69", "70-74", "75-79", "80-84", "85+"))
 
   }
 

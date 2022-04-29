@@ -94,7 +94,7 @@ df2 <- format_mortality_current_census(date_recall_event = "21/04/2019",
 
 (t(create_mortality_quality_report(df2,
                                  grouping = "enum",
-                                 short_report = FALSE,
+                                 short_report = TRUE,
                                  exp_sex_ratio = 1,
                                  exp_ratio_0_4 = (0.19 / 1 - 0.19),
                                  exp_ratio_2_5 = (0.4 / (1 - 0.4)),

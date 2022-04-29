@@ -18,30 +18,38 @@ library(healthyr)
 
 df <- raw_anthro_iycf2
 
+df <- readxl::read_xlsx("nutrition_example_group3.xlsx")
+
 # Step 2: Format Your Dataset ####
 
 df2 <- format_nut_health_indicators(df = df, use_flags_yn = "yes",
-                                    hhid = "household_id",
-                                    date_of_dc = "date_of_interview",
-                                    enum = "team_number",
+
+                                    hhid = "parent_index",
+                                    date_of_dc = "interview_section_n1_n_ref_a_date",
+                                    enum = "a_03_supervisor_name",
                                     cluster = "cluster_id",
                                     date_of_birth = "date_of_birth_of_name",
                                     age_months_var = "interview_section_n1_j_childage",
                                     sex_var = "sex_of_name",
 
-                                    iycf_1 = "ever_breastfed", # ever breastfed (y/n)
-                                    iycf_2 = "first_put_to_breast", # how long after birth breastfed
-                                    iycf_3 = "breastmilk_first_two_days", # given anything to eat/drink in first 2 days after delivery
-                                    iycf_4 = "breastfed_yesterday", # breastfed yesterday during the day or night (y/n)
-                                    iycf_5 = "bottle_with_nipple", # drink anything from bottle with a nipple (y/n)
+                                    weight_var = "weight_in_kg",
+                                    height_var = "the_childs_height_length_to_use",
+                                    muac_var = "muac_mid_upper_arm_circumference",
+                                    oedema_var = "bilateral_pitting_oedema",
+
+                                    iycf_1 = "was_name_ever_been_breastfed_ever_bf", # ever breastfed (y/n)
+                                    iycf_2 = "how_long_after_birth_did_you_first_put_name_to_the_breast", # how long after birth breastfed
+                                    iycf_3 = "in_the_first_two_days_after_delivery_was_name_given_anything_other_than_breast_milk_to_eat_or_drink_anything_at_all_like_water_infant_formula", # given anything to eat/drink in first 2 days after delivery
+                                    iycf_4 = "was_name_breastfed_yesterday_during_the_day_or_at_night", # breastfed yesterday during the day or night (y/n)
+                                    iycf_5 = "did_name_drink_anything_from_a_bottle_with_a_nipple_including_breast_milk_yesterday_during_the_day_or_night", # drink anything from bottle with a nipple (y/n)
                                     iycf_6a = "plain_water", # plain water
                                     iycf_6b = "infant_formula", # infant formula (y/n)
-                                    iycf_6b_num = "number_infant_formula", # infant formula (number)
+                                    iycf_6b_num = "how_many_times_did_name_drink_formula_mik", # infant formula (number)
                                     iycf_6c = "animal_tinned_or_powdered_milk", # milk from animals, fresh tinned powder (y/n)
-                                    iycf_6c_num = "number_drink_milk", # milk form animals, fresh, tinned, pwder (number)
+                                    iycf_6c_num = "how_many_times_did_name_drink_milk", # milk form animals, fresh, tinned, pwder (number)
                                     iycf_6c_swt = "sweet_or_flavoured_type_of_milk", # milk was sweetened (y/n)
                                     iycf_6d = "yogurt_drinks", # yoghurt drinks (y/n)
-                                    iycf_6d_num = "number_yoghurt_drinks", # yoghurt drinks (number)
+                                    iycf_6d_num = "how_many_times_did_name_drink_yogurt", # yoghurt drinks (number)
                                     iycf_6d_swt = "sweet_or_flavoured_type_of_yogurt_drink", # yoghurt drink was sweetened (y/n)
                                     iycf_6e = "chocolate_flavoured_drinks", # chocolate flavoured drinks, including from syrup / powders (y/n)
                                     iycf_6f = "fruit_juice", # Fruit juice or fruit-flavoured drinks including those made from syrups or powders? (y/n)
@@ -74,35 +82,84 @@ df2 <- format_nut_health_indicators(df = df, use_flags_yn = "yes",
                                     iycf_8 = "number_solid_semi_solid_soft_foods_yesterday", # times child ate solid/semi-solid foods (number)
 )
 
+df3 <- flag_anthro_issues(df2, grouping = "county_admin2")
+
 # Step 3: Review a Quality Summary Report ####
 # Ratio is (prevalence / (1 - prevalence))
 
-(create_iycf_quality_report(df = df2, short_report = TRUE, exp_prevalence_mad = 0.05, exp_sex_ratio = 1, exp_ratio_under6m_6to23m = 0.3))
+(create_anthro_quality_report(df = df3,
+                              grouping = "enum",
+                              short_report = TRUE))
 
-(create_iycf_quality_report(df = df2, grouping = "enum", short_report = TRUE, exp_prevalence_mad = 0.05, exp_sex_ratio = 1, exp_ratio_under6m_6to23m = 0.3))
+(create_anthro_quality_report(df = df3,
+                              grouping = "enum",
+                              short_report = FALSE))
 
-(create_iycf_quality_report(df = df2, grouping = "enum", short_report = FALSE, exp_prevalence_mad = 0.05, exp_sex_ratio = 1, exp_ratio_under6m_6to23m = 0.3))
+(create_iycf_quality_report(df = df3,
+                            short_report = TRUE,
 
-(create_iycf_quality_report(df = df2, grouping = "county_admin2", short_report = FALSE, exp_prevalence_mad = 0.05, exp_sex_ratio = 1, exp_ratio_under6m_6to23m = 0.3))
+                            exp_prevalence_mad = 0.05,
+                            exp_sex_ratio = 1.1,
+                            exp_ratio_under6m_6to23m = 0.3))
+
+(create_iycf_quality_report(df = df3, grouping = "enum",
+                            short_report = TRUE,
+                            exp_prevalence_mad = 0.05,
+                            exp_sex_ratio = 1,
+                            exp_ratio_under6m_6to23m = 0.3))
+
+(create_iycf_quality_report(df = df3,
+                            grouping = "enum",
+                            short_report = FALSE,
+                            exp_prevalence_mad = 0.05,
+                            exp_sex_ratio = 1,
+                            exp_ratio_under6m_6to23m = 0.3))
+
+(create_iycf_quality_report(df = df3,
+                            grouping = "county_admin2",
+                            short_report = FALSE,
+                            exp_prevalence_mad = 0.05,
+                            exp_sex_ratio = 1,
+                            exp_ratio_under6m_6to23m = 0.3))
 
 # Step 4: Evaluate Data with Visualizations ####
 
-(plot_age_months_distribution(df2))
+(plot_age_months_distribution(df3))
 
-(plot_age_months_distribution(df2, by_group = "enum"))
+(plot_age_months_distribution(df3, by_group = "enum"))
 
-(plot_age_months_distribution(df2, by_group = "county_admin2"))
+(plot_age_months_distribution(df3, by_group = "county_admin2"))
+
+# Use 'wfhz' for index for Weight for Height z-score
+# Use 'hfaz' for index for Height for Age z-score
+# Use 'wfaz' for index for Weight for Age z-score
+# Use 'mfaz' for index for MUAC for Age z-score
+# Use 'yes' for flags if you want to include flags in the plot
+
+(plot_zscore_distribution(df = df3, index = "hfaz", flags = "yes"))
+
+(plot_zscore_distribution(df = df3, index = "hfaz", flags = "no", grouping = "enum"))
+
+(plot_anthro_age_distribution(df = df3, index = "wfhz"))
+
+(plot_cumulative_distribution(df = df3, index = "muac", flags = "no"))
+
+(plot_cumulative_distribution(df = df3, index = "muac", flags = "yes", grouping = "enum"))
+
+(plot_cumulative_distribution(df = df3, index = "wfhz", flags = "no"))
+
+(plot_cumulative_distribution(df = df3, index = "wfhz", flags = "no", grouping = "enum"))
 
 # Step 5: Export Flagged Records to Cleaning Log + Cleaning ####
 
-(flag_summary <- flag_summary_table(df = df2, grouping = "enum"))
+(flag_summary <- flag_summary_table(df = df3, grouping = "enum"))
 
-cl <- create_cleaning_log_flags(df = df2, uuid_col = "hh_id")
+cl <- create_cleaning_log_flags(df = df3, uuid_col = "hh_id")
 View(cl)
 
 # Step 6: Analyse Survey Results ####
 
-(res <- analyse_survey_results(df = df2,
+(res_iycf <- analyse_survey_results(df = df3,
                                aggregation = "county_admin2",
                                   sample_design = "two_stage_stratified_cluster",
                                strata = "county_admin2",
@@ -113,8 +170,18 @@ View(cl)
                                                   "iycf_mad", "iycf_eff", "iycf_ufc","iycf_zvf", "iycf_bof"),
                                   means = c("iycf_mdd_score")))
 
+(res_anthro <- analyse_survey_results(df = df3,
+                               sample_design = "two_stage_cluster",
+                               cluster = "cluster",
+                               proportions = c("gam_wfhz_noflag", "mam_wfhz_noflag", "sam_wfhz_noflag",
+                                               "global_stunting_noflag", "moderate_stunting_noflag", "severe_stunting_noflag",
+                                               "global_underweight_noflag", "moderate_underweight_noflag", "severe_underweight_noflag",
+                                               "gam_muac_noflag", "mam_muac_noflag", "sam_muac_noflag"),
+                               means = c("wfhz_noflag", "hfaz_noflag", "wfaz_noflag", "muac_noflag")))
 
 
+
+df3 %>% healthyr::format_anthro_to_ena() %>% writexl::write_xlsx("my_ena_anthro_data.xlsx")
 
 
 

@@ -244,7 +244,6 @@ create_iycf_quality_report <- function(df, grouping = NULL, short_report = NULL,
     if(num_flag_no_anything > 0) {cat(paste0("\n IYCF FLAG: No foods or liquids were mentioned consumed yesterday for a child 6 months or older, which is unlikely. \n", num_flag_no_anything, " records were flagged. No indicators are affected, but please check for data quality.\n")) }
 
   }
-  print(results)
 
   if(c("iycf_caregiver") %in% colnames(df)) {
 

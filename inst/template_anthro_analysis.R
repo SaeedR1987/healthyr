@@ -34,7 +34,9 @@ df2 <- format_nut_health_indicators(df = df,
                                     oedema_var = "edema",
                                     )
 
-df3 <- flag_anthro_issues(df2, grouping = "enum")
+df3 <- flag_anthro_issues(df2)
+
+df3 <- flag_anthro_issues(df2, grouping = "")
 
 # Step 3: Create a Quality Summary Report ####
 
