@@ -229,6 +229,8 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
     }
 
 
+
+
   }
   if(c("weight") %in% names(df)) {
 
@@ -272,6 +274,8 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
         }
       }
     }
+
+    df <- df %>% mutate(oedema = ifelse(is.na(oedema), "n", oedema))
 
   }
 

@@ -56,11 +56,11 @@ df3 <- flag_anthro_issues(df2, grouping = "")
 
 (plot_age_proxy_distribution(df = df3, by_group = "enum"))
 
-(plot_zscore_distribution(df = df3, index = "wfhz", flags = "yes"))
+(plot_zscore_distribution(df = df3, index = "mfaz", flags = "yes"))
 
 (plot_zscore_distribution(df = df3, index = "wfhz", flags = "no", grouping = "enum"))
 
-(plot_anthro_age_distribution(df = df3, index = "wfhz"))
+(plot_anthro_age_distribution(df = df3, index = "mfaz"))
 
 (plot_cumulative_distribution(df = df3, index = "muac", flags = "no"))
 

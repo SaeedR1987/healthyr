@@ -759,59 +759,59 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
 
   # Calculating Childhood Vaccination Indicators
 
-  if(c("penta") %in% names(df)) {
-    df <- df %>%
-      dplyr::mutate(age_days_penta1 = as.numeric(abs(lubridate::as_date(.data$penta_date1) - lubridate::as_date(.data$dob_date))),
-             age_days_penta2 = as.numeric(abs(lubridate::as_date(.data$penta_date2) - lubridate::as_date(.data$dob_date))),
-             age_days_penta3 = as.numeric(abs(lubridate::as_date(.data$penta_date3) - lubridate::as_date(.data$dob_date))),
-             age_days_at_interview = ifelse(!is.na(.data$dob_date), as.numeric(abs(lubridate::as_date(.data$date_dc) - lubridate::as_date(.data$dob_date))), ifelse(is.na(.data$age_months), NA, .data$age_months*(365/12))),
+  # if(c("penta") %in% names(df)) {
+  #   df <- df %>%
+  #     dplyr::mutate(age_days_penta1 = as.numeric(abs(lubridate::as_date(.data$penta_date1) - lubridate::as_date(.data$dob_date))),
+  #            age_days_penta2 = as.numeric(abs(lubridate::as_date(.data$penta_date2) - lubridate::as_date(.data$dob_date))),
+  #            age_days_penta3 = as.numeric(abs(lubridate::as_date(.data$penta_date3) - lubridate::as_date(.data$dob_date))),
+  #            age_days_at_interview = ifelse(!is.na(.data$dob_date), as.numeric(abs(lubridate::as_date(.data$date_dc) - lubridate::as_date(.data$dob_date))), ifelse(is.na(.data$age_months), NA, .data$age_months*(365/12))),
+  #
+  #            diff_age_penta12 = ifelse(is.na(.data$age_days_penta2), NA, .data$age_days_penta2 - .data$age_days_penta1),
+  #            diff_age_penta23 = ifelse(is.na(.data$age_days_penta3), NA, .data$age_days_penta3 - .data$age_days_penta2),
+  #
+  #            crude_penta_count = ifelse(is.na(.data$penta_count), NA, as.numeric(.data$penta_count)),
+  #
+  #            crude_penta = ifelse(is.na(.data$penta), NA, ifelse(.data$penta == 1 | .data$penta == 2, 1, 0)),
+  #            crude_penta_dose1 = ifelse(is.na(.data$crude_penta), NA, ifelse(.data$crude_penta == 1 & .data$crude_penta_count >= 1, 1, 0)),
+  #            crude_penta_dose2 = ifelse(is.na(.data$crude_penta), NA, ifelse(.data$crude_penta == 1 & .data$crude_penta_count >= 2, 1, 0)),
+  #            crude_penta_dose3 = ifelse(is.na(.data$crude_penta), NA, ifelse(.data$crude_penta == 1 & .data$crude_penta_count >= 3, 1, 0)),
+  #
+  #            flag_age_penta_dose1 = ifelse(is.na(.data$age_days_at_interview), NA, ifelse(is.na(.data$crude_penta_dose1), NA, ifelse(.data$age_days_at_interview < 42 & .data$crude_penta == 1, 1, 0))), # if 1st dose of PENTA occured before appropriate age
+  #            flag_age_penta_dose2 = ifelse(is.na(.data$age_days_at_interview), NA, ifelse(is.na(.data$crude_penta_dose2), NA, ifelse(.data$age_days_at_interview < 72 & .data$crude_penta == 1, 1, 0))), # if 2nd dose of PENTA occured before appropriate age
+  #            flag_age_penta_dose3 = ifelse(is.na(.data$age_days_at_interview), NA, ifelse(is.na(.data$crude_penta_dose3), NA, ifelse(.data$age_days_at_interview < 98 & .data$crude_penta == 1, 1, 0))), # if 3rd dose of PENTA occured before appropriate age
+  #            flag_timediff_penta12 = ifelse(is.na(.data$diff_age_penta12), NA, ifelse(.data$diff_age_penta12 < 28, 1, 0)), # if 2nd dose of PENTA was administered less than 4 weeks after the 1st dose
+  #            flag_timediff_penta23 = ifelse(is.na(.data$diff_age_penta23), NA, ifelse(.data$diff_age_penta23 < 28, 1, 0)), # if 3rd dose of PENTA was administered less than 4 weeks after the 2nd dose
+  #
+  #            valid_penta_dose1 = ifelse(is.na(.data$penta), NA, ifelse(.data$penta == 2, ifelse(!is.na(.data$penta_date1), 1, 0), 0)),
+  #            valid_penta_dose1 = ifelse(is.na(.data$penta), NA, ifelse(is.na(.data$age_days_penta1), .data$valid_penta_dose1, ifelse(.data$age_days_penta1 < 42, NA, .data$valid_penta_dose1))), #if received penta dose 1 before recommended age
+  #            valid_penta_dose2 = ifelse(is.na(.data$penta), NA, ifelse(.data$penta == 2, ifelse(!is.na(.data$penta_date2), 1, 0), 0)),
+  #            valid_penta_dose2 = ifelse(is.na(.data$penta), NA, ifelse(is.na(.data$age_days_penta2), .data$valid_penta_dose2, ifelse(.data$age_days_penta2 < 70, NA, .data$valid_penta_dose2))), #if received penta dose 2 before recommended age
+  #            valid_penta_dose2 = ifelse(is.na(.data$penta), NA, ifelse(is.na(.data$diff_age_penta12), .data$valid_penta_dose2, ifelse(.data$diff_age_penta12 < 28, 0, .data$valid_penta_dose2))),
+  #            valid_penta_dose3 = ifelse(is.na(.data$penta), NA, ifelse(.data$penta == 2, ifelse(!is.na(.data$penta_date3), 1, 0), 0)),
+  #            valid_penta_dose3 = ifelse(is.na(.data$penta), NA, ifelse(is.na(.data$age_days_penta3), .data$valid_penta_dose3, ifelse(.data$age_days_penta3 < 98, NA, .data$valid_penta_dose3))), #if received penta dose 3 before recommended age
+  #            valid_penta_dose3 = ifelse(is.na(.data$penta), NA, ifelse(is.na(.data$diff_age_penta23), .data$valid_penta_dose3, ifelse(.data$diff_age_penta23 < 28, 0, .data$valid_penta_dose3))),
+  #
+  #            valid_penta_count = ifelse(!is.na(.data$valid_penta_dose3), 3, ifelse(!is.na(.data$valid_penta_dose2), 2, ifelse(!is.na(.data$valid_penta_dose1), 1, 0))),
+  #
+  #
+  #
+  #     )
+  # }
 
-             diff_age_penta12 = ifelse(is.na(.data$age_days_penta2), NA, .data$age_days_penta2 - .data$age_days_penta1),
-             diff_age_penta23 = ifelse(is.na(.data$age_days_penta3), NA, .data$age_days_penta3 - .data$age_days_penta2),
-
-             crude_penta_count = ifelse(is.na(.data$penta_count), NA, as.numeric(.data$penta_count)),
-
-             crude_penta = ifelse(is.na(.data$penta), NA, ifelse(.data$penta == 1 | .data$penta == 2, 1, 0)),
-             crude_penta_dose1 = ifelse(is.na(.data$crude_penta), NA, ifelse(.data$crude_penta == 1 & .data$crude_penta_count >= 1, 1, 0)),
-             crude_penta_dose2 = ifelse(is.na(.data$crude_penta), NA, ifelse(.data$crude_penta == 1 & .data$crude_penta_count >= 2, 1, 0)),
-             crude_penta_dose3 = ifelse(is.na(.data$crude_penta), NA, ifelse(.data$crude_penta == 1 & .data$crude_penta_count >= 3, 1, 0)),
-
-             flag_age_penta_dose1 = ifelse(is.na(.data$age_days_at_interview), NA, ifelse(is.na(.data$crude_penta_dose1), NA, ifelse(.data$age_days_at_interview < 42 & .data$crude_penta == 1, 1, 0))), # if 1st dose of PENTA occured before appropriate age
-             flag_age_penta_dose2 = ifelse(is.na(.data$age_days_at_interview), NA, ifelse(is.na(.data$crude_penta_dose2), NA, ifelse(.data$age_days_at_interview < 72 & .data$crude_penta == 1, 1, 0))), # if 2nd dose of PENTA occured before appropriate age
-             flag_age_penta_dose3 = ifelse(is.na(.data$age_days_at_interview), NA, ifelse(is.na(.data$crude_penta_dose3), NA, ifelse(.data$age_days_at_interview < 98 & .data$crude_penta == 1, 1, 0))), # if 3rd dose of PENTA occured before appropriate age
-             flag_timediff_penta12 = ifelse(is.na(.data$diff_age_penta12), NA, ifelse(.data$diff_age_penta12 < 28, 1, 0)), # if 2nd dose of PENTA was administered less than 4 weeks after the 1st dose
-             flag_timediff_penta23 = ifelse(is.na(.data$diff_age_penta23), NA, ifelse(.data$diff_age_penta23 < 28, 1, 0)), # if 3rd dose of PENTA was administered less than 4 weeks after the 2nd dose
-
-             valid_penta_dose1 = ifelse(is.na(.data$penta), NA, ifelse(.data$penta == 2, ifelse(!is.na(.data$penta_date1), 1, 0), 0)),
-             valid_penta_dose1 = ifelse(is.na(.data$penta), NA, ifelse(is.na(.data$age_days_penta1), .data$valid_penta_dose1, ifelse(.data$age_days_penta1 < 42, NA, .data$valid_penta_dose1))), #if received penta dose 1 before recommended age
-             valid_penta_dose2 = ifelse(is.na(.data$penta), NA, ifelse(.data$penta == 2, ifelse(!is.na(.data$penta_date2), 1, 0), 0)),
-             valid_penta_dose2 = ifelse(is.na(.data$penta), NA, ifelse(is.na(.data$age_days_penta2), .data$valid_penta_dose2, ifelse(.data$age_days_penta2 < 70, NA, .data$valid_penta_dose2))), #if received penta dose 2 before recommended age
-             valid_penta_dose2 = ifelse(is.na(.data$penta), NA, ifelse(is.na(.data$diff_age_penta12), .data$valid_penta_dose2, ifelse(.data$diff_age_penta12 < 28, 0, .data$valid_penta_dose2))),
-             valid_penta_dose3 = ifelse(is.na(.data$penta), NA, ifelse(.data$penta == 2, ifelse(!is.na(.data$penta_date3), 1, 0), 0)),
-             valid_penta_dose3 = ifelse(is.na(.data$penta), NA, ifelse(is.na(.data$age_days_penta3), .data$valid_penta_dose3, ifelse(.data$age_days_penta3 < 98, NA, .data$valid_penta_dose3))), #if received penta dose 3 before recommended age
-             valid_penta_dose3 = ifelse(is.na(.data$penta), NA, ifelse(is.na(.data$diff_age_penta23), .data$valid_penta_dose3, ifelse(.data$diff_age_penta23 < 28, 0, .data$valid_penta_dose3))),
-
-             valid_penta_count = ifelse(!is.na(.data$valid_penta_dose3), 3, ifelse(!is.na(.data$valid_penta_dose2), 2, ifelse(!is.na(.data$valid_penta_dose1), 1, 0))),
-
-
-
-      )
-  }
-
-  if(c("measles") %in% names(df)) {
-
-    df <- df %>%
-      dplyr::mutate(age_days_measles1 = as.numeric(abs(lubridate::as_date(.data$measles_date1) - lubridate::as_date(.data$dob_date))),
-             age_days_at_interview = ifelse(!is.na(.data$dob_date), as.numeric(abs(lubridate::as_date(.data$date_dc) - lubridate::as_date(.data$dob_date))), ifelse(is.na(.data$age_months), NA, .data$age_months*(365/12))),
-             crude_measles = ifelse(is.na(.data$measles), NA, ifelse(.data$measles == 1 | .data$measles == 2, 1, 0)),
-             valid_measles = ifelse(is.na(.data$measles), NA, ifelse(.data$measles == 2, 1, 0)),
-             valid_measles = ifelse(is.na(.data$measles), NA, ifelse(is.na(.data$age_days_measles1), .data$valid_measles, ifelse(.data$age_days_measles1 < 252, NA, .data$valid_measles))), #if received measles dose 1 before recommended age
-
-             flag_age_crude_measles = ifelse(is.na(.data$age_days_at_interview), NA, ifelse(is.na(.data$crude_measles), NA, ifelse(.data$crude_measles == 1 & .data$age_days_at_interview < 252, 1, 0))),
-
-      )
-
-  }
+  # if(c("measles") %in% names(df)) {
+  #
+  #   df <- df %>%
+  #     dplyr::mutate(age_days_measles1 = as.numeric(abs(lubridate::as_date(.data$measles_date1) - lubridate::as_date(.data$dob_date))),
+  #            age_days_at_interview = ifelse(!is.na(.data$dob_date), as.numeric(abs(lubridate::as_date(.data$date_dc) - lubridate::as_date(.data$dob_date))), ifelse(is.na(.data$age_months), NA, .data$age_months*(365/12))),
+  #            crude_measles = ifelse(is.na(.data$measles), NA, ifelse(.data$measles == 1 | .data$measles == 2, 1, 0)),
+  #            valid_measles = ifelse(is.na(.data$measles), NA, ifelse(.data$measles == 2, 1, 0)),
+  #            valid_measles = ifelse(is.na(.data$measles), NA, ifelse(is.na(.data$age_days_measles1), .data$valid_measles, ifelse(.data$age_days_measles1 < 252, NA, .data$valid_measles))), #if received measles dose 1 before recommended age
+  #
+  #            flag_age_crude_measles = ifelse(is.na(.data$age_days_at_interview), NA, ifelse(is.na(.data$crude_measles), NA, ifelse(.data$crude_measles == 1 & .data$age_days_at_interview < 252, 1, 0))),
+  #
+  #     )
+  #
+  # }
 
   return(df)
 

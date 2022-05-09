@@ -23,8 +23,10 @@ wgss_data <- raw_wgss3
 df2 <- format_nut_health_indicators(df = wgss_data,
                                     hhid = "X_uuid",
                                     cluster = "cadaster",
+
                                     sex_var = "gender_ind",
                                     age_years_var = "age_yrs_ind",
+
                                     wgss_seeing = "wgss_seeing",
                                     wgss_hearing = "wgss_hearing",
                                     wgss_walking = "wgss_walking",

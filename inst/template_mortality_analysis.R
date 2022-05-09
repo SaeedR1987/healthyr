@@ -9,7 +9,7 @@
 
 rm(list = ls())
 
-# remotes::install_github("SaeedR1987/healthyr")
+remotes::install_github("SaeedR1987/healthyr")
 
 library(tidyverse)
 library(healthyr)
@@ -76,6 +76,14 @@ df2 <- format_mortality_current_census(date_recall_event = "21/04/2019",
                                    exp_hh_size = 7.5)))
 
 (t(create_mortality_quality_report(df2,
+                                   short_report = TRUE,
+                                   exp_sex_ratio = 1,
+                                   exp_ratio_0_4 = (0.19 / 1 - 0.19),
+                                   exp_ratio_2_5 = (0.4 / (1 - 0.4)),
+                                   exp_ratio_5_10 = 1.1,
+                                   exp_hh_size = 7.5)))
+
+(t(create_mortality_quality_report(df2,
                                    short_report = FALSE,
                                    exp_sex_ratio = 1,
                                    exp_ratio_0_4 = (0.19 / 1 - 0.19),
@@ -85,7 +93,7 @@ df2 <- format_mortality_current_census(date_recall_event = "21/04/2019",
 
 (t(create_mortality_quality_report(df2,
                                  grouping = "enum",
-                                 short_report = TRUE,
+                                 short_report = TR,
                                  exp_sex_ratio = 1,
                                  exp_ratio_0_4 = (0.19 / 1 - 0.19),
                                  exp_ratio_2_5 = (0.4 / (1 - 0.4)),
@@ -105,13 +113,13 @@ df2 <- format_mortality_current_census(date_recall_event = "21/04/2019",
 
 (plot_agepyramid(df2))
 
-(plot_agepyramid(df2 %>% filter(enum == "6")))
+(plot_agepyramid(df2 %>% filter(enum == "5")))
 
 (plot_agepyramid(df2, filtering = "death"))
 
-(plot_age_years_distribution(df2, min_age = 0, max_age = 100, breaks = 1))
+(plot_age_years_distribution(df2, min_age = 0, max_age = 100))
 
-(plot_age_years_distribution(df2, min_age = 0, max_age = 10, breaks = 1))
+(plot_age_years_distribution(df2, min_age = 0, max_age = 10))
 
 # Step 5: Export Flagged Records to Cleaning Log + Cleaning ####
 
