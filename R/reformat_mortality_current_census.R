@@ -99,6 +99,114 @@ reformat_mortality_current_census <- function(df) {
 
   }
 
+  # Checking Date Join
+
+  if(c("date_join") %in% names(df)) {
+
+    dob_recodes <- c("mdy", "dmy", "ymd", "ydm")
+    unique_dates <- df %>% dplyr::filter(!is.na(.data$date_join)) %>% dplyr::select(.data$date_join) %>% t %>% c %>% unique
+
+    print(paste0("Example of JOIN DATE value: ", if(length(unique_dates)>0) {unique_dates[[1]]}, " ", if(length(unique_dates)>1) {unique_dates[[2]]}, " ",if(length(unique_dates)>2) {unique_dates[[3]]}))
+    a <- readline(cat(paste0("\n RE-FORMATTING VARIABLE : JOIN DATE \n What is the date format for the JOIN DATE formatted? Please input : \n 'mdy' for months-day-year, \n 'dmy' for day-months-year \n 'ymd' for year-month-day \n 'ydm' for year-day-month." )))
+    while(length(setdiff(a, dob_recodes))==1) {
+      a <- readline(cat(paste0("Invalid input. ", "\n RE-FORMATTING VARIABLE : JOIN DATE \n How is JOIN DATE formatted? Please input : \n  'mdy' for months-day-year, \n 'dmy' for day-months-year \n 'ymd' for year-month-day \n 'ydm' for year-day-month.")))
+    }
+
+    cat("\014") #clears the console
+    if(is.character(df$date_join)) {df <- df %>% dplyr::mutate(date_join = ifelse(.data$date_join == "", NA, .data$date_join))}
+
+
+    df <- df %>%
+      dplyr::mutate(date_join_date = lubridate::parse_date_time(.data$date_join, orders = a)) %>%
+      dplyr::mutate(date_join_month = lubridate::month(.data$date_join_date),
+                    date_join_day = lubridate::day(.data$date_join_date),
+                    date_join_year = lubridate::year(.data$date_join_date)) %>%
+      dplyr::mutate(date_join = paste(.data$date_join_month, .data$date_join_day, .data$date_join_year, sep = "/"),
+                    date_join = ifelse(is.na(.data$date_join), NA, ifelse(.data$date_join == "NA/NA/NA", NA, .data$date_join)))
+
+  }
+
+  # Checking Date Left
+
+  if(c("date_left") %in% names(df)) {
+
+    dob_recodes <- c("mdy", "dmy", "ymd", "ydm")
+    unique_dates <- df %>% dplyr::filter(!is.na(.data$date_left)) %>% dplyr::select(.data$date_left) %>% t %>% c %>% unique
+
+    print(paste0("Example of LEFT DATE value: ", if(length(unique_dates)>0) {unique_dates[[1]]}, " ", if(length(unique_dates)>1) {unique_dates[[2]]}, " ",if(length(unique_dates)>2) {unique_dates[[3]]}))
+    a <- readline(cat(paste0("\n RE-FORMATTING VARIABLE : LEFT DATE \n What is the date format for the LEFT DATE formatted? Please input : \n 'mdy' for months-day-year, \n 'dmy' for day-months-year \n 'ymd' for year-month-day \n 'ydm' for year-day-month." )))
+    while(length(setdiff(a, dob_recodes))==1) {
+      a <- readline(cat(paste0("Invalid input. ", "\n RE-FORMATTING VARIABLE : LEFT DATE \n How is LEFT DATE formatted? Please input : \n  'mdy' for months-day-year, \n 'dmy' for day-months-year \n 'ymd' for year-month-day \n 'ydm' for year-day-month.")))
+    }
+
+    cat("\014") #clears the console
+    if(is.character(df$date_left)) {df <- df %>% dplyr::mutate(date_left = ifelse(.data$date_left == "", NA, .data$date_left))}
+
+
+    df <- df %>%
+      dplyr::mutate(date_left_date = lubridate::parse_date_time(.data$date_left, orders = a)) %>%
+      dplyr::mutate(date_left_month = lubridate::month(.data$date_left_date),
+                    date_left_day = lubridate::day(.data$date_left_date),
+                    date_left_year = lubridate::year(.data$date_left_date)) %>%
+      dplyr::mutate(date_left = paste(.data$date_left_month, .data$date_left_day, .data$date_left_year, sep = "/"),
+                    date_left = ifelse(is.na(.data$date_left), NA, ifelse(.data$date_left == "NA/NA/NA", NA, .data$date_left)))
+
+  }
+
+  # Checking Date Birth
+
+  if(c("date_birth") %in% names(df)) {
+
+    dob_recodes <- c("mdy", "dmy", "ymd", "ydm")
+    unique_dates <- df %>% dplyr::filter(!is.na(.data$date_birth)) %>% dplyr::select(.data$date_birth) %>% t %>% c %>% unique
+
+    print(paste0("Example of BIRTH DATE value: ", if(length(unique_dates)>0) {unique_dates[[1]]}, " ", if(length(unique_dates)>1) {unique_dates[[2]]}, " ",if(length(unique_dates)>2) {unique_dates[[3]]}))
+    a <- readline(cat(paste0("\n RE-FORMATTING VARIABLE : BIRTH DATE \n What is the date format for the BIRTH DATE formatted? Please input : \n 'mdy' for months-day-year, \n 'dmy' for day-months-year \n 'ymd' for year-month-day \n 'ydm' for year-day-month." )))
+    while(length(setdiff(a, dob_recodes))==1) {
+      a <- readline(cat(paste0("Invalid input. ", "\n RE-FORMATTING VARIABLE : BIRTH DATE \n How is BIRTH DATE formatted? Please input : \n  'mdy' for months-day-year, \n 'dmy' for day-months-year \n 'ymd' for year-month-day \n 'ydm' for year-day-month.")))
+    }
+
+    cat("\014") #clears the console
+    if(is.character(df$date_birth)) {df <- df %>% dplyr::mutate(date_birth = ifelse(.data$date_birth == "", NA, .data$date_birth))}
+
+
+    df <- df %>%
+      dplyr::mutate(date_birth_date = lubridate::parse_date_time(.data$date_birth, orders = a)) %>%
+      dplyr::mutate(date_birth_month = lubridate::month(.data$date_birth_date),
+                    date_birth_day = lubridate::day(.data$date_birth_date),
+                    date_birth_year = lubridate::year(.data$date_birth_date)) %>%
+      dplyr::mutate(date_birth = paste(.data$date_birth_month, .data$date_birth_day, .data$date_birth_year, sep = "/"),
+                    date_birth = ifelse(is.na(.data$date_birth), NA, ifelse(.data$date_birth == "NA/NA/NA", NA, .data$date_birth)))
+
+  }
+
+  # Checking Date Death
+
+  if(c("date_death") %in% names(df)) {
+
+    dob_recodes <- c("mdy", "dmy", "ymd", "ydm")
+    unique_dates <- df %>% dplyr::filter(!is.na(.data$date_death)) %>% dplyr::select(.data$date_death) %>% t %>% c %>% unique
+
+    print(paste0("Example of DEATH DATE value: ", if(length(unique_dates)>0) {unique_dates[[1]]}, " ", if(length(unique_dates)>1) {unique_dates[[2]]}, " ",if(length(unique_dates)>2) {unique_dates[[3]]}))
+    a <- readline(cat(paste0("\n RE-FORMATTING VARIABLE : DEATH DATE \n What is the date format for the DEATH DATE formatted? Please input : \n 'mdy' for months-day-year, \n 'dmy' for day-months-year \n 'ymd' for year-month-day \n 'ydm' for year-day-month." )))
+    while(length(setdiff(a, dob_recodes))==1) {
+      a <- readline(cat(paste0("Invalid input. ", "\n RE-FORMATTING VARIABLE : DEATH DATE \n How is DEATH DATE formatted? Please input : \n  'mdy' for months-day-year, \n 'dmy' for day-months-year \n 'ymd' for year-month-day \n 'ydm' for year-day-month.")))
+    }
+
+    cat("\014") #clears the console
+    if(is.character(df$date_death)) {df <- df %>% dplyr::mutate(date_death = ifelse(.data$date_death == "", NA, .data$date_death))}
+
+
+    df <- df %>%
+      dplyr::mutate(date_death_date = lubridate::parse_date_time(.data$date_death, orders = a)) %>%
+      dplyr::mutate(date_death_month = lubridate::month(.data$date_death_date),
+                    date_death_day = lubridate::day(.data$date_death_date),
+                    date_death_year = lubridate::year(.data$date_death_date)) %>%
+      dplyr::mutate(date_death = paste(.data$date_death_month, .data$date_death_day, .data$date_death_year, sep = "/"),
+                    date_death = ifelse(is.na(.data$date_death), NA, ifelse(.data$date_death == "NA/NA/NA", NA, .data$date_death)))
+
+  }
+
   # Checking Joined, Left, Birth, Dead
 
   demographic_vars <- c("join", "left", "birth", "death")

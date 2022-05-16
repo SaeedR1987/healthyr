@@ -5,4 +5,3 @@
 .DS_Store
 R/run_monitoring_dashboard.R
 R/check_which_analysis_var.R
-MonitoringDashboard/

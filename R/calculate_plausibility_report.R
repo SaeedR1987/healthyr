@@ -264,20 +264,20 @@ calculate_plausibility_report <- function(df) {
   if(c("flag_severe_hhs") %in% names(df)) {
 
     df <- df %>%
-      dplyr::mutate(plaus_flag_severe_hhs = ifelse(.data$flag_severe_hhs < 1, 0,
-                                            ifelse(.data$flag_severe_hhs < 5, 2,
-                                                   ifelse(.data$flag_severe_hhs < 10, 4,
-                                                          ifelse(.data$flag_severe_hhs >= 10, 10, 0)))))
+      dplyr::mutate(plaus_flag_severe_hhs = ifelse(.data$flag_severe_hhs < 5, 0,
+                                            ifelse(.data$flag_severe_hhs < 10, 2,
+                                                   ifelse(.data$flag_severe_hhs < 20, 4,
+                                                          ifelse(.data$flag_severe_hhs >= 20, 10, 0)))))
   }
   if(length(setdiff(c("corr.fcs_rcsi", "corr.fcs_rcsi.pvalue"), names(df)))==0) {
 
     df <- df %>%
       dplyr::mutate(plaus_corr.fcs_rcsi = ifelse(.data$corr.fcs_rcsi < -0.2 & .data$corr.fcs_rcsi.pvalue < 0.05, 0,
-                                                 ifelse(.data$corr.fcs_rcsi < -0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 3,
-                                                        ifelse(.data$corr.fcs_rcsi >= -0.2 & .data$corr.fcs_rcsi < 0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 5,
-                                                               ifelse(.data$corr.fcs_rcsi >= -0.2 & .data$corr.fcs_rcsi < 0.2 & .data$corr.fcs_rcsi.pvalue < 0.05, 10,
-                                                                      ifelse(.data$corr.fcs_rcsi >= 0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 12,
-                                                                             ifelse(.data$corr.fcs_rcsi >= 0.2 & .data$corr.fcs_rcsi.pvalue < 0.05, 15, 0)))))))
+                                                 ifelse(.data$corr.fcs_rcsi < -0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 2,
+                                                        ifelse(.data$corr.fcs_rcsi >= -0.2 & .data$corr.fcs_rcsi < 0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 4,
+                                                               ifelse(.data$corr.fcs_rcsi >= -0.2 & .data$corr.fcs_rcsi < 0.2 & .data$corr.fcs_rcsi.pvalue < 0.05, 6,
+                                                                      ifelse(.data$corr.fcs_rcsi >= 0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 8,
+                                                                             ifelse(.data$corr.fcs_rcsi >= 0.2 & .data$corr.fcs_rcsi.pvalue < 0.05, 10, 0)))))))
   }
   if(length(setdiff(c("corr.fcs_hhs", "corr.fcs_hhs.pvalue"), names(df)))==0) {
 
@@ -311,13 +311,13 @@ calculate_plausibility_report <- function(df) {
 
   # Food Security Plausibility Score and Classification
 
-  fsl_plaus_vars <- c("prop_fc_flags", "flag_lcs_severity", "sd_fcs", "flag_high_rcsi", "flag_severe_hhs", "corr.fcs_rcsi", "corr.fcs_rcsi.pvalue",
+  fsl_plaus_vars <- c("prop_fc_flags", "sd_fcs", "flag_high_rcsi", "flag_severe_hhs", "corr.fcs_rcsi", "corr.fcs_rcsi.pvalue",
                       "corr.fcs_hhs", "corr.fcs_hhs.pvalue", "corr.hhs_rcsi", "corr.hhs_rcsi.pvalue", "poisson_pvalues.hhs_very_severe")
 
   if(length(setdiff(fsl_plaus_vars, names(df)))==0) {
 
     df <- df %>%
-      dplyr::mutate(fsl_plaus_score = .data$plaus_prop_fc_flags + .data$plaus_flag_lcs_severity + .data$plaus_sd_fcs + .data$plaus_flag_high_rcsi + .data$plaus_flag_severe_hhs + .data$plaus_corr.fcs_rcsi + .data$plaus_corr.fcs_hhs + .data$plaus_corr.hhs_rcsi + .data$plaus_poisson.hhs,
+      dplyr::mutate(fsl_plaus_score = .data$plaus_prop_fc_flags + .data$plaus_sd_fcs + .data$plaus_flag_high_rcsi + .data$plaus_flag_severe_hhs + .data$plaus_corr.fcs_rcsi + .data$plaus_corr.fcs_hhs + .data$plaus_corr.hhs_rcsi + .data$plaus_poisson.hhs,
              fsl_plaus_cat = ifelse(.data$fsl_plaus_score >=0 & .data$fsl_plaus_score < 10, "Excellent (0-<10)",
                                     ifelse(.data$fsl_plaus_score >= 10 & .data$fsl_plaus_score < 20, "Good (10-<20)",
                                            ifelse(.data$fsl_plaus_score >= 20 & .data$fsl_plaus_score < 30, "Acceptable (20 - <30)",

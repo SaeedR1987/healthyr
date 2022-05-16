@@ -549,7 +549,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
 
       df <- df %>%
         dplyr::mutate(fcs_score = ifelse(is.na(.data$fcs_weight_cereal1), NA, .data$fcs_score),
-               fcs_cat = ifelse(is.na(.data$fcs_score), NA, ifelse(.data$fcs_score < 28, "Poor", ifelse(.data$fcs_score <=42, "Borderline", ifelse(.data$fcs_score>42 & .data$fcs_score < 200, "Acceptable", NA)))))
+               fcs_cat = ifelse(is.na(.data$fcs_score), NA, ifelse(.data$fcs_score <= 28, "Poor", ifelse(.data$fcs_score <=42, "Borderline", ifelse(.data$fcs_score>42 & .data$fcs_score < 200, "Acceptable", NA)))))
 
     }
 

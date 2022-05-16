@@ -46,9 +46,10 @@ df2 <- format_nut_health_indicators(df = wgss_data,
 # p-value association between domains expected to be reported together?
 # % of interviews directly asked to the person
 # Multiple individuals with disability in the same household?
-#
 
 # Step 4: Evaluate Data with Visualizations ####
+# wg_sum_seeing_34 is coded 1 for yes, 0 for no, if the individual reported a lot of difficulty or
+# cannot do at all for that domain. Similar idea for the other domains
 
 (plot_agepyramid(df2))
 
@@ -63,6 +64,25 @@ df2 <- format_nut_health_indicators(df = wgss_data,
 (plot_age_years_distribution(df2, min_age = 15, max_age = 80, breaks = 1))
 
 (plot_age_years_distribution(df2, min_age = 0, max_age = 18, breaks = 1))
+
+(g <- plot_domain_radar(df = df2,
+                        domain_cols = c("wg_sum_seeing_34","wg_sum_hearing_34","wg_sum_communication_34","wg_sum_walking_34","wg_sum_selfcare_34","wg_sum_remembering_34"),
+                        domain_labels = c("Seeing", "Hearing", "Communication", "Walking", "Self-care", "Remembering")))
+
+(g <- plot_domain_radar(df = df2,
+                        domain_cols = c("wg_sum_seeing_34","wg_sum_hearing_34","wg_sum_communication_34","wg_sum_walking_34","wg_sum_selfcare_34","wg_sum_remembering_34"),
+                        domain_labels = c("Seeing", "Hearing", "Communication", "Walking", "Self-care", "Remembering"),
+                        grouping = "governorate"))
+
+(g <- plot_domain_radar(df = df2,
+                        domain_cols = c("wg_sum_seeing_34","wg_sum_hearing_34","wg_sum_communication_34","wg_sum_walking_34","wg_sum_selfcare_34","wg_sum_remembering_34"),
+                        domain_labels = c("Seeing", "Hearing", "Communication", "Walking", "Self-care", "Remembering"),
+                        grouping = "age_group"))
+
+(g <- plot_domain_radar(df = df2,
+                        domain_cols = c("wg_sum_seeing_34","wg_sum_hearing_34","wg_sum_communication_34","wg_sum_walking_34","wg_sum_selfcare_34","wg_sum_remembering_34"),
+                        domain_labels = c("Seeing", "Hearing", "Communication", "Walking", "Self-care", "Remembering"),
+                        grouping = "sex"))
 
 # Step 5: Export Flagged Records to Cleaning Log + Cleaning ####
 

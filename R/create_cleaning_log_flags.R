@@ -148,8 +148,8 @@ create_cleaning_log_flags <- function(df, uuid_col, file_path = NULL) {
     cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_yes_foods", cols = foods_to_check, description = "All foods at all were reported consumed by the child 6-23 months, which is unusual.")
     cl <- rbind(cl, cl2)
   }
-  if(length(setdiff(c("flag_all_foods_no_meal ", foods_to_check, "iycf_8"), names(df)))==0) {
-    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_all_foods_no_meal", cols = c(foods_to_check, "iycf_8"), description = "Some foods were reported consumed by the child 6-23 months, but soft, semi-solid or solid foods were reported consumed 0 times. Logical inconsistency.")
+  if(length(setdiff(c("flag_some_foods_no_meal ", foods_to_check, "iycf_8"), names(df)))==0) {
+    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_some_foods_no_meal", cols = c(foods_to_check, "iycf_8"), description = "Some foods were reported consumed by the child 6-23 months, but soft, semi-solid or solid foods were reported consumed 0 times. Logical inconsistency.")
     cl <- rbind(cl, cl2)
   }
   if(length(setdiff(c("flag_yes_liquids", "iycf_4", foods_to_check, liquids_to_check), names(df)))==0) {
@@ -160,6 +160,21 @@ create_cleaning_log_flags <- function(df, uuid_col, file_path = NULL) {
     cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_no_anything", cols = c("iycf_4", foods_to_check, liquids_to_check), description = "No foods or liquids consumed at all for a child 6-23 months, which is unlikely.")
     cl <- rbind(cl, cl2)
   }
+
+  if(length(setdiff(c("flag_high_mdd_low_mmf", foods_to_check), names(df)))==0) {
+    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_high_mdd_low_mmf", cols = c("iycf_4", foods_to_check, liquids_to_check, "iycf_8"), description = "High dietary diversity, but only one or fewer meals consumed at for a child 6-23 months, which is unlikely.")
+    cl <- rbind(cl, cl2)
+  }
+  if(length(setdiff(c("flag_under6_nobf_nomilk", foods_to_check), names(df)))==0) {
+    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_under6_nobf_nomilk", cols = c("iycf_4", "iycf_6b_num", "iycf_6c_num", "iycf_6d_num"), description = "Child under 6 months with no breastmilk, milk, formula, or dairy at all, which is unlikely.")
+    cl <- rbind(cl, cl2)
+  }
+  if(length(setdiff(c("flag_meats_nostaples", foods_to_check), names(df)))==0) {
+    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_meats_nostaples", cols = c(foods_to_check), description = "Child consumed protein foods, but no staple foods, which is unusual.")
+    cl <- rbind(cl, cl2)
+  }
+
+
 
   #washington group flags
 
@@ -224,8 +239,12 @@ create_cleaning_log_flags <- function(df, uuid_col, file_path = NULL) {
     cl <- rbind(cl, cl2)
   }
 
-  if(length(setdiff(c("flag_high_rcsi", hdds_vars), names(df)))==0) {
+  if(length(setdiff(c("flag_high_rcsi", rcsi_vars), names(df)))==0) {
     cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_high_rcsi", cols = rcsi_vars, description = "This household reported a very high rCSI score. While not impossible, it is unusual.")
+    cl <- rbind(cl, cl2)
+  }
+  if(length(setdiff(c("flag_proteins_rcsi", c(rcsi_vars, "fcs_dairy", "fcs_meat")), names(df)))==0) {
+    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_proteins_rcsi", cols = c(rcsi_vars, "fcs_dairy", "fcs_meat"), description = "This household reported a very high rCSI score. While not impossible, it is unusual.")
     cl <- rbind(cl, cl2)
   }
   if(length(setdiff(c("flag_lcs_severity", hdds_vars), names(df)))==0) {

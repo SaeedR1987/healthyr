@@ -273,11 +273,22 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
           } else {df <- df %>% dplyr::mutate(oedema = ifelse(is.na(.data$oedema), NA, ifelse(.data$oedema == oedema_codes[[i]], d, .data$oedema)))}
         }
       }
+
+
+
     }
 
-    df <- df %>% mutate(oedema = ifelse(is.na(oedema), "n", oedema))
+
 
   }
+
+  if(c("oedema") %in% names(df)) {
+
+    df <- df %>% dplyr::mutate(oedema = ifelse(is.na(.data$oedema), "n", .data$oedema))
+
+    }
+
+
 
   # reformatting Washingtong Group Short Set indicators ####
 

@@ -40,6 +40,11 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
       dplyr::mutate(flag_wgss_extreme = ifelse(is.na(.data$wgss_hd_score), NA, ifelse(.data$wgss_hd_score >= 9, 1, 0)))
 
   }
+  if(c("wgss_type_interview") %in% names(df)) {
+    df <- df %>%
+      dplyr::mutate(flag_wgss_proxy = ifelse(is.na(.data$wgss_hd_score), NA, ifelse(.data$wgss_hd_score == "proxy", 1, 0)))
+
+  }
 
   # IYCF flags
 
@@ -57,8 +62,6 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
 
     df <- df %>%
       dplyr::mutate(flag_yes_foods = ifelse(.data$foods_all_yes == TRUE, 1, 0))
-
-
 
   }
   if(length(liquids_to_check) > 0) {
@@ -184,9 +187,11 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
     # Much higher meats than cereals
     df <- df %>%
       dplyr::mutate(flag_above7_fcs = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal > 7 | .data$fcs_legumes  > 7 | .data$fcs_dairy  > 7 | .data$fcs_meat  > 7 | .data$fcs_veg  > 7 | .data$fcs_fruit  > 7 | .data$fcs_oil  > 7 | .data$fcs_sugar > 7, 1, 0)),
-                        flag_meat_cereal_ratio = ifelse(is.na(.data$fcs_cereal), NA, ifelse(as.numeric(.data$fcs_meat) - as.numeric(.data$fcs_cereal) > 0, 1, 0 )),
-                        flag_zero_fcs = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal == 0 & .data$fcs_legumes == 0 & .data$fcs_dairy == 0 & .data$fcs_meat == 0 & .data$fcs_veg == 0 & .data$fcs_fruit == 0 & .data$fcs_oil == 0 & .data$fcs_sugar == 0, 1, 0)),
-                        flag_all_fcs = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal == 7 & .data$fcs_legumes == 7 & .data$fcs_dairy == 7 & .data$fcs_meat == 7 & .data$fcs_veg == 7 & .data$fcs_fruit == 7 & .data$fcs_oil == 7 & .data$fcs_sugar == 7, 1, 0)),
+                    flag_meat_cereal_ratio = ifelse(is.na(.data$fcs_cereal), NA, ifelse(as.numeric(.data$fcs_cereal) <= 4 & ( as.numeric(.data$fcs_meat) >= 6  | as.numeric(.data$fcs_dairy) >= 6 ), 1, 0 )),
+                    flag_zero_fcs = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal == 0 & .data$fcs_legumes == 0 & .data$fcs_dairy == 0 & .data$fcs_meat == 0 & .data$fcs_veg == 0 & .data$fcs_fruit == 0 & .data$fcs_oil == 0 & .data$fcs_sugar == 0, 1, 0)),
+                    flag_all_fcs = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal == 7 & .data$fcs_legumes == 7 & .data$fcs_dairy == 7 & .data$fcs_meat == 7 & .data$fcs_veg == 7 & .data$fcs_fruit == 7 & .data$fcs_oil == 7 & .data$fcs_sugar == 7, 1, 0)),
+                    flag_low_cereal_oil = ifelse(is.na(.data$fcs_cereal), NA, ifelse( .data$fcs_cereal <= 4 | .data$fcs_oil <= 4, 1, 0)),
+                    flag_proteins_rcsi = ifelse(is.na(.data$fcs_dairy), NA, ifelse(is.na(.data$fcs_meat), NA, ifelse(is.na(rcsi_score), NA, ifelse( (.data$rcsi_score >= 19 & as.numeric(.data$fcs_dairy) >= 6) | (.data$rcsi_score >= 19 & as.numeric(.data$fcs_meat) >= 6), 1, 0))))
     )
 
     # Extreme FCS_score ( <3 or >60 )
@@ -194,7 +199,7 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
 
       df <- df %>%
         dplyr::mutate(flag_low_fcs = ifelse(is.na(.data$fcs_score), NA, ifelse(.data$fcs_score < 5, 1, 0)),
-               flag_high_fcs = ifelse(is.na(.data$fcs_score), NA, ifelse(.data$fcs_score > 60, 1, 0)))
+                      flag_high_fcs = ifelse(is.na(.data$fcs_score), NA, ifelse(.data$fcs_score > 60, 1, 0)))
 
     }
 
@@ -250,6 +255,15 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
 
     df <- df %>%
       dplyr::mutate(flag_high_rcsi = ifelse(is.na(.data$rcsi_score), NA, ifelse(.data$rcsi_score >= 50, 1, 0)))
+
+  }
+
+  if(length(setdiff(c(fcs_vars, "rcsi_score"), colnames(df)))==0) {
+
+    df <- df %>%
+      dplyr::mutate(flag_protein_high_rcsi = ifelse( is.na(.data$rcsi_score), NA,
+                                                     ifelse(is.na(.data$fcs_cereal), NA,
+                                                            ifelse(.data$rcsi_score >= 19 & ( as.numeric(.data$fcs_dairy) >= 6 | as.numeric(.data$fcs_meat) >= 6), 1, 0 ))))
 
   }
 

@@ -93,6 +93,10 @@ df2 <- format_nut_health_indicators(df = df, use_flags_yn = "yes",
 
 (plot_age_months_distribution(df2, by_group = "county_admin2"))
 
+(g <- plot_iycf_areagraph(df2))
+
+(g <- plot_iycf_areagraph(df2 %>% filter(enum == 1)))
+
 # Step 5: Export Flagged Records to Cleaning Log + Cleaning ####
 
 (flag_summary <- flag_summary_table(df = df2, grouping = "enum"))

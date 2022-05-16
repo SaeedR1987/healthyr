@@ -17,6 +17,8 @@ format_mortality_current_census(
   age_roster,
   joined_roster,
   birth_roster,
+  birthdate_roster = NULL,
+  joined_date_roster = NULL,
   df_left,
   date_dc_left,
   enum_left,
@@ -28,6 +30,8 @@ format_mortality_current_census(
   age_left,
   birth_left,
   joined_left,
+  joined_date_left = NULL,
+  left_date_left = NULL,
   df_died,
   date_dc_died,
   enum_died,
@@ -41,6 +45,9 @@ format_mortality_current_census(
   joined_died,
   death_cause,
   death_location,
+  date_death = NULL,
+  joined_date_died = NULL,
+  birthdate_died = NULL,
   date_recall_event
 )
 }
@@ -72,6 +79,10 @@ the start of the recall period.}
 \item{birth_roster}{Inputs a character value specifying the column in df_roster for if the individual was born into
 the household since the start of the recall period.}
 
+\item{birthdate_roster}{Optional input of a character value specifying date of birth of a current roster member}
+
+\item{joined_date_roster}{Optional input of a character value specifying date a current roster member joined the household}
+
 \item{df_left}{Inputs a dataframe of the roster of individuals who have left the household during the recall period.}
 
 \item{date_dc_left}{Inputs a character value specifying the column in df_left for date of data collection}
@@ -96,6 +107,10 @@ since the start of the recall period.}
 
 \item{joined_left}{Inputs a character value specifying the column in df_left for if the individual joined the household
 since the start of the recall period.}
+
+\item{joined_date_left}{Optional input of a character value specifying date a left household had joined the household}
+
+\item{left_date_left}{Optional input of a character value specifying date a left household member had left the household}
 
 \item{df_died}{Inputs a dataframe of the roster of individuals who have died from the household during the recall period.}
 
@@ -125,6 +140,12 @@ since the start of the recall period.}
 \item{death_cause}{Inputs a character value specifying the column in df_died for the reported cause of death.}
 
 \item{death_location}{Inputs a character value specifying the column in df_died for the reported location of death.}
+
+\item{date_death}{Optional input of a character value specifying date of death of a deceased household member.}
+
+\item{joined_date_died}{Optional input of a character value specifying date that a deceased household member had joined the household.}
+
+\item{birthdate_died}{Optional input of a character value specifying date of birth of a deceased household member.}
 
 \item{date_recall_event}{Inputs a character value with the date of the recall event. Person time observed will be determined based
 on the difference in time between this date and the date of data collection. While this function will check the formatting, it is
