@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-#' format_mortality_to_ena(df = proc_mortality1)
+#' \dontrun{format_mortality_to_ena(df = proc_mortality1)}
 #'
 #' @importFrom rlang .data
 format_mortality_to_ena <- function(df, file_path = NULL) {

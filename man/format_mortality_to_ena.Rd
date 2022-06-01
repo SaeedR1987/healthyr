@@ -19,6 +19,6 @@ The resulting dataframe can be copy-pasted straight into the ENA program for ana
 This function will take a standardized mortality dataset and reshape it for use in the ENA software.
 }
 \examples{
-format_mortality_to_ena(df = proc_mortality1)
+\dontrun{format_mortality_to_ena(df = proc_mortality1)}
 
 }
