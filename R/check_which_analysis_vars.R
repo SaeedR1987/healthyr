@@ -1,5 +1,18 @@
 
 
+#' Check Which Analysis Variables
+#'
+#' A helper function to identify which standard indicators can be checked with
+#' the dashboard based on the data frame input.
+#'
+#' @param df Inputs a dataframe of a standardized anthropometric, FSL, mortality or WG-SS dataset
+#' @param anthro_grouping_var Inputs an optional character value specifying the grouping by which to make SMART flags
+#'
+#' @return Returns a vector with values specifying different technical indicators.
+#' @export
+#'
+#' @examples
+#' \dontrun{}
 check_which_analysis_vars <- function(df, anthro_grouping_var = NULL) {
 
   # Set list of varnames to search for

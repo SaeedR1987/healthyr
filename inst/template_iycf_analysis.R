@@ -21,10 +21,12 @@ df <- raw_anthro_iycf2
 # Step 2: Format Your Dataset ####
 
 df2 <- format_nut_health_indicators(df = df, use_flags_yn = "yes",
+
                                     hhid = "household_id",
                                     date_of_dc = "date_of_interview",
                                     enum = "team_number",
                                     cluster = "cluster_id",
+
                                     date_of_birth = "date_of_birth_of_name",
                                     age_months_var = "interview_section_n1_j_childage",
                                     sex_var = "sex_of_name",
@@ -39,7 +41,7 @@ df2 <- format_nut_health_indicators(df = df, use_flags_yn = "yes",
                                     iycf_6b_num = "number_infant_formula", # infant formula (number)
                                     iycf_6c = "animal_tinned_or_powdered_milk", # milk from animals, fresh tinned powder (y/n)
                                     iycf_6c_num = "number_drink_milk", # milk form animals, fresh, tinned, pwder (number)
-                                    iycf_6c_swt = "sweet_or_flavoured_type_of_milk", # milk was sweetened (y/n)
+                                    #iycf_6c_swt = "sweet_or_flavoured_type_of_milk", # milk was sweetened (y/n)
                                     iycf_6d = "yogurt_drinks", # yoghurt drinks (y/n)
                                     iycf_6d_num = "number_yoghurt_drinks", # yoghurt drinks (number)
                                     iycf_6d_swt = "sweet_or_flavoured_type_of_yogurt_drink", # yoghurt drink was sweetened (y/n)
@@ -47,10 +49,10 @@ df2 <- format_nut_health_indicators(df = df, use_flags_yn = "yes",
                                     iycf_6f = "fruit_juice", # Fruit juice or fruit-flavoured drinks including those made from syrups or powders? (y/n)
                                     iycf_6g = "sodas_malt_drinks", # sodas, malt drinks, sports and energy drinks (y/n)
                                     iycf_6h = "tea_coffee", # tea, coffee, herbal drinks (y/n)
-                                    iycf_6h_swt = "any_of_these_otherliquids_sweetened", # tea coffee herbal drinks were sweetened (y/n)
+                                    #iycf_6h_swt = "any_of_these_otherliquids_sweetened", # tea coffee herbal drinks were sweetened (y/n)
                                     iycf_6i = "clear_broth", # clear broth / soup (y/n)
                                     iycf_6j = "any_other_liquids", # other liquids (y/n)
-                                    iycf_6j_swt = "any_of_these_otherliquids_sweetened", # other drinks were sweetened (y/n)
+                                    #iycf_6j_swt = "any_of_these_otherliquids_sweetened", # other drinks were sweetened (y/n)
                                     iycf_7a = "yoghurt_other_than_yogurt_drinks", # yoghurt (NOT yoghurt drinks) (y/n)
                                     iycf_7a_num = "number_food_yoghurt", # yoghurt (NOT yoghurt drinks) (number)
                                     iycf_7b = "porridge_bread_rice_noodles_pasta_asida_and_kisra", # porridge, bread, rice, nooodles (y/n)
@@ -77,7 +79,11 @@ df2 <- format_nut_health_indicators(df = df, use_flags_yn = "yes",
 # Step 3: Review a Quality Summary Report ####
 # Ratio is (prevalence / (1 - prevalence))
 
-(create_iycf_quality_report(df = df2, short_report = TRUE, exp_prevalence_mad = 0.05, exp_sex_ratio = 1, exp_ratio_under6m_6to23m = 0.3))
+(create_iycf_quality_report(df = df2,
+                            short_report = FALSE,
+                            exp_prevalence_mad = 0.05,
+                            exp_sex_ratio = 1,
+                            exp_ratio_under6m_6to23m = 0.3))
 
 (create_iycf_quality_report(df = df2, grouping = "enum", short_report = TRUE, exp_prevalence_mad = 0.05, exp_sex_ratio = 1, exp_ratio_under6m_6to23m = 0.3))
 
@@ -107,14 +113,18 @@ View(cl)
 # Step 6: Analyse Survey Results ####
 
 (res <- analyse_survey_results(df = df2,
+
                                aggregation = "county_admin2",
+
                                   sample_design = "two_stage_stratified_cluster",
                                strata = "county_admin2",
                                   cluster = "cluster",
+
                                   proportions = c("iycf_evbf","iycf_eibf", "iycf_ebf2d", "iycf_ebf", "iycf_mixmf",
                                                   "iycf_cbf", "iycf_isssf", "mmf_bf_6to8months", "mmf_bf_9to23months",
                                                   "iycf_mdd_cat", "mmf_nonbf_6to23months", "iycf_mmf", "iycf_mmff",
                                                   "iycf_mad", "iycf_eff", "iycf_ufc","iycf_zvf", "iycf_bof"),
+
                                   means = c("iycf_mdd_score")))
 
 

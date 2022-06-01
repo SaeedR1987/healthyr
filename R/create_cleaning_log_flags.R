@@ -36,7 +36,7 @@ create_cleaning_log_flags <- function(df, uuid_col, file_path = NULL) {
   cl <- data.frame(uuid, question.name, issue, feedback, changed, old.value, new.value, description)
 
   #demographic and mortality flags
-  if(length(setdiff(c("flag_birth_age", "age_years", "birth"), names(df)))==0) {
+  if(length(setdiff(c("flag_birth", "age_years", "birth"), names(df)))==0) {
 
     cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_birth_age", cols = c("age_years", "birth"), description = "Person was born within recall period, but is 1 full year or older, not possible. ")
     cl <- rbind(cl, cl2)
@@ -80,12 +80,12 @@ create_cleaning_log_flags <- function(df, uuid_col, file_path = NULL) {
     cl <- rbind(cl, cl2)
   }
 
-  if(length(setdiff(c("flag_birth"), names(df)))==0) {
-    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_birth", cols = c("birth"), description = "Cause of death is missing for reported death.")
+  if(length(setdiff(c("flag_births"), names(df)))==0) {
+    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_birth", cols = c("birth"), description = "Multiple births reported ina household. It is possible, but less likely to occur.")
     cl <- rbind(cl, cl2)
   }
 
-  if(length(setdiff(c("flag_death"), names(df)))==0) {
+  if(length(setdiff(c("flag_deaths"), names(df)))==0) {
     cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_death", cols = c("death"), description = "Multiple deaths reported in a household. It is possible, but less likely to occur.")
     cl <- rbind(cl, cl2)
   }
@@ -254,6 +254,12 @@ create_cleaning_log_flags <- function(df, uuid_col, file_path = NULL) {
 
   if(length(setdiff(c("flag_fc_cell", "fc_cell", "fc_phase"), names(df)))==0) {
     cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_fc_cell", cols = c("fc_cell", "fc_phase"), description = "This household was classified in the FEWSNET Matrix either cells 3,4,5,8,9, or 10. These are logically inconsistent cells showing high HHS, moderate or high food consumption, but low food coping behaviours. ")
+    cl <- rbind(cl, cl2)
+  }
+
+  # adding all text other responses for columns ending in '_other'
+  if(length(grep(pattern = "_other", x = colnames(df), value = TRUE)) > 0) {
+    cl2 <- healthyr::cleaning_log_helper_others(df = df, uuid = uuid_col,)
     cl <- rbind(cl, cl2)
   }
 

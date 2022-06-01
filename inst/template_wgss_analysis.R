@@ -97,10 +97,14 @@ View(cl)
 # Step 6: Analyse Survey Results ####
 
 (res <- analyse_survey_results(df = df2,
+
                                aggregation = "region",
+
                                sample_design = "two_stage_stratified", cluster = "cluster",
                                strata = "strata", svy_weights = "svy_weight",
+
                                proportions = c("disability3", "disability4"),
+
                                means = c("wgss_sco_score", "wgss_hd_score")))
 
 (res <- analyse_survey_results(df = df2,

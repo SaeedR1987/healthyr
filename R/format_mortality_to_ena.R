@@ -56,7 +56,7 @@ format_mortality_to_ena <- function(df, file_path = NULL) {
 
   #select and order relevant columns
 
-  df <- df %>% dplyr::select(.data$date_dc_char, .data$cluster, .data$enum, .data$hh_id, .data$individual_id, .data$sex, .data$age_years, .data$join, .data$left, .data$birth, .data$death, .data$death_cause, .data$death_location) %>%
+  df <- df %>% dplyr::select(.data$date_dc_char, .data$cluster, .data$enum, .data$hh_id, .data$individual_id, .data$sex, .data$age_years, .data$join, .data$left, .data$birth, .data$death, .data$death_cause_smart, .data$death_location_smart) %>%
     dplyr::arrange(as.numeric(.data$cluster), as.numeric(.data$hh_id), as.numeric(.data$individual_id))
 
   # spread data

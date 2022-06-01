@@ -32,17 +32,23 @@ Imports:
     tidyr,
     varhandle,
     writexl,
-    zscorer (>= 0.3.1)
+    zscorer (>= 0.3.1),
+    ggridges,
+    fastDummies,
+    GGally,
+    shiny,
+    shinydashboard,
+    shinythemes,
+    shinyWidgets,
+    plotly,
+    DT,
+    runner
 Suggests:
     epirhandbook (>= 0.0.0.9000),
     apyramid,
     janitor,
     srvyr,
-    runner,
-    praise,
-    ggridges,
-    fastDummies,
-    GGally,
+    praise
 Remotes: 
     nutriverse/zscorer,
     nutriverse/nipnTK,

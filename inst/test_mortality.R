@@ -17,6 +17,7 @@ deaths_data <- read.csv("MultiSectoral_HHS-E_died_member.csv")
 # include situation where dob_nown = "no" and age estimate is included. create an estimate birthdate
 
 # some basic date cleaning first
+
 roster_data2 <- roster_data %>%
   mutate(birthdate = format(lubridate::parse_date_time(birthdate, orders = "dmy"), "%Y-%m-%d" ),
          curr_joined_date = format(lubridate::parse_date_time(curr_joined_date, orders = "dmy"), "%Y-%m-%d" ),
@@ -111,4 +112,36 @@ df2 <- format_mortality_current_census(date_recall_event = "03/11/2020",
 )
 
 writexl::write_xlsx(df2, "testmortscript.xlsx")
+
+
+
+test_fsl <- raw_fsl1
+
+test_fsl2 <- format_nut_health_indicators(df = test_fsl, date_of_dc = "today",
+  cluster = "cluster_id", enum = "enum",
+
+  fcs_cereal = "F01A", fcs_legumes = "F02A", fcs_dairy = "F03A", fcs_meat = "F04A", fcs_veg = "F05A", fcs_fruit = "F06A", fcs_oil = "F07A", fcs_sugar = "F08A",
+
+  hdds_cereals = "F011B", hdds_tubers = "F012B", hdds_dairy = "F03B", hdds_veg = "F05B", hdds_fish = "F043B", hdds_meat = "hdds_meats_any", hdds_eggs = "F044B", hdds_fruit = "F06B", hdds_legumes = "F02B", hdds_condiments = "F09B", hdds_sugars = "F08B", hdds_oils = "F07B",
+
+  hhs_nofoodhh_1 = "hhs_1", hhs_nofoodhh_1a = "hhs_2", hhs_sleephungry_2 = "hhs_3", hhs_sleephungry_2a = "hhs_4", hhs_alldaynight_3 = "hhs_5", hhs_alldaynight_3a = "hhs_6",
+
+  rcsi_lesspreferred_1 = "rcsi1", rcsi_borrowfood_2 = "rcsi2", rcsi_limitportion_3 = "rcsi3", rcsi_restrict_4 = "rcsi4", rcsi_reducemeals5 = "rcsi5",
+
+  lcs_variables = c("lcs1", "lcs2", "lcs3", "lcs4", "lcs5", "lcs6", "lcs7", "lcs8", "lcs9", "lcs10"))
+
+run_monitoring_dashboard(df = test_fsl2,
+                         grouping_var = "enum",
+                         filter_var1 = "cluster",
+                         filter_var2 = "fcs_cereal")
+
+
+
+(plot_ridge_distribution(df = proc_anthro1,
+                         # numeric_cols = c("rcsi_lesspreferred_1","rcsi_borrowfood_2","rcsi_limitportion_3","rcsi_restrict_4","rcsi_reducemeals5")
+  ))
+
+
+
+
 

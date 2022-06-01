@@ -32,6 +32,7 @@ format_mortality_current_census(
   joined_left,
   joined_date_left = NULL,
   left_date_left = NULL,
+  birthdate_left = NULL,
   df_died,
   date_dc_died,
   enum_died,
@@ -111,6 +112,8 @@ since the start of the recall period.}
 \item{joined_date_left}{Optional input of a character value specifying date a left household had joined the household}
 
 \item{left_date_left}{Optional input of a character value specifying date a left household member had left the household}
+
+\item{birthdate_left}{Optional input of a character value specifying date a left household member was born, if born after the recall event}
 
 \item{df_died}{Inputs a dataframe of the roster of individuals who have died from the household during the recall period.}
 

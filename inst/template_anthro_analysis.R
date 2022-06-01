@@ -21,6 +21,7 @@ df <- raw_anthro1
 # Step 2: Format Your Dataset ####
 
 df2 <- format_nut_health_indicators(df = df,
+
                                     hhid = "KEY",
                                     date_of_dc = "today",
                                     cluster = "cluster_id",
@@ -56,7 +57,7 @@ df3 <- flag_anthro_issues(df2, grouping = "")
 
 (plot_age_proxy_distribution(df = df3, by_group = "enum"))
 
-(plot_zscore_distribution(df = df3, index = "mfaz", flags = "yes"))
+(plot_zscore_distribution(df = df3, index = "wfhz", flags = "yes"))
 
 (plot_zscore_distribution(df = df3, index = "wfhz", flags = "no", grouping = "enum"))
 
@@ -72,7 +73,7 @@ df3 <- flag_anthro_issues(df2, grouping = "")
 
 # Step 5: Export Flagged Records to Cleaning Log + Cleaning ####
 
-(flag_summary <- flag_summary_table(df = df3, grouping = "enum"))
+(flag_summary <- flag_summary_table(df = df3))
 
 cl <- create_cleaning_log_flags(df = df3, uuid_col = "hh_id")
 View(cl)
@@ -80,12 +81,15 @@ View(cl)
 # Step 6: Analyse Survey Results ####
 
 (res <- analyse_survey_results(df = df3,
+
                                   sample_design = "two_stage_cluster",
                                   cluster = "cluster",
+
                                   proportions = c("gam_wfhz_noflag", "mam_wfhz_noflag", "sam_wfhz_noflag",
                                                   "global_stunting_noflag", "moderate_stunting_noflag", "severe_stunting_noflag",
                                                   "global_underweight_noflag", "moderate_underweight_noflag", "severe_underweight_noflag",
                                                   "gam_muac_noflag", "mam_muac_noflag", "sam_muac_noflag"),
+
                                   means = c("wfhz_noflag", "hfaz_noflag", "wfaz_noflag", "muac_noflag")))
 
 # Step 7: Exporting Results to ENA ####

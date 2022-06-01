@@ -56,6 +56,7 @@
 #' @param joined_date_roster Optional input of a character value specifying date a current roster member joined the household
 #' @param joined_date_left Optional input of a character value specifying date a left household had joined the household
 #' @param left_date_left Optional input of a character value specifying date a left household member had left the household
+#' @param birthdate_left Optional input of a character value specifying date a left household member was born, if born after the recall event
 #' @param date_death Optional input of a character value specifying date of death of a deceased household member.
 #' @param joined_date_died Optional input of a character value specifying date that a deceased household member had joined the household.
 #' @param birthdate_died Optional input of a character value specifying date of birth of a deceased household member.
@@ -84,13 +85,14 @@
 format_mortality_current_census <- function(df_roster, file_path = NULL,  date_dc_roster, enum_roster, cluster_roster, admin1_roster = NULL, admin2_roster = NULL, hh_id_roster, sex_roster, age_roster, joined_roster, birth_roster,
                                             birthdate_roster = NULL, joined_date_roster = NULL,
                                             df_left, date_dc_left, enum_left, cluster_left, admin1_left = NULL, admin2_left = NULL, hh_id_left, sex_left, age_left, birth_left, joined_left,
-                                            joined_date_left = NULL, left_date_left = NULL,
+                                            joined_date_left = NULL, left_date_left = NULL, birthdate_left = NULL,
                                             df_died, date_dc_died, enum_died, cluster_died, admin1_died = NULL, admin2_died = NULL, hh_id_died, sex_died, age_died, birth_died, joined_died, death_cause, death_location,
                                             date_death = NULL, joined_date_died = NULL, birthdate_died = NULL,
 
                                             date_recall_event) {
 
   if(!methods::hasArg(date_recall_event)) {stop("A date for recall event is required. Please input a character date with a format like dd/mm/yyyy. E.g 28/12/2020. Please check your input.")}
+
 
   df_roster <- df_roster %>%
     dplyr::rename(date_dc = {{date_dc_roster}},
@@ -120,7 +122,8 @@ format_mortality_current_census <- function(df_roster, file_path = NULL,  date_d
            join = {{joined_left}},
            birth = {{birth_left}},
            date_join = {{joined_date_left}},
-           date_left = {{left_date_left}}) %>%
+           date_left = {{left_date_left}},
+           date_birth = {{birthdate_left}}) %>%
     dplyr::mutate(date_recall = date_recall_event)
 
 
@@ -296,7 +299,7 @@ format_mortality_current_census <- function(df_roster, file_path = NULL,  date_d
 
   if(length(setdiff(c(date_vars), colnames(df_mortality))) != 4) {
 
-    print("I AM INSIDE THE DATE MORTALITY PART")
+    # print("I AM INSIDE THE DATE MORTALITY PART")
 
     df_mortality <- df_mortality %>%
       dplyr::mutate(
@@ -335,7 +338,7 @@ format_mortality_current_census <- function(df_roster, file_path = NULL,  date_d
 
   } else {
 
-    print("I AM OUTSIDE THE DATE MORTALITY PART")
+    # print("I AM OUTSIDE THE DATE MORTALITY PART")
 
     df_mortality <- df_mortality %>%
       dplyr::mutate(
@@ -369,6 +372,17 @@ format_mortality_current_census <- function(df_roster, file_path = NULL,  date_d
                                            "60-64", "65-69", "70-74", "75-79", "80-84", "85+"))
 
   df_mortality <- healthyr::flag_mortality_issues(df = df_mortality)
+
+  # create unique id
+
+  df_mortality <- df_mortality %>%
+    dplyr::group_by(.data$hh_id) %>%
+    dplyr::mutate(individual_id = dplyr::row_number()) %>%
+    ungroup() %>%
+    dplyr::mutate(id = paste0(hh_id, "_", individual_id), individual_id = NULL) %>%
+    dplyr::select(id, everything())
+
+  # df_mortality <- df_mortality %>% dplyr::mutate()
 
   # Saving the new dataframe to a xlsx, if specified
   if(!is.null(file_path)) {writexl::write_xlsx(df_mortality, file_path)}
