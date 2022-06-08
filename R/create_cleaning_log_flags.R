@@ -86,7 +86,7 @@ create_cleaning_log_flags <- function(df, uuid_col, file_path = NULL) {
   }
 
   if(length(setdiff(c("flag_deaths"), names(df)))==0) {
-    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_death", cols = c("death"), description = "Multiple deaths reported in a household. It is possible, but less likely to occur.")
+    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_deaths", cols = c("death"), description = "Multiple deaths reported in a household. It is possible, but less likely to occur.")
     cl <- rbind(cl, cl2)
   }
 
