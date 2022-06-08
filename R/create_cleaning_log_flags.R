@@ -38,7 +38,7 @@ create_cleaning_log_flags <- function(df, uuid_col, file_path = NULL) {
   #demographic and mortality flags
   if(length(setdiff(c("flag_birth", "age_years", "birth"), names(df)))==0) {
 
-    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_birth_age", cols = c("age_years", "birth"), description = "Person was born within recall period, but is 1 full year or older, not possible. ")
+    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_birth", cols = c("age_years", "birth"), description = "Person was born within recall period, but is 1 full year or older, not possible. ")
     cl <- rbind(cl, cl2)
 
   }
