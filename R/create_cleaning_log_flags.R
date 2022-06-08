@@ -259,7 +259,7 @@ create_cleaning_log_flags <- function(df, uuid_col, file_path = NULL) {
 
   # adding all text other responses for columns ending in '_other'
   if(length(grep(pattern = "_other", x = colnames(df), value = TRUE)) > 0) {
-    cl2 <- healthyr::cleaning_log_helper_others(df = df, uuid = uuid_col,)
+    cl2 <- healthyr::cleaning_log_helper_others(df = df, uuid = uuid_col)
     cl <- rbind(cl, cl2)
   }
 

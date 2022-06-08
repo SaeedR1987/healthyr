@@ -17,18 +17,21 @@ cleaning_log_helper_others <- function(df, uuid) {
 
   cols <- grep(pattern = "_other", x = colnames(df), value = TRUE)
 
+  cols2 <- stringr::str_remove(string = cols, pattern = "_other")
+
   description = "Other values, check if should be recoded."
 
   df <- df %>% dplyr::mutate(n = dplyr::row_number())
 
   df <- df %>% dplyr::rename(uuid = {{uuid}}) %>%
-    dplyr::select(.data$n, uuid, cols) %>%
-    tidyr::gather(key = "question.name",value = "old.value", cols) %>%
-    dplyr::rename(drop = {{flag}}) %>% dplyr::filter(drop != 0) %>%
-    dplyr::mutate(drop = NULL, issue = paste0("flag_", question.name)) %>%
+    dplyr::select(.data$n, uuid, cols, cols2) %>%
+    tidyr::gather(key = "question.name",value = "old.value", c(cols,cols2) ) %>%
+    # dplyr::rename(drop = {{flag}}) %>% dplyr::filter(drop != 0) %>%
+    dplyr::mutate(drop = NULL, issue = paste0("flag_", .data$question.name)) %>%
     dplyr::mutate(new.value = "", feedback = "", changed = "") %>%
     dplyr::select(.data$uuid, .data$question.name, .data$issue, .data$feedback, .data$changed, .data$old.value, .data$new.value) %>%
-    dplyr::mutate(description = description)
+    dplyr::mutate(description = description) %>%
+    dplyr::filter(!is.na(.data$old.value))
 
   return(df)
 
