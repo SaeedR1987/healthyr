@@ -19,6 +19,10 @@ cleaning_log_helper_others <- function(df, uuid) {
 
   cols2 <- stringr::str_remove(string = cols, pattern = "_other")
 
+  # cols1 <- intersect(cols1, colnames(df))
+
+  cols2 <- intersect(cols2, colnames(df))
+
   description = "Other values, check if should be recoded."
 
   df <- df %>% dplyr::mutate(n = dplyr::row_number())

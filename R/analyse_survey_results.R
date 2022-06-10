@@ -129,9 +129,9 @@ analyse_survey_results <- function(df, file_path = NULL,
 
         for (i in 1:length(ratios_rates.numerators)) {
 
-          a <- ratios_rates.numerators[[i]]
+          a <- as.character(ratios_rates.numerators[[i]])
 
-          if(all(varhandle::check.numeric(df[,a]))) {} else {stop(paste0("There are non-numeric values in ", ratios_rates.numerators[[i]], ". Please check your input."))}
+          if(all(varhandle::check.numeric(df[[a]]))) {} else {stop(paste0("There are non-numeric values in ", ratios_rates.numerators[[i]], ". Please check your input."))}
 
         }
 
@@ -140,9 +140,9 @@ analyse_survey_results <- function(df, file_path = NULL,
 
         for (i in 1:length(ratios_rates.denominators)) {
 
-          a <- ratios_rates.denominators[[i]]
+          a <- as.character(ratios_rates.denominators[[i]])
 
-          if(all(varhandle::check.numeric(df[,a]))) {} else {stop(paste0("There are non-numeric values in ", ratios_rates.denominators[[i]], ". Please check your input."))}
+          if(all(varhandle::check.numeric(df[[a]]))) {} else {stop(paste0("There are non-numeric values in ", ratios_rates.denominators[[i]], ". Please check your input."))}
 
         }
 
