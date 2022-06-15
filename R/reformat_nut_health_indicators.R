@@ -670,10 +670,10 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
   if(!is.null(lcs_variables)) {
 
     df <- df %>%
-      dplyr::mutate(lcs_stress = "",
-             lcs_crisis = "",
-             lcs_emergency = "",
-             lcs_other = "",
+      dplyr::mutate(lcs_stress = "0",
+             lcs_crisis = "0",
+             lcs_emergency = "0",
+             lcs_other = "0",
       )
 
     # for recoding all barriers, assumes they are all coded the same way
@@ -711,6 +711,7 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
 
     lcs_severity_recodes <- c("1", "2", "3","9")
     # for assigning domains for each variable
+
     for (z in 1:length(lcs_variables)) {
 
       a <- readline(cat(paste0("Which severity of livelihood coping does <<",lcs_variables[[z]], ">> correspond to? Please choose either: \n '1' for Stress \n '2' for Crisis, \n '3' for Emergency, or \n '9' for Not Applicable." )))
