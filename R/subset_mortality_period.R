@@ -47,50 +47,109 @@ subset_mortality_period <- function(df, start_date, end_date) {
       filter( is.na(date_death_date) | lubridate::as_date(.data$date_death_date) > format(lubridate::parse_date_time(start_date, orders = "ymd", tz = ""), "%Y-%m-%d"))
   }
 
+  # Re-classify demographic events based on the new recall periods
+
+  df <- df %>%
+    dplyr::mutate(age_years = as.numeric(.data$age_years),
+                  date_dc_date = lubridate::as_date(lubridate::parse_date_time(end_date, orders = "ymd", tz = "")),
+                  date_recall_date = lubridate::as_date(lubridate::parse_date_time(start_date, orders = "ymd", tz = "")),
+
+                  date_dc_date = as.Date(date_dc_date),
+                  date_recall_date = as.Date(date_recall_date),
+                  date_join_date = as.Date(date_join_date),
+                  date_left_date = as.Date(date_left_date),
+                  date_birth_date = as.Date(date_birth_date),
+                  date_death_date = as.Date(date_death_date),
+
+                  # date_dc_date2 = date_dc_date,
+                  # date_recall_date2 = date_recall_date,
+                  # date_join_date2 = date_join_date,
+                  # date_left_date2 = date_left_date,
+                  # date_birth_date2 = date_birth_date,
+                  # date_death_date2 = date_death_date,
+
+                  join = ifelse(.data$date_recall_date - .data$date_join_date > 0, NA, join),
+                  left = ifelse(.data$date_left_date - .data$date_dc_date > 0, NA, left),
+                  birth = ifelse(.data$date_recall_date - .data$date_birth_date > 0, NA, birth),
+                  death = ifelse(.data$date_death_date - .data$date_dc_date > 0, NA, death),
+                  # date_left_date = ifelse(is.na(.data$left), "", lubridate::as_date(lubridate::parse_date_time(date_left_date, orders = "ymd", tz = "")))
+                  # test = .data$date_dc_date - .data$date_left_date,
+
+                  # birth = ifelse(as.Date(.data$date_recall_date, origin = "1970-01-01") - as.Date(.data$date_birth_date, origin = "1970-01-01") < 0, NA, birth),
+                  # death = ifelse(as.Date(.data$date_death_date, origin = "1970-01-01") - as.Date(.data$date_dc_date, origin = "1970-01-01") < 0, NA, death),
+
+                  # diff_join = as.numeric(.data$date_dc_date - .data$date_join_date),
+                  # remove_join = ifelse(diff_join < 0, 1, 0),
+                  # date_join_date = ifelse(remove_join == 1, NA, as.Date(date_join_date, origin = "1970-01-01")),
+                  # date_join_date = ifelse(as.Date(.data$date_dc_date, origin = "1970-01-01") - as.Date(.data$date_join_date, origin = "1970-01-01") < 0, NA, as.Date(.data$date_join_date, origin = "1970-01-01")),
+                  # date_join_day = ifelse(.data$date_join_date2 < .data$date_recall_date2, NA, date_join_day),
+                  # date_join_month = ifelse(.data$date_join_date2 < .data$date_recall_date2, NA, date_join_month),
+                  # date_join_year = ifelse(.data$date_join_date2 < .data$date_recall_date2, NA, date_join_year)
+                  )
+  # %>%
+    # dplyr::mutate(left = ifelse(.data$date_left_date2 > .data$date_dc_date2, NA, left),
+    #               date_left_date = ifelse(.data$date_left_date2 > .data$date_dc_date2, NA, date_left_date),
+    #               date_left_day = ifelse(.data$date_left_date2 > .data$date_dc_date2, NA, date_left_day),
+    #               date_left_month = ifelse(.data$date_left_date2 > .data$date_dc_date2, NA, date_left_month),
+    #               date_left_year = ifelse(.data$date_left_date2 > .data$date_dc_date2, NA, date_left_year)) %>%
+    # dplyr::mutate(birth = ifelse(.data$date_birth_date2 < .data$date_recall_date2, NA, birth),
+    #               date_birth_date = ifelse(.data$date_birth_date2 < .data$date_recall_date2, NA, date_birth_date),
+    #               date_birth_day = ifelse(.data$date_birth_date2 < .data$date_recall_date2, NA, date_birth_day),
+    #               date_birth_month = ifelse(.data$date_birth_date2 < .data$date_recall_date2, NA, date_birth_month),
+    #               date_birth_year = ifelse(.data$date_birth_date2 < .data$date_recall_date2, NA, date_birth_year)) %>%
+    # dplyr::mutate(death = ifelse(.data$date_death_date2 > .data$date_dc_date2, NA, death),
+    #               date_death_date = ifelse(.data$date_death_date2 > .data$date_dc_date2, NA, date_death_date),
+    #               date_death_day = ifelse(.data$date_death_date2 > .data$date_dc_date2, NA, date_death_day),
+    #               date_death_month = ifelse(.data$date_death_date2 > .data$date_dc_date2, NA, date_death_month),
+    #               date_death_year = ifelse(.data$date_death_date2 > .data$date_dc_date2, NA, date_death_year)
+                  # )
+
   # recalculate person time with new start and end date
+
+  df <- df %>%
+    dplyr::mutate(date_join_date = lubridate::as_date(lubridate::parse_date_time(date_join_date, orders = "ymd", tz = "")),
+                  date_left_date = lubridate::as_date(lubridate::parse_date_time(date_left_date, orders = "ymd", tz = "")),
+                  date_birth_date = lubridate::as_date(lubridate::parse_date_time(date_birth_date, orders = "ymd", tz = "")),
+                  date_death_date = lubridate::as_date(lubridate::parse_date_time(date_death_date, orders = "ymd", tz = "")),
+                  under_5 = ifelse(is.na(.data$age_years), NA, ifelse(as.numeric(.data$age_years) < 5, 1, NA)),
+                  under_5_pt = ifelse(is.na(.data$under_5), NA, ifelse(.data$under_5 == 1, .data$person_time, NA)))
 
   df <- df %>%
     dplyr::mutate(
       age_years = as.numeric(.data$age_years),
-      date_dc_date = lubridate::as_date(lubridate::parse_date_time(end_date, orders = "ymd", tz = "")),
-      date_recall_date = lubridate::as_date(lubridate::parse_date_time(start_date, orders = "ymd", tz = "")),
-      date_join_date = lubridate::as_date(lubridate::parse_date_time(date_join_date, orders = "ymd", tz = "")),
-      date_left_date = lubridate::as_date(lubridate::parse_date_time(date_left_date, orders = "ymd", tz = "")),
-      date_birth_date = lubridate::as_date(lubridate::parse_date_time(date_birth_date, orders = "ymd", tz = "")),
-      date_death_date = lubridate::as_date(lubridate::parse_date_time(date_death_date, orders = "ymd", tz = "")),
+
+
       # default person time calculations
       person_time = as.numeric(.data$date_dc_date - .data$date_recall_date),
-      # joiner person time calculations
+
       person_time = ifelse(is.na(.data$date_join_date), .data$person_time,
-                           ifelse(!is.na(.data$date_death_date), as.numeric(.data$date_death_date - .data$date_join_date),
-                                  ifelse(!is.na(.data$date_left_date), as.numeric(.data$date_left_date - .data$date_join_date),
-                                         ifelse(.data$date_join_date < .data$date_recall_date, .data$person_time, as.numeric(.data$date_dc_date - .data$date_join_date))))),
+                           ifelse(!is.na(.data$date_death_date) & !is.na(death) & !is.na(join), as.numeric(.data$date_death_date - .data$date_join_date),
+                                  ifelse(!is.na(.data$date_left_date) & !is.na(.data$left) & !is.na(join), as.numeric(.data$date_left_date - .data$date_join_date),
+                                        ifelse(!is.na(join), as.numeric(.data$date_dc_date - .data$date_join_date), .data$person_time)))),
 
       # leaver person time calculations - join_left situaiton taken care above, so it defaults to person_time here
       person_time = ifelse(is.na(.data$date_left_date), .data$person_time,
-                           ifelse(!is.na(.data$date_join_date), .data$person_time,
-                                  ifelse(.data$date_left_date > .data$date_dc_date, .data$person_time, as.numeric(.data$date_left_date - .data$date_recall_date)))),
+                           ifelse(!is.na(.data$date_join_date) & !is.na(join), .data$person_time,
+                                  ifelse(!is.na(.data$left), as.numeric(.data$date_left_date - .data$date_recall_date), .data$person_time))),
 
       # # birth person time calculations
       person_time = ifelse(is.na(.data$date_birth_date), .data$person_time,
                            ifelse( .data$date_birth_date < .data$date_recall_date, .data$person_time,
-                                   ifelse(!is.na(.data$date_death_date), as.numeric(.data$date_death_date - .data$date_birth_date),
-                                          ifelse(!is.na(.data$date_left_date), .data$person_time ,
-                                                 ifelse(.data$date_birth_date < .data$date_recall_date, .data$person_time,as.numeric(.data$date_left_date - .data$date_birth_date)))))),
-
+                                   ifelse(!is.na(.data$date_death_date)  & !is.na(death) & !is.na(birth), as.numeric(.data$date_death_date - .data$date_birth_date),
+                                          ifelse(!is.na(.data$date_left_date) & !is.na(.data$left) & !is.na(birth), as.numeric(.data$date_left_date - .data$date_birth_date),
+                                                ifelse(!is.na(birth), as.numeric(.data$date_dc_date - .data$date_birth_date), .data$person_time))))),
+      #
       # # death person time calculations
       person_time = ifelse(is.na(.data$date_death_date), .data$person_time,
-                           ifelse(!is.na(.data$date_join_date), .data$person_time,
-                                  ifelse(!is.na(.data$date_birth_date), .data$person_time,
-                                         ifelse(.data$date_death_date > .data$date_dc_date, .data$person_time,as.numeric(.data$date_death_date - .data$date_recall_date))))),
-    )
+                           ifelse(!is.na(.data$date_join_date) & !is.na(join), .data$person_time,
+                                  ifelse(!is.na(.data$date_birth_date) & !is.na(birth), .data$person_time,
+                                        ifelse(!is.na(death), as.numeric(.data$date_death_date - .data$date_recall_date), .data$person_time))))  ,
 
-  df <- df %>%
-    dplyr::mutate(
-      under_5 = ifelse(is.na(.data$age_years), NA, ifelse(as.numeric(.data$age_years) < 5, 1, NA)),
-      under_5_pt = ifelse(is.na(.data$under_5), NA, ifelse(.data$under_5 == 1, .data$person_time, NA)))
+      )
+
 
   print("date_recall_date, and date_dc_date columns have been modified to reflect the specified recall period.")
+
 
   return(df)
 

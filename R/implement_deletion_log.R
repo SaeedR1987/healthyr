@@ -19,7 +19,7 @@ implement_deletion_log <- function(df, deletion_log, uuid_col) {
 
   if(c("uuid") %in% colnames(deletion_log)) {} else {stop("You must have a column named 'uuid' in the deletion log specifying the record id to be deleted. ")}
 
-  df <- df %>% filter(!(uuid_col %in% deletion_log$uuid))
+  df <- df %>% dplyr::filter(!(!!rlang::sym(uuid_col) %in% deletion_log$uuid))
 
   return(df)
 

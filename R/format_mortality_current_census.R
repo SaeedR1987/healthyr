@@ -304,30 +304,31 @@ format_mortality_current_census <- function(df_roster, file_path = NULL,  date_d
     df_mortality <- df_mortality %>%
       dplyr::mutate(
         age_years = as.numeric(.data$age_years),
-        # joiner person time calculations
+        # default person time calculations
         person_time = as.numeric(.data$date_dc_date - .data$date_recall_date),
 
         person_time = ifelse(is.na(.data$date_join_date), .data$person_time,
-                             ifelse(!is.na(.data$date_death_date), as.numeric(.data$date_death_date - .data$date_join_date),
-                                    ifelse(!is.na(.data$date_left_date), as.numeric(.data$date_left_date - .data$date_join_date), as.numeric(.data$date_dc_date - .data$date_join_date)))),
+                             ifelse(!is.na(.data$date_death_date) & !is.na(death) & !is.na(join), as.numeric(.data$date_death_date - .data$date_join_date),
+                                    ifelse(!is.na(.data$date_left_date) & !is.na(.data$left) & !is.na(join), as.numeric(.data$date_left_date - .data$date_join_date),
+                                           ifelse(!is.na(join), as.numeric(.data$date_dc_date - .data$date_join_date), .data$person_time)))),
 
         # leaver person time calculations - join_left situaiton taken care above, so it defaults to person_time here
         person_time = ifelse(is.na(.data$date_left_date), .data$person_time,
-                             ifelse(!is.na(.data$date_join_date), .data$person_time, as.numeric(.data$date_left_date - .data$date_recall_date))),
+                             ifelse(!is.na(.data$date_join_date) & !is.na(join), .data$person_time,
+                                    ifelse(!is.na(.data$left), as.numeric(.data$date_left_date - .data$date_recall_date), .data$person_time))),
 
         # # birth person time calculations
         person_time = ifelse(is.na(.data$date_birth_date), .data$person_time,
                              ifelse( .data$date_birth_date < .data$date_recall_date, .data$person_time,
-                                     ifelse(!is.na(.data$date_death_date), as.numeric(.data$date_death_date - .data$date_birth_date),
-                                            ifelse(!is.na(.data$date_left_date), .data$person_time , as.numeric(.data$date_left_date - .data$date_birth_date))))),
+                                     ifelse(!is.na(.data$date_death_date)  & !is.na(death) & !is.na(birth), as.numeric(.data$date_death_date - .data$date_birth_date),
+                                            ifelse(!is.na(.data$date_left_date) & !is.na(.data$left) & !is.na(birth), as.numeric(.data$date_left_date - .data$date_birth_date),
+                                                   ifelse(!is.na(birth), as.numeric(.data$date_dc_date - .data$date_birth_date), .data$person_time))))),
         #
         # # death person time calculations
         person_time = ifelse(is.na(.data$date_death_date), .data$person_time,
-                             ifelse(!is.na(.data$date_join_date), .data$person_time,
-                                    ifelse(!is.na(.data$date_birth_date), .data$person_time, as.numeric(.data$date_death_date - .data$date_recall_date)))),
-
-        # if any situation where a person died, born, left or joined, and there is no corresponding date, it will half the person_time for that person (halving what has been calculated in the scenarios above)
-        # person_time = ifelse( (is.na(.data$date_death_date) & !is.na(.data$death)) | (is.na(.data$date_join_date) & !is.na(.data$join)) | (is.na(.data$date_left_date) & !is.na(.data$left)) | (is.na(.data$date_birth_date) & !is.na(.data$birth)), as.numeric(.data$person_time)*0.5, .data$person_time)
+                             ifelse(!is.na(.data$date_join_date) & !is.na(join), .data$person_time,
+                                    ifelse(!is.na(.data$date_birth_date) & !is.na(birth), .data$person_time,
+                                           ifelse(!is.na(death), as.numeric(.data$date_death_date - .data$date_recall_date), .data$person_time))))  ,
 
       )
 
