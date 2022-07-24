@@ -81,7 +81,7 @@ create_cleaning_log_flags <- function(df, uuid_col, file_path = NULL) {
   }
 
   if(length(setdiff(c("flag_births"), names(df)))==0) {
-    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_birth", cols = c("birth"), description = "Multiple births reported ina household. It is possible, but less likely to occur.")
+    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_births", cols = c("birth"), description = "Multiple births reported ina household. It is possible, but less likely to occur.")
     cl <- rbind(cl, cl2)
   }
 
@@ -184,14 +184,14 @@ create_cleaning_log_flags <- function(df, uuid_col, file_path = NULL) {
     cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_wgss_age", cols = c("age_years", wgss_vars), description = "Washington Group Short Set values are present for a person under-5 years of age. This indicator set is not applicable for this age group.")
     cl <- rbind(cl, cl2)
   }
-  if(length(setdiff(c("flag_wgss_sco_score", wgss_vars), names(df)))==0) {
-    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_wgss_sco_score", cols = wgss_vars, description = "Washington Group Short Set values are present for a person under-5 years of age. This indicator set is not applicable for this age group.")
-    cl <- rbind(cl, cl2)
-  }
-  if(length(setdiff(c("wgss_hd_score", wgss_vars), names(df)))==0) {
-    cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "wgss_hd_score", cols = wgss_vars, description = "Washington Group Short Set values are present for a person under-5 years of age. This indicator set is not applicable for this age group.")
-    cl <- rbind(cl, cl2)
-  }
+  # if(length(setdiff(c("flag_wgss_sco_score", wgss_vars), names(df)))==0) {
+  #   cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_wgss_sco_score", cols = wgss_vars, description = "Shows an extreme WGSS")
+  #   cl <- rbind(cl, cl2)
+  # }
+  # if(length(setdiff(c("wgss_hd_score", wgss_vars), names(df)))==0) {
+  #   cl2 <- healthyr::cleaning_log_helper(df = df, uuid = uuid_col, flag = "flag_wgss_hd_score", cols = wgss_vars, description = "Washington Group Short Set values are present for a person under-5 years of age. This indicator set is not applicable for this age group.")
+  #   cl <- rbind(cl, cl2)
+  # }
 
   # FSL Flags ##########
 

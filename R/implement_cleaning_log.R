@@ -20,30 +20,36 @@ implement_cleaning_log <- function(df, uuid_col, cleaning_log) {
 
   df <- df %>% dplyr::rename(uuid_col = {{uuid_col}})
 
-  cols_to_clean <- unique(cleaning_log$question.name)
+  if(nrow(cleaning_log) > 0) {
 
-  df[cols_to_clean] <- lapply(df[cols_to_clean], as.character)
+    cols_to_clean <- unique(cleaning_log$question.name)
 
-  # cleaning households
+    df[cols_to_clean] <- lapply(df[cols_to_clean], as.character)
 
-  for(i in 1:nrow(cleaning_log)){
-    if(cleaning_log[["tobe_changed"]][i]=="yes"& !is.na(cleaning_log[["tobe_changed"]][i])){
-      uuid_i <- cleaning_log$uuid[i]
-      var_i <- cleaning_log$question.name[i]
-      old_i <- cleaning_log$old.value[i]
-      new_i <- cleaning_log$new.value[i]
+    # cleaning households
 
-      if(is.na(new_i)) {
+    for(i in 1:nrow(cleaning_log)){
+      if(cleaning_log[["tobe_changed"]][i]=="yes"& !is.na(cleaning_log[["tobe_changed"]][i])){
+        uuid_i <- cleaning_log$uuid[i]
+        var_i <- cleaning_log$question.name[i]
+        old_i <- cleaning_log$old.value[i]
+        new_i <- cleaning_log$new.value[i]
 
-        df[df$uuid_col == uuid_i, var_i] <- NA_character_
+        if(is.na(new_i)) {
 
-      }else{
+          df[df$uuid_col == uuid_i, var_i] <- NA_character_
 
-        df[df$uuid_col == uuid_i, var_i] <- new_i
-        print(paste0("The variable ", var_i, " was changed from ", old_i, " to ", new_i, " for id: ", uuid_i))
+        }else{
+
+          df[df$uuid_col == uuid_i, var_i] <- new_i
+          print(paste0("The variable ", var_i, " was changed from ", old_i, " to ", new_i, " for id: ", uuid_i))
+        }
       }
     }
+
   }
+
+
 
   return(df)
 

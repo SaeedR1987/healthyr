@@ -217,6 +217,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       ) %>%
       dplyr::rowwise() %>%
       dplyr::mutate(wgss_sco_score = sum(c(.data$wg_sco_score_seeing, .data$wg_sco_score_hearing, .data$wg_sco_score_communication, .data$wg_sco_score_walking, .data$wg_sco_score_selfcare, .data$wg_sco_score_remembering), na.rm = TRUE),
+                    wgss_sco_score = ifelse(.data$age_years < 5, NA, wgss_sco_score),
              wg_sum_234 = sum(c(.data$wg_sum_seeing_234, .data$wg_sum_hearing_234, .data$wg_sum_communication_234, .data$wg_sum_walking_234, .data$wg_sum_selfcare_234, .data$wg_sum_remembering_234), na.rm = TRUE),
              wg_sum_34 = sum(c(.data$wg_sum_seeing_34, .data$wg_sum_hearing_34, .data$wg_sum_communication_34, .data$wg_sum_walking_34, .data$wg_sum_selfcare_34, .data$wg_sum_remembering_34), na.rm = TRUE),
              wg_sum_4 = sum(c(.data$wg_sum_seeing_4, .data$wg_sum_hearing_4, .data$wg_sum_communication_4, .data$wg_sum_walking_4, .data$wg_sum_selfcare_4, .data$wg_sum_remembering_4), na.rm = TRUE)) %>%
@@ -233,6 +234,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
              wgss_hd_score = ifelse(is.na(.data$wg_sum_4), NA, ifelse(.data$wg_sum_4 > 0, 4, .data$wgss_hd_score)),
              wgss_hd_score = ifelse(is.na(.data$wg_sum_4), NA, ifelse(.data$wg_sum_4 == 6, 9, .data$wgss_hd_score)),
              wgss_hd_score = ifelse(is.na(.data$wgss_hd_score), NA, ifelse(.data$wgss_hd_score == 0, 1, .data$wgss_hd_score)),
+             wgss_hd_score = ifelse(.data$age_years < 5, NA, wgss_hd_score),
 
              disability1 = ifelse(is.na(.data$wg_sum_234), NA, ifelse(.data$wg_sum_234 > 0, 1, 0)),
              disability2 = ifelse(is.na(.data$wg_sum_34) & is.na(.data$wg_sum_234), NA, ifelse(.data$wg_sum_234 >=2 | .data$wg_sum_34 > 0, 1, 0)),
