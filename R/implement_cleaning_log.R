@@ -29,7 +29,7 @@ implement_cleaning_log <- function(df, uuid_col, cleaning_log) {
     # cleaning households
 
     for(i in 1:nrow(cleaning_log)){
-      if(cleaning_log[["tobe_changed"]][i]=="yes"& !is.na(cleaning_log[["tobe_changed"]][i])){
+      if(cleaning_log[["changed"]][i]=="yes"& !is.na(cleaning_log[["changed"]][i])){
         uuid_i <- cleaning_log$uuid[i]
         var_i <- cleaning_log$question.name[i]
         old_i <- cleaning_log$old.value[i]

@@ -17,7 +17,7 @@ append_cleaning_log <- function(old_cl, new_cl) {
 #
   combined_cl <- rbind(new_cl, old_cl)
   # check for similar columns with uuid, question.name, issue, description, old.value
-  cl <- combined_cl[ !duplicated(combined_cl[,c("uuid", "question.name", "issue", "old.value", "description")], fromLast=T)]
+  cl <- combined_cl[!duplicated(combined_cl[c("uuid", "question.name", "issue", "old.value")], fromLast = FALSE),]
 
   return(cl)
 }
