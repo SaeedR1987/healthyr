@@ -253,6 +253,8 @@ reformat_mortality_current_census <- function(df) {
   ideal_codes <- c("1", "2", "3")
   cause_recodes <- c("1", "2", "3", "NA")
 
+  df <- df %>% dplyr::mutate(death_cause_smart = "")
+
   if(length(setdiff(cause_codes, ideal_codes))==0) {
     print("Good - Cause of Death coded as 1/2/3 for unknown/injury/illness")
   } else {
@@ -267,8 +269,8 @@ reformat_mortality_current_census <- function(df) {
       print(paste("The input ", a, " is replacing", cause_codes[[i]]))
 
       if(!is.na(cause_codes[[i]])){
-        if(a == "NA") {df <- df %>% dplyr::mutate(death_cause_smart = ifelse(.data$death_cause == cause_codes[[i]], NA, .data$death_cause))
-        } else {df <- df %>% dplyr::mutate(death_cause_smart = ifelse(.data$death_cause == cause_codes[[i]], a, .data$death_cause))}
+        if(a == "NA") {df <- df %>% dplyr::mutate(death_cause_smart = ifelse(.data$death_cause == cause_codes[[i]], NA, .data$death_cause_smart))
+        } else {df <- df %>% dplyr::mutate(death_cause_smart = ifelse(.data$death_cause == cause_codes[[i]], a, .data$death_cause_smart))}
       }
 
     }
@@ -279,6 +281,8 @@ reformat_mortality_current_census <- function(df) {
   location_codes <- unique(df$death_location)
   ideal_codes <- c("1", "2", "3", "4")
   location_recodes <- c("1", "2", "3", "4", "NA")
+
+  df <- df %>% dplyr::mutate(death_location_smart = "")
 
   if(length(setdiff(location_codes, ideal_codes))==0) {
     print("Good - Cause of Death coded as 1/2/3/4 for unknown/injury/illness")
@@ -294,8 +298,8 @@ reformat_mortality_current_census <- function(df) {
       print(paste("The input ", a, " is replacing", location_codes[[i]]))
 
       if(!is.na(location_codes[[i]])){
-        if(a == "NA") {df <- df %>% dplyr::mutate(death_location_smart = ifelse(.data$death_location == location_codes[[i]], NA, .data$death_location))
-        } else {df <- df %>% dplyr::mutate(death_location_smart = ifelse(.data$death_location == location_codes[[i]], a, .data$death_location))}
+        if(a == "NA") {df <- df %>% dplyr::mutate(death_location_smart = ifelse(.data$death_location == location_codes[[i]], NA, .data$death_location_smart))
+        } else {df <- df %>% dplyr::mutate(death_location_smart = ifelse(.data$death_location == location_codes[[i]], a, .data$death_location_smart))}
       }
 
     }

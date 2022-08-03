@@ -191,8 +191,15 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
                     flag_zero_fcs = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal == 0 & .data$fcs_legumes == 0 & .data$fcs_dairy == 0 & .data$fcs_meat == 0 & .data$fcs_veg == 0 & .data$fcs_fruit == 0 & .data$fcs_oil == 0 & .data$fcs_sugar == 0, 1, 0)),
                     flag_all_fcs = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal == 7 & .data$fcs_legumes == 7 & .data$fcs_dairy == 7 & .data$fcs_meat == 7 & .data$fcs_veg == 7 & .data$fcs_fruit == 7 & .data$fcs_oil == 7 & .data$fcs_sugar == 7, 1, 0)),
                     flag_low_cereal_oil = ifelse(is.na(.data$fcs_cereal), NA, ifelse( .data$fcs_cereal <= 4 | .data$fcs_oil <= 4, 1, 0)),
-                    flag_proteins_rcsi = ifelse(is.na(.data$fcs_dairy), NA, ifelse(is.na(.data$fcs_meat), NA, ifelse(is.na(rcsi_score), NA, ifelse( (.data$rcsi_score >= 19 & as.numeric(.data$fcs_dairy) >= 6) | (.data$rcsi_score >= 19 & as.numeric(.data$fcs_meat) >= 6), 1, 0))))
     )
+
+    if(length(setdiff(c(fcs_vars, "rcsi_score"), colnames(df)))==0) {
+
+      df <- df %>%
+        dplyr::mutate(flag_proteins_rcsi = ifelse(is.na(.data$fcs_dairy), NA, ifelse(is.na(.data$fcs_meat), NA, ifelse(is.na(rcsi_score), NA, ifelse( (.data$rcsi_score >= 19 & as.numeric(.data$fcs_dairy) >= 6) | (.data$rcsi_score >= 19 & as.numeric(.data$fcs_meat) >= 6), 1, 0))))
+        )
+
+    }
 
     # Extreme FCS_score ( <3 or >60 )
     if(c("fcs_score") %in% colnames(df)) {
