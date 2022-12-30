@@ -718,7 +718,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
                                                                                                                          ifelse(.data$fc_phase == "Phase 4 FC" & .data$lcs_cat == "None", "Phase 4 - FCLC",
                                                                                                                                 ifelse(.data$fc_phase == "Phase 4 FC" & .data$lcs_cat == "Stress", "Phase 4 - FCLC",
                                                                                                                                        ifelse(.data$fc_phase == "Phase 4 FC" & .data$lcs_cat == "Crisis", "Phase 4 - FCLC",
-                                                                                                                                              ifelse(.data$fc_phase == "Phase 4 FC" & .data$lcs_cat == "Emergency", "Phase 5 - FCLC",
+                                                                                                                                              ifelse(.data$fc_phase == "Phase 4 FC" & .data$lcs_cat == "Emergency", "Phase 4 - FCLC",
                                                                                                                                                      ifelse(.data$fc_phase == "Phase 5 FC", "Phase 5 - FCLC", NA))))))))))))))))))
 
   }
