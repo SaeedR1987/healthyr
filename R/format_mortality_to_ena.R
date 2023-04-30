@@ -4,6 +4,10 @@
 #'
 #' @param df Inputs a dataframe which has been standardized already by the format_mortality_current_census function.
 #' @param file_path Inputs an optional character value for specifying a file path to save the output as an xlsx file.
+#' @param keep_cluster_ids A TRUE or FALSE value whether the user wants to include cluster ids as they are in the dataset,
+#' or have the function automatically recode them to ambiguous numerical values for ENA.
+#' @param keep_hh_ids A TRUE or FALSE value whether the user wants to include households ids as they are in the dataset,
+#' or have the function automatically recode them to ambiguous numerical values for ENA.
 #'
 #' @return Returns a dataframe with wide mortality data, that is each row is a single household, which is formatted for ENA.
 #' The resulting dataframe can be copy-pasted straight into the ENA program for analysis of mortality data.
@@ -13,17 +17,14 @@
 #' \dontrun{format_mortality_to_ena(df = proc_mortality1)}
 #'
 #' @importFrom rlang .data
-format_mortality_to_ena <- function(df, file_path = NULL) {
+format_mortality_to_ena <- function(df, file_path = NULL, keep_cluster_ids = NULL, keep_hh_ids = NULL) {
 
   df <- df %>%
     dplyr::mutate(join = ifelse(is.na(.data$join), NA, ifelse(.data$join == "1", "y", .data$join)),
-           left = ifelse(is.na(.data$left), NA, ifelse(.data$left == "1", "y", .data$left)),
-           birth = ifelse(is.na(.data$birth), NA, ifelse(.data$birth == "1", "y", .data$birth)),
-           death = ifelse(is.na(.data$death), NA, ifelse(.data$death == "1", "y", .data$death)),
+                  left = ifelse(is.na(.data$left), NA, ifelse(.data$left == "1", "y", .data$left)),
+                  birth = ifelse(is.na(.data$birth), NA, ifelse(.data$birth == "1", "y", .data$birth)),
+                  death = ifelse(is.na(.data$death), NA, ifelse(.data$death == "1", "y", .data$death)),
     )
-
-
-  #length(setdiff(c("sex", "oedema"), colnames(df)))>0
 
   if(length(setdiff(c("date_dc"), colnames(df)))>0) { df <- df %>% dplyr::mutate(date_dc = "")}
   if(length(setdiff(c("cluster"), colnames(df)))>0) { df <- df %>% dplyr::mutate(cluster = "")}
@@ -35,17 +36,41 @@ format_mortality_to_ena <- function(df, file_path = NULL) {
 
   df <- df %>% dplyr::mutate(sex = ifelse(.data$sex == "1", "m", ifelse(.data$sex == "2", "f", NA)))
 
-  # create sequential cluster ID
-
-  df <- df %>% dplyr::mutate(cluster = as.character(as.numeric(as.factor(.data$cluster))))
-
   # create numeric enumerator code
 
   df <- df %>% dplyr::mutate(enum = as.character(as.numeric(as.factor(.data$enum))))
 
+  if(is.null(keep_cluster_ids) | keep_cluster_ids == F) {
+
+    # create sequential cluster ID
+
+    df <- df %>% dplyr::mutate(cluster = as.character(as.numeric(as.factor(.data$cluster))))
+
+  } else if(keep_cluster_ids == T) {
+
+    if(!all(varhandle::check.numeric(df[["cluster"]]))) {
+      stop("If you want to keep the original cluster Id, it must be a column of numeric values, as this is what ENA expects.")
+    }
+
+    df <- df %>% dplyr::mutate(cluster = as.numeric(.data$cluster))
+
+  }
+
   # create sequential HH ID
 
-  df <- df %>% dplyr::group_by(.data$cluster) %>% dplyr::mutate(hh_id = as.character(as.numeric(as.factor(.data$hh_id)))) %>% dplyr::ungroup()
+  if(is.null(keep_hh_ids) | keep_hh_ids == F) {
+
+    df <- df %>% dplyr::group_by(.data$cluster) %>% dplyr::mutate(hh_id = as.character(as.numeric(as.factor(.data$hh_id)))) %>% dplyr::ungroup()
+
+  } else if(keep_hh_ids == T) {
+
+    if(!all(varhandle::check.numeric( df[["hh_id"]]))) {
+      stop("If you want to keep the original household Id, it must be a column of numeric values, as this is what ENA expects.")
+    }
+
+    df <- df %>% dplyr::group_by(.data$cluster) %>% dplyr::mutate(hh_id = .data$hh_id) %>% dplyr::ungroup()
+
+  }
 
   # create sequential person ID
 
@@ -57,7 +82,8 @@ format_mortality_to_ena <- function(df, file_path = NULL) {
   #select and order relevant columns
 
   df <- df %>% dplyr::select(.data$date_dc_char, .data$cluster, .data$enum, .data$hh_id, .data$individual_id, .data$sex, .data$age_years, .data$join, .data$left, .data$birth, .data$death, .data$death_cause_smart, .data$death_location_smart) %>%
-    dplyr::arrange(as.numeric(.data$cluster), as.numeric(.data$hh_id), as.numeric(.data$individual_id))
+    dplyr::arrange(as.numeric(.data$cluster), as.numeric(.data$hh_id), as.numeric(.data$individual_id)) %>%
+    dplyr::filter(!is.na(.data$sex) & !is.na(.data$age_years))
 
   # spread data
 

@@ -113,6 +113,7 @@
 #' @param monthly_expenditures Inputs a character vector of column names for monthly expenditures over 30 days
 #' @param period_expenditures Inputs a character vector of column names for period expenditures of a period of time
 #' @param num_period_months Inputs a number for the number of months of the period expenditures for health expediture calculations
+#' @param food_exp_col Inputs a character value specifying the column name for food expenditures
 #' @param health_exp_col Inputs a character value specifying the column name for health expenditures
 #' @param lcs_variables Inputs a character vector of column names specifying all the livelihood coping strategy columns.
 #' @param vaccine_card_yn Inputs a character value specifying the column name for vaccine card yes no question
@@ -124,6 +125,9 @@
 #' @param measles Inputs a character value specifying the column name for measles vaccine
 #' @param measles_date1 Inputs a character value specifying the column name for date of measles dose 1
 #' @param measles_date2 Inputs a character value specifying the column name for date of measles dose 2
+#' @param livelihood_variables Inputs a character vector of column names specifying all the livelihood activities
+#' for which income is received. These should be numerical columns with estimated income per livelihood activity.
+#' As per MSNA core indicator bank 2023.
 #'
 #' @return Returns a data frame with standardized variable names and values, additional columns for calculated indicators, and additional columns
 #' for data quality flags.
@@ -193,11 +197,12 @@ format_nut_health_indicators <- function(df, #dataframe
                                          iycf_7s = NULL, # did child eat solid/semi-solid foods (y/n) for list based questionnaires
                                          iycf_8 = NULL, # times child ate solid/semi-solid foods (number)
 
-                                         # Health Expenditures
+                                         # Expenditures
                                          monthly_expenditures = NULL, # character vector of columns names for monthly expenses (over 30 days)
                                          period_expenditures = NULL, # character vector of column names for period expenses (over num_period_months)
                                          num_period_months = NULL,  # number of months of the period for period expenses
                                          health_exp_col = NULL, # character value of name of the health expenses column
+                                         food_exp_col = NULL, # character value of name of the food expenses column
 
                                          # Child Vaccination Indicators
                                          vaccine_card_yn = NULL,
@@ -216,12 +221,29 @@ format_nut_health_indicators <- function(df, #dataframe
                                          hdds_legumes = NULL, hdds_dairy = NULL,  hdds_oils = NULL, hdds_sugars = NULL, hdds_condiments = NULL,
                                          hhs_nofoodhh_1 = NULL, hhs_nofoodhh_1a = NULL, hhs_sleephungry_2 = NULL, hhs_sleephungry_2a = NULL, hhs_alldaynight_3 = NULL, hhs_alldaynight_3a = NULL,
                                          rcsi_lesspreferred_1 = NULL, rcsi_borrowfood_2 = NULL, rcsi_limitportion_3 = NULL, rcsi_restrict_4 = NULL, rcsi_reducemeals5 = NULL,
-                                         lcs_variables = NULL
+                                         lcs_variables = NULL,
+                                         livelihood_variables = NULL
 ) {
 
   options(warn=-1)
 
+  # Create initial map
+
+  # Step 1: Create initial map of categorical and character columns.
+
+  df_map <- create_value_map(df)
+
+  # Step 4: Carry throughout the current formatting functions and add mapped values
+  # use an "appending" function to add on variable names and values
+
+  # Step 5: Create a "checking" function on whether new mapping is needed.
+
+  # Step 6: Exporting and importing the map
+
+
   # Rename Columns
+
+  variable <- names(df)
 
   df <- df %>%
     dplyr::rename(date_dc = {{date_of_dc}},
@@ -337,13 +359,29 @@ format_nut_health_indicators <- function(df, #dataframe
            # Select MSNA Indicators
            delivery_location = {{delivery_location}},
            birth_assistant = {{birth_assistant}},
-           # Health expenditures
+           # Health and Food expenditures
+           main_income_source = {{main_income_source}},
+           monthly_income = {{monthly_income}},
+           food_exp = {{food_exp_col}},
            health_exp = {{health_exp_col}}
 
 
     )
 
-  original_names <- names(df)
+  new_variable <- names(df)
+
+  changed_names <- data.frame(
+    variable,
+    new_variable
+  ) %>%
+    dplyr::filter(variable != new_variable)
+
+  df_map <- df_map %>%
+    dplyr::filter(variable %in% changed_names$variable) %>%
+    dplyr::left_join(changed_names, by = "variable")
+
+  map_object <- list(changed_names, df_map)
+
 
   # input checks for anthropometry
   if(c("age_months") %in% names(df)) {
@@ -391,6 +429,13 @@ format_nut_health_indicators <- function(df, #dataframe
     if(!is.vector(lcs_variables)) {stop("lcs_variables must be a character vector of column names for livelihood coping strategy questions. Something like c('', '', '', ...). Please check your input.")}
     if(!is.character(lcs_variables)) {stop("The 'lcs_variables' argument should contain a character vector of the names of the livelihood coping strategy columns in your dataframe. Your input was not a character vector. Please check your input.")}
     if(length(setdiff(lcs_variables, colnames(df)))!=0) {stop("Not all column names in lcs_variables exist in the dataframe. Please check your input.")}
+  }
+
+  # input checks for livelihood_variables
+  if(!is.null(livelihood_variables)) {
+    if(!is.vector(livelihood_variables)) {stop("livelihood_variables must be a character vector of column names for main sources of income, as per MSNA 2023 guidelines. Something like c('', '', '', ...). Please check your input.")}
+    if(!is.character(livelihood_variables)) {stop("The 'livelihood_variables' argument should contain a character vector of the names of the livelihood coping strategy columns in your dataframe. Your input was not a character vector. Please check your input.")}
+    if(length(setdiff(livelihood_variables, colnames(df)))!=0) {stop("Not all column names in livelihood_variables exist in the dataframe. Please check your input.")}
   }
 
   # input checks for IYCF 2021
@@ -499,24 +544,32 @@ format_nut_health_indicators <- function(df, #dataframe
   if(!is.null(monthly_expenditures)) {
     if(!is.vector(monthly_expenditures)) {stop("monthly_expenditures must be a character vector of column names. Something like c('', '', '', ...). Please check your input.")}
     if(!is.character(monthly_expenditures)) {stop("The 'monthly_expenditures' parameter should contain a character vector of the names of the monthly_expenditures columns in your dataframe. Your input was not a character vector. Please check your input.")}
+
+    if(!is.null(food_exp_col)) {monthly_expenditures <- replace(monthly_expenditures, monthly_expenditures == food_exp_col, "food_exp")}
+
     if(length(setdiff(monthly_expenditures, colnames(df)))!=0) {stop("Not all column names in monthly_expenditures exist in the dataframe. Please check your input.")}
   }
   if(!is.null(period_expenditures)) {
     if(!is.vector(period_expenditures)) {stop("period_expenditures must be a character vector of column names. Something like c('', '', '', ...). Please check your input.")}
     if(!is.character(period_expenditures)) {stop("The 'period_expenditures' parameter should contain a character vector of the names of the period_expenditures columns in your dataframe. Your input was not a character vector. Please check your input.")}
+
+    if(!is.null(health_exp_col)) {period_expenditures <- replace(period_expenditures, period_expenditures == health_exp_col, "health_exp")}
+
     if(length(setdiff(period_expenditures, colnames(df)))!=0) {stop("Not all column names in period_expenditures exist in the dataframe. Please check your input.")}
   }
 
   if(!is.null(monthly_expenditures)) {a <- 1} else {a <- 0 }
   if(!is.null(period_expenditures)) {b <- 1} else {b <- 0 }
+  if(!is.null(food_exp_col)) {c2 <- 1} else {c2 <- 0 }
   if(!is.null(health_exp_col)) {c <- 1} else {c <- 0 }
   if(!is.null(num_period_months)) {d <- 1} else {d <- 0 }
 
-  e <- a + c
+
+  e <- a + c + c2
   f <- a + b + c + d
 
-  if(e == 1) {stop("To calculate health expenditure indicators over 30 day period, you minimally require the monthly_expenditures and health_exp_col parameters. You only have one, but not both. Please check your input.")}
-  if(f > 0 & f < 4 & b + d > 0) {stop("To calculate health expenditures with varying recall periods, you minimially require the monthly_expenditures, period_expenditures, health_exp_col, and num_period_months parameters. You have included some period parameters, but not all the required parameters. Please check your input.")}
+  if(e == 1) {stop("To calculate health or food expenditure indicators over 30 day period, you minimally require the monthly_expenditures and health_exp_col and/or  parameters. You only have one, but not both. Please check your input.")}
+  if(f > 0 & f < 4 & b + d > 0 & c == 1) {stop("To calculate health expenditures with varying recall periods, you minimially require the monthly_expenditures, period_expenditures, health_exp_col, and num_period_months parameters. You have included some period parameters, but not all the required parameters. Please check your input.")}
 
   if(!is.null(monthly_expenditures) & !is.null(period_expenditures)) {
     g <- length(intersect(monthly_expenditures, period_expenditures))
@@ -530,7 +583,7 @@ format_nut_health_indicators <- function(df, #dataframe
 
       a <- monthly_expenditures[[i]]
 
-      if(all(varhandle::check.numeric(df[a]))) {} else {stop(paste0("There are non-numeric values in ", monthly_expenditures[[i]], ". Please check your input."))}
+      if(all(varhandle::check.numeric(df %>% dplyr::pull(a)))) {} else {stop(paste0("There are non-numeric values in ", monthly_expenditures[[i]], ". Please check your input."))}
 
     }
 
@@ -541,16 +594,19 @@ format_nut_health_indicators <- function(df, #dataframe
 
       a <- period_expenditures[[i]]
 
-      if(all(varhandle::check.numeric(df[a]))) {} else {stop(paste0("There are non-numeric values in ", period_expenditures[[i]], ". Please check your input."))}
+      if(all(varhandle::check.numeric(df %>% dplyr::pull(a)))) {} else {stop(paste0("There are non-numeric values in ", period_expenditures[[i]], ". Please check your input."))}
 
     }
 
   }
   if(!is.null(health_exp_col)) {
-    if(all(varhandle::check.numeric(df[health_exp_col]))) {} else {stop(paste0("There are non-numeric values in ", health_exp_col, ". Please check your input."))}
+    if(all(varhandle::check.numeric(df %>% dplyr::pull("health_exp")))) {} else {stop(paste0("There are non-numeric values in ", health_exp_col, ". Please check your input."))}
+  }
+  if(!is.null(food_exp_col)) {
+    if(all(varhandle::check.numeric(df %>% dplyr::pull("food_exp")))) {} else {stop(paste0("There are non-numeric values in ", food_exp_col, ". Please check your input."))}
   }
   if(!is.null(num_period_months)) {
-    if(all(varhandle::check.numeric(df$num_period_months))) {} else {stop("There is a non-numeric value for num_period_months. The input must be a number (in months). Please check your input")}
+    if(all(varhandle::check.numeric(num_period_months))) {} else {stop("There is a non-numeric value for num_period_months. The input must be a number (in months). Please check your input")}
   }
 
   # input checks for date variables
@@ -658,14 +714,16 @@ format_nut_health_indicators <- function(df, #dataframe
 
   # Passing to the reformatting and calculation functions
 
-  df <- reformat_nut_health_indicators(df, health_barriers = health_barriers, lcs_variables = lcs_variables)
+  return_reformat <- reformat_nut_health_indicators(df, health_barriers = health_barriers, lcs_variables = lcs_variables, livelihood_variables = livelihood_variables, value_map = df_map)
+  df <- return_reformat[[1]]
+  df_map <- return_reformat[[2]]
 
   if(is.null(use_flags_yn)) {use_flags_yn <- "no"} else {use_flags_yn <- use_flags_yn}
 
   df <- healthyr::calculate_nut_health_indicators(df, monthly_expenditures = period_expenditures, period_expenditures = period_expenditures, num_period_months = num_period_months)
   df <- healthyr::flag_nut_health_issues(df, use_flags = use_flags_yn)
 
-  new_names <- setdiff(names(df), original_names)
+  new_names <- setdiff(names(df), variable)
   print(paste0("The following columns have been added to the dataset:"))
   print(new_names)
 

@@ -151,20 +151,20 @@ format_mortality_current_census <- function(df_roster, file_path = NULL,  date_d
 
   if(length(intersect(date_vars, colnames(df_roster))) > 0 | length(intersect(date_vars, colnames(df_left))) > 0 | length(intersect(date_vars, colnames(df_died))) > 0) {
 
-    if(length(intersect(c("date_death"), colnames(df_roster))) == 0 ) {df_roster <- df_roster %>% mutate(date_death = NA)}
-    if(length(intersect(c("date_join"), colnames(df_roster))) == 0 ) {df_roster <- df_roster %>% mutate(date_join = NA)}
-    if(length(intersect(c("date_left"), colnames(df_roster))) == 0 ) {df_roster <- df_roster %>% mutate(date_left = NA)}
-    if(length(intersect(c("date_birth"), colnames(df_roster))) == 0 ) {df_roster <- df_roster %>% mutate(date_birth = NA)}
+    if(length(intersect(c("date_death"), colnames(df_roster))) == 0 ) {df_roster <- df_roster %>% dplyr::mutate(date_death = NA)}
+    if(length(intersect(c("date_join"), colnames(df_roster))) == 0 ) {df_roster <- df_roster %>% dplyr::mutate(date_join = NA)}
+    if(length(intersect(c("date_left"), colnames(df_roster))) == 0 ) {df_roster <- df_roster %>% dplyr::mutate(date_left = NA)}
+    if(length(intersect(c("date_birth"), colnames(df_roster))) == 0 ) {df_roster <- df_roster %>% dplyr::mutate(date_birth = NA)}
 
-    if(length(intersect(c("date_death"), colnames(df_left))) == 0 ) {df_left <- df_left %>% mutate(date_death = NA)}
-    if(length(intersect(c("date_join"), colnames(df_left))) == 0 ) {df_left <- df_left %>% mutate(date_join = NA)}
-    if(length(intersect(c("date_left"), colnames(df_left))) == 0 ) {df_left <- df_left %>% mutate(date_left = NA)}
-    if(length(intersect(c("date_birth"), colnames(df_left))) == 0 ) {df_left <- df_left %>% mutate(date_birth = NA)}
+    if(length(intersect(c("date_death"), colnames(df_left))) == 0 ) {df_left <- df_left %>% dplyr::mutate(date_death = NA)}
+    if(length(intersect(c("date_join"), colnames(df_left))) == 0 ) {df_left <- df_left %>% dplyr::mutate(date_join = NA)}
+    if(length(intersect(c("date_left"), colnames(df_left))) == 0 ) {df_left <- df_left %>% dplyr::mutate(date_left = NA)}
+    if(length(intersect(c("date_birth"), colnames(df_left))) == 0 ) {df_left <- df_left %>% dplyr::mutate(date_birth = NA)}
 
-    if(length(intersect(c("date_death"), colnames(df_died))) == 0 ) {df_died <- df_died %>% mutate(date_death = NA)}
-    if(length(intersect(c("date_join"), colnames(df_died))) == 0 ) {df_died <- df_died %>% mutate(date_join = NA)}
-    if(length(intersect(c("date_left"), colnames(df_died))) == 0 ) {df_died <- df_died %>% mutate(date_left = NA)}
-    if(length(intersect(c("date_birth"), colnames(df_died))) == 0 ) {df_died <- df_died %>% mutate(date_birth = NA)}
+    if(length(intersect(c("date_death"), colnames(df_died))) == 0 ) {df_died <- df_died %>% dplyr::mutate(date_death = NA)}
+    if(length(intersect(c("date_join"), colnames(df_died))) == 0 ) {df_died <- df_died %>% dplyr::mutate(date_join = NA)}
+    if(length(intersect(c("date_left"), colnames(df_died))) == 0 ) {df_died <- df_died %>% dplyr::mutate(date_left = NA)}
+    if(length(intersect(c("date_birth"), colnames(df_died))) == 0 ) {df_died <- df_died %>% dplyr::mutate(date_birth = NA)}
 
     df_roster[date_vars] <- lapply(df_roster[date_vars], as.character)
     df_left[date_vars] <- lapply(df_left[date_vars], as.character)
@@ -308,27 +308,27 @@ format_mortality_current_census <- function(df_roster, file_path = NULL,  date_d
         person_time = as.numeric(.data$date_dc_date - .data$date_recall_date),
 
         person_time = ifelse(is.na(.data$date_join_date), .data$person_time,
-                             ifelse(!is.na(.data$date_death_date) & !is.na(death) & !is.na(join), as.numeric(.data$date_death_date - .data$date_join_date),
-                                    ifelse(!is.na(.data$date_left_date) & !is.na(.data$left) & !is.na(join), as.numeric(.data$date_left_date - .data$date_join_date),
-                                           ifelse(!is.na(join), as.numeric(.data$date_dc_date - .data$date_join_date), .data$person_time)))),
+                             ifelse(!is.na(.data$date_death_date) & !is.na(.data$death) & !is.na(.data$join), as.numeric(.data$date_death_date - .data$date_join_date),
+                                    ifelse(!is.na(.data$date_left_date) & !is.na(.data$left) & !is.na(.data$join), as.numeric(.data$date_left_date - .data$date_join_date),
+                                           ifelse(!is.na(.data$join), as.numeric(.data$date_dc_date - .data$date_join_date), .data$person_time)))),
 
         # leaver person time calculations - join_left situaiton taken care above, so it defaults to person_time here
         person_time = ifelse(is.na(.data$date_left_date), .data$person_time,
-                             ifelse(!is.na(.data$date_join_date) & !is.na(join), .data$person_time,
+                             ifelse(!is.na(.data$date_join_date) & !is.na(.data$join), .data$person_time,
                                     ifelse(!is.na(.data$left), as.numeric(.data$date_left_date - .data$date_recall_date), .data$person_time))),
 
         # # birth person time calculations
         person_time = ifelse(is.na(.data$date_birth_date), .data$person_time,
                              ifelse( .data$date_birth_date < .data$date_recall_date, .data$person_time,
-                                     ifelse(!is.na(.data$date_death_date)  & !is.na(death) & !is.na(birth), as.numeric(.data$date_death_date - .data$date_birth_date),
+                                     ifelse(!is.na(.data$date_death_date)  & !is.na(.data$death) & !is.na(.data$birth), as.numeric(.data$date_death_date - .data$date_birth_date),
                                             ifelse(!is.na(.data$date_left_date) & !is.na(.data$left) & !is.na(birth), as.numeric(.data$date_left_date - .data$date_birth_date),
-                                                   ifelse(!is.na(birth), as.numeric(.data$date_dc_date - .data$date_birth_date), .data$person_time))))),
+                                                   ifelse(!is.na(.data$birth), as.numeric(.data$date_dc_date - .data$date_birth_date), .data$person_time))))),
         #
         # # death person time calculations
         person_time = ifelse(is.na(.data$date_death_date), .data$person_time,
-                             ifelse(!is.na(.data$date_join_date) & !is.na(join), .data$person_time,
-                                    ifelse(!is.na(.data$date_birth_date) & !is.na(birth), .data$person_time,
-                                           ifelse(!is.na(death), as.numeric(.data$date_death_date - .data$date_recall_date), .data$person_time))))  ,
+                             ifelse(!is.na(.data$date_join_date) & !is.na(.data$join), .data$person_time,
+                                    ifelse(!is.na(.data$date_birth_date) & !is.na(.data$birth), .data$person_time,
+                                           ifelse(!is.na(.data$death), as.numeric(.data$date_death_date - .data$date_recall_date), .data$person_time))))  ,
 
       )
 
@@ -380,8 +380,8 @@ format_mortality_current_census <- function(df_roster, file_path = NULL,  date_d
     dplyr::group_by(.data$hh_id) %>%
     dplyr::mutate(individual_id = dplyr::row_number()) %>%
     ungroup() %>%
-    dplyr::mutate(id = paste0(hh_id, "_", individual_id), individual_id = NULL) %>%
-    dplyr::select(id, everything())
+    dplyr::mutate(id = paste0(.data$hh_id, "_", .data$individual_id), individual_id = NULL) %>%
+    dplyr::select(.data$id, dplyr::everything())
 
   # df_mortality <- df_mortality %>% dplyr::mutate()
 

@@ -4,12 +4,23 @@
 \alias{format_mortality_to_ena}
 \title{Reformat Mortaltiy to ENA}
 \usage{
-format_mortality_to_ena(df, file_path = NULL)
+format_mortality_to_ena(
+  df,
+  file_path = NULL,
+  keep_cluster_ids = NULL,
+  keep_hh_ids = NULL
+)
 }
 \arguments{
 \item{df}{Inputs a dataframe which has been standardized already by the format_mortality_current_census function.}
 
 \item{file_path}{Inputs an optional character value for specifying a file path to save the output as an xlsx file.}
+
+\item{keep_cluster_ids}{A TRUE or FALSE value whether the user wants to include cluster ids as they are in the dataset,
+or have the function automatically recode them to ambiguous numerical values for ENA.}
+
+\item{keep_hh_ids}{A TRUE or FALSE value whether the user wants to include households ids as they are in the dataset,
+or have the function automatically recode them to ambiguous numerical values for ENA.}
 }
 \value{
 Returns a dataframe with wide mortality data, that is each row is a single household, which is formatted for ENA.

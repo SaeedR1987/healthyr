@@ -33,6 +33,10 @@ create_fsl_quality_report <- function(df, grouping = NULL, short_report = NULL, 
     grouping <- "group"
   }
 
+  # if using groups, drop records of a group if less than 10, so that doesn't get stuck. If too few overall, throw a stop error message.
+
+
+
   # Mean and SD of each FSL score
 
   if(c("fcs_score") %in% colnames(df)) {
@@ -40,7 +44,23 @@ create_fsl_quality_report <- function(df, grouping = NULL, short_report = NULL, 
     results2 <- df %>%
       dplyr::group_by(!!rlang::sym(grouping)) %>%
       dplyr::summarise(mean_fcs = round(mean(.data$fcs_score, na.rm = TRUE),2),
-                       sd_fcs = round(stats::sd(.data$fcs_score, na.rm = TRUE),2))
+                       sd_fcs = round(stats::sd(.data$fcs_score, na.rm = TRUE),2),
+                       mean_days_cereals = round(mean(.data$fcs_cereal, na.rm = TRUE),2),
+                       sd_days_cereals = round(stats::sd(.data$fcs_cereal, na.rm = TRUE),2),
+                       mean_days_legumes = round(mean(.data$fcs_legumes, na.rm = TRUE),2),
+                       sd_days_legumes = round(stats::sd(.data$fcs_legumes, na.rm = TRUE),2),
+                       mean_days_dairy = round(mean(.data$fcs_dairy, na.rm = TRUE),2),
+                       sd_days_dairy = round(stats::sd(.data$fcs_dairy, na.rm = TRUE),2),
+                       mean_days_meat = round(mean(.data$fcs_meat, na.rm = TRUE),2),
+                       sd_days_meat = round(stats::sd(.data$fcs_meat, na.rm = TRUE),2),
+                       mean_days_veg = round(mean(.data$fcs_veg, na.rm = TRUE),2),
+                       sd_days_veg = round(stats::sd(.data$fcs_veg, na.rm = TRUE),2),
+                       mean_days_fruit = round(mean(.data$fcs_fruit, na.rm = TRUE),2),
+                       sd_days_fruit = round(stats::sd(.data$fcs_fruit, na.rm = TRUE),2),
+                       mean_days_oils = round(mean(.data$fcs_oil, na.rm = TRUE),2),
+                       sd_days_oils = round(stats::sd(.data$fcs_oil, na.rm = TRUE),2),
+                       mean_days_sugar = round(mean(.data$fcs_sugar, na.rm = TRUE),2),
+                       sd_days_sugar = round(stats::sd(.data$fcs_sugar, na.rm = TRUE),2))
 
     if(!exists("results")) {results <- results2} else {results <- merge(results, results2)}
 
@@ -136,14 +156,24 @@ create_fsl_quality_report <- function(df, grouping = NULL, short_report = NULL, 
 
   }
 
+  # FCS-rCSI box (fcs > 56 and rCSI > 18)
+
+  # if(length(setdiff(c("fcs_score", "rcsi_score"), colnames(df)))==0) {
+  #
+  #   results2 <- df %>%
+  #     dplyr::group_by(!!rlang::sym(grouping)) %>%
+  #     dplyr::summarise(flag_)
+  #
+  # }
+
   # Poisson or clustering of extreme results
 
   if(length(setdiff(c("hhs_cat", "cluster"), colnames(df)))==0) {
 
-    df <- df %>% dplyr::mutate(hhs_very_severe = ifelse(is.na(.data$hhs_cat), NA, ifelse(.data$hhs_cat == "Very Severe", 1, 0)))
+    df <- df %>% dplyr::mutate(hhs_severe = ifelse(is.na(.data$hhs_cat), NA, ifelse(.data$hhs_cat == "Very Severe" | .data$hhs_cat == "Severe", 1, 0)))
 
-    poisson_pvalues <-healthyr::calculate_poisson_pvalues(df, strata = grouping, cluster = "cluster", case = "hhs_very_severe")
-    names(poisson_pvalues)[2] <- "poisson_pvalues.hhs_very_severe"
+    poisson_pvalues <- healthyr::calculate_poisson_pvalues(df, strata = grouping, cluster = "cluster", case = "hhs_severe")
+    names(poisson_pvalues)[2] <- "poisson_pvalues.hhs_severe"
 
     if(!exists("results")) {
 
@@ -155,7 +185,8 @@ create_fsl_quality_report <- function(df, grouping = NULL, short_report = NULL, 
 
   # % of different flags
 
-  if(length(setdiff(c("fcs_score", "hhs_score", "hdds_score", "rcsi_score", "flag_lcs_severity"), names(df)))<5) {
+  # if the df doesn't have any of the below, the difference is 5 and it will skip this part.
+  if(length(setdiff(c("fcs_score", "hhs_score", "hdds_score", "rcsi_score", "flag_lcsi_coherence"), names(df)))<5) {
 
     nms <- df %>% dplyr::select(dplyr::starts_with('flag')) %>% names()
 
@@ -204,7 +235,7 @@ create_fsl_quality_report <- function(df, grouping = NULL, short_report = NULL, 
   results <- healthyr::calculate_plausibility_report(df = results)
 
   a <- c("n",
-         "fews_p1", "fews_p2", "fews_p3", "fews_4", "fews_p5",
+         "fews_p1", "fews_p2", "fews_p3", "fews_p4", "fews_p5",
          "prop_fc_flags", "flag_severe_hhs",
          "fsl_plaus_score", "fsl_plaus_cat")
 

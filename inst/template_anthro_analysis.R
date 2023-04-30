@@ -11,12 +11,16 @@ rm(list = ls())
 
 # remotes::install_github("SaeedR1987/healthyr")
 
-library(tidyverse)
-library(healthyr)
+# library(tidyverse)
+# library(healthyr)
+
+devtools::load_all()
 
 # Step 1: Load your Dataset ####
 
 df <- raw_anthro1
+
+# df <- readxl::read_xlsx("kalonge 17082022.xlsx")
 
 # Step 2: Format Your Dataset ####
 
@@ -32,18 +36,18 @@ df2 <- format_nut_health_indicators(df = df,
                                     weight_var = "weight",
                                     height_var = "height",
                                     muac_var = "muac",
-                                    oedema_var = "edema",
+                                    oedema_var = "edema_confirm",
                                     )
 
 df3 <- flag_anthro_issues(df2)
 
-df3 <- flag_anthro_issues(df2, grouping = "")
+# df3 <- flag_anthro_issues(df2, grouping = "")
 
 # Step 3: Create a Quality Summary Report ####
 
-(create_anthro_quality_report(df = df3, grouping = "enum", short_report = TRUE))
+(create_anthro_quality_report(df = df3, short_report = TRUE))
 
-(create_anthro_quality_report(df = df3, grouping = "enum", short_report = FALSE))
+(a <- create_anthro_quality_report(df = df3, grouping = "enum", short_report = FALSE))
 
 # Step 4: Evaluate Data with Visualizations ####
 # Use 'wfhz' for index for Weight for Height z-score

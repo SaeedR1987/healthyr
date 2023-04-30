@@ -82,6 +82,7 @@ format_nut_health_indicators(
   period_expenditures = NULL,
   num_period_months = NULL,
   health_exp_col = NULL,
+  food_exp_col = NULL,
   vaccine_card_yn = NULL,
   penta = NULL,
   penta_date1 = NULL,
@@ -122,7 +123,8 @@ format_nut_health_indicators(
   rcsi_limitportion_3 = NULL,
   rcsi_restrict_4 = NULL,
   rcsi_reducemeals5 = NULL,
-  lcs_variables = NULL
+  lcs_variables = NULL,
+  livelihood_variables = NULL
 )
 }
 \arguments{
@@ -282,6 +284,8 @@ the child is 6-23 months of age, or 24-59 months of age. For use with some MUAC 
 
 \item{health_exp_col}{Inputs a character value specifying the column name for health expenditures}
 
+\item{food_exp_col}{Inputs a character value specifying the column name for food expenditures}
+
 \item{vaccine_card_yn}{Inputs a character value specifying the column name for vaccine card yes no question}
 
 \item{penta}{Inputs a character value specifying the column name for pentavalent vaccine}
@@ -363,6 +367,10 @@ the child is 6-23 months of age, or 24-59 months of age. For use with some MUAC 
 \item{rcsi_reducemeals5}{Input of a character value specifying the column name for rcsi reduce meals per day}
 
 \item{lcs_variables}{Inputs a character vector of column names specifying all the livelihood coping strategy columns.}
+
+\item{livelihood_variables}{Inputs a character vector of column names specifying all the livelihood activities
+for which income is received. These should be numerical columns with estimated income per livelihood activity.
+As per MSNA core indicator bank 2023.}
 }
 \value{
 Returns a data frame with standardized variable names and values, additional columns for calculated indicators, and additional columns

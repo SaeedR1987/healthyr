@@ -7,7 +7,7 @@
 calculate_plausibility_report(df)
 }
 \arguments{
-\item{df}{Inputs a dataframe that has been created from the create_anthro_summary_report function.}
+\item{df}{Inputs a dataframe that has been created from one of the create quality report functions.}
 }
 \value{
 Returns a dataframe with additional columns for plausibility penalty scores and classifications,

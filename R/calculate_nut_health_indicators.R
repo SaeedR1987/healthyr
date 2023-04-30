@@ -217,7 +217,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       ) %>%
       dplyr::rowwise() %>%
       dplyr::mutate(wgss_sco_score = sum(c(.data$wg_sco_score_seeing, .data$wg_sco_score_hearing, .data$wg_sco_score_communication, .data$wg_sco_score_walking, .data$wg_sco_score_selfcare, .data$wg_sco_score_remembering), na.rm = TRUE),
-                    wgss_sco_score = ifelse(.data$age_years < 5, NA, wgss_sco_score),
+                    wgss_sco_score = ifelse(.data$age_years < 5, NA, .data$wgss_sco_score),
              wg_sum_234 = sum(c(.data$wg_sum_seeing_234, .data$wg_sum_hearing_234, .data$wg_sum_communication_234, .data$wg_sum_walking_234, .data$wg_sum_selfcare_234, .data$wg_sum_remembering_234), na.rm = TRUE),
              wg_sum_34 = sum(c(.data$wg_sum_seeing_34, .data$wg_sum_hearing_34, .data$wg_sum_communication_34, .data$wg_sum_walking_34, .data$wg_sum_selfcare_34, .data$wg_sum_remembering_34), na.rm = TRUE),
              wg_sum_4 = sum(c(.data$wg_sum_seeing_4, .data$wg_sum_hearing_4, .data$wg_sum_communication_4, .data$wg_sum_walking_4, .data$wg_sum_selfcare_4, .data$wg_sum_remembering_4), na.rm = TRUE)) %>%
@@ -234,7 +234,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
              wgss_hd_score = ifelse(is.na(.data$wg_sum_4), NA, ifelse(.data$wg_sum_4 > 0, 4, .data$wgss_hd_score)),
              wgss_hd_score = ifelse(is.na(.data$wg_sum_4), NA, ifelse(.data$wg_sum_4 == 6, 9, .data$wgss_hd_score)),
              wgss_hd_score = ifelse(is.na(.data$wgss_hd_score), NA, ifelse(.data$wgss_hd_score == 0, 1, .data$wgss_hd_score)),
-             wgss_hd_score = ifelse(.data$age_years < 5, NA, wgss_hd_score),
+             wgss_hd_score = ifelse(.data$age_years < 5, NA, .data$wgss_hd_score),
 
              disability1 = ifelse(is.na(.data$wg_sum_234), NA, ifelse(.data$wg_sum_234 > 0, 1, 0)),
              disability2 = ifelse(is.na(.data$wg_sum_34) & is.na(.data$wg_sum_234), NA, ifelse(.data$wg_sum_234 >=2 | .data$wg_sum_34 > 0, 1, 0)),
@@ -269,8 +269,9 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df[c("iycf_1", "age_months")] <- sapply(df[c("iycf_1", "age_months")], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(iycf_evbf = ifelse(is.na(.data$age_months) | .data$age_months >23, NA, ifelse(is.na(.data$iycf_1), 0, ifelse(.data$iycf_1 == 1, 1, 0))))
-
+      dplyr::mutate(iycf_evbf = dplyr::case_when(.data$iycf_1 == 1 ~ 1,
+                                                 .data$iycf_1 != 1 ~ 0,
+                                                 .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_1) ~ NA_integer_))
   }
 
   # "IYCF Indicator 2: Early Initiation of Breastfeeding;
@@ -280,7 +281,10 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df[c("iycf_2", "age_months")] <- sapply(df[c("iycf_2", "age_months")], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(iycf_eibf = ifelse(is.na(.data$age_months) | .data$age_months >23, NA, ifelse(is.na(.data$iycf_2), 0, ifelse(.data$iycf_2 == 1 | .data$iycf_2 == 2, 1, 0))))
+      dplyr::mutate(iycf_eibf = dplyr::case_when(.data$iycf_2 == 1 | .data$iycf_2 == 2 ~ 1,
+                                                 .data$iycf_2 != 1 & .data$iycf_2 != 2 ~ 0,
+                                                 .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_2) ~ NA_integer_))
+
 
   }
 
@@ -291,23 +295,55 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df[c("iycf_3", "age_months")] <- sapply(df[c("iycf_3", "age_months")], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(iycf_ebf2d = ifelse(is.na(.data$age_months) | .data$age_months >23, NA, ifelse(is.na(.data$iycf_3), 0 , ifelse(.data$iycf_3 == 2, 1, 0))))
+      dplyr::mutate(iycf_ebf2d = dplyr::case_when(.data$iycf_3 == 2 ~ 1,
+                                                  .data$iycf_3 != 2 ~ 0,
+                                                  .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_3) ~ NA_integer_))
 
   }
 
   # "IYCF Indicator 4: Exclusive Breastfeeding;
 
-  if(length(setdiff(ebf_vars, colnames(df)))==0) {
+  # essential_ebf_vars <- c("age_months", "iycf_4", )
+  ebf_foods <- c("iycf_7a", "iycf_7b", "iycf_7c", "iycf_7d", "iycf_7e", "iycf_7f", "iycf_7g", "iycf_7h", "iycf_7i", "iycf_7j", "iycf_7k", "iycf_7l", "iycf_7m", "iycf_7n", "iycf_7o", "iycf_7p", "iycf_7q", "iycf_7r")
+  ebf_liquids <- c("iycf_6a", "iycf_6b", "iycf_6c", "iycf_6d", "iycf_6e", "iycf_6f", "iycf_6g", "iycf_6h", "iycf_6i", "iycf_6j")
 
-    df[ebf_vars] <- sapply(df[ebf_vars], as.numeric)
+  a <- length(setdiff(c("age_months", "iycf_4"), names(df)))
+  b <- length(setdiff(ebf_foods, names(df)))
+  c <- length(setdiff(ebf_liquids, names(df)))
+
+  if(a == 0 & b > 0 & c > 0) {
+
+    ebf_foods <- intersect(ebf_foods, names(df))
+    a <- length(ebf_foods)
+    df$count_no_foods <- apply(df[c(ebf_foods)], 1, function(x) sum(x == "2"))
+
+    if(length(ebf_foods) != length(a)) {
+      print("Warning: Your dataset appears not to have all the foods from the standard IYCF 2021 question sequence. It is advised you ask about all recommended liquids or there is a risk of overestimating EBF.  ")
+      print(paste0("Missing the following variables ", setdiff(ebf_foods, names(df))))
+      }
+
+    ebf_liquids <- intersect(ebf_liquids, names(df))
+    b <- length(ebf_liquids)
+    df$count_no_liquids <- apply(df[c(ebf_liquids)], 1, function(x) sum(x == "2"))
+
+    if(length(ebf_liquids) != length(b)) {
+      print("Warning: Your dataset appears not to have all the liquids from the standard IYCF 2021 question sequence. It is advised you ask about all recommended liquids or there is a risk of overestimating EBF.  ")
+      print(paste0("Missing the following variables ", setdiff(ebf_liquids, names(df))))
+
+      }
+
+    df[c("iycf_4", ebf_foods, ebf_liquids)] <- sapply(df[c("iycf_4", ebf_foods, ebf_liquids)], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(iycf_ebf = ifelse(is.na(.data$age_months) | .data$age_months > 5, NA,
-                               ifelse(is.na(.data$iycf_6a) | is.na(.data$iycf_6b) | is.na(.data$iycf_6c) | is.na(.data$iycf_6d) | is.na(.data$iycf_6e) | is.na(.data$iycf_6f) | is.na(.data$iycf_6g) | is.na(.data$iycf_6h) | is.na(.data$iycf_6i) | is.na(.data$iycf_6j) | is.na(.data$iycf_7a) | is.na(.data$iycf_7b) | is.na(.data$iycf_7c) | is.na(.data$iycf_7d) | is.na(.data$iycf_7e) | is.na(.data$iycf_7f) | is.na(.data$iycf_7g) | is.na(.data$iycf_7h) | is.na(.data$iycf_7i) | is.na(.data$iycf_7j) | is.na(.data$iycf_7k) | is.na(.data$iycf_7l) | is.na(.data$iycf_7m) | is.na(.data$iycf_7n) | is.na(.data$iycf_7o) | is.na(.data$iycf_7p) | is.na(.data$iycf_7q) | is.na(.data$iycf_7r), 0,
-                                      ifelse(.data$iycf_6a == 2 & .data$iycf_6b == 2 & .data$iycf_6c == 2 & .data$iycf_6d == 2 & .data$iycf_6e == 2 & .data$iycf_6f == 2 & .data$iycf_6g == 2 & .data$iycf_6h == 2 & .data$iycf_6i == 2 & .data$iycf_6j == 2 & .data$iycf_7a == 2 & .data$iycf_7b == 2 & .data$iycf_7c == 2 & .data$iycf_7d == 2 & .data$iycf_7e == 2 & .data$iycf_7f == 2 & .data$iycf_7g == 2 & .data$iycf_7h == 2 & .data$iycf_7i == 2 & .data$iycf_7j == 2 & .data$iycf_7k== 2 & .data$iycf_7l == 2 & .data$iycf_7m == 2 & .data$iycf_7n == 2 & .data$iycf_7o == 2 & .data$iycf_7p == 2 & .data$iycf_7q == 2 & .data$iycf_7r == 2, 1, 0))),
-      )
+      dplyr::mutate(
+        count_foods = a - .data$count_no_foods,
+        count_foods = b - .data$count_no_liquids,
+        iycf_ebf = dplyr::case_when(
+          .data$iycf_4 == 1 & .data$count_foods == 0 & .data$count_liquids == 0 ~ 1,
+          .data$iycf_4 != 1 | .data$count_foods > 0 | .data$count_liquids > 0 ~ 0,
+          .data$age_months >= 6 | is.na(.data$age_months) | is.na(.data$iycf_4) ~ NA_integer_
 
-
+      ))
 
   }
 
@@ -318,7 +354,12 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df[c("iycf_4", "iycf_6b", "iycf_6c", "age_months")] <- sapply(df[c("iycf_4", "iycf_6b", "iycf_6c", "age_months")], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(iycf_mixmf = ifelse(is.na(.data$age_months) | .data$age_months >5, NA, ifelse(is.na(.data$iycf_4) | is.na(.data$iycf_6b) | is.na(.data$iycf_6c) | is.na(.data$iycf_6c), 0, ifelse(.data$iycf_4 == 1 & (.data$iycf_6b == 1 | .data$iycf_6c == 1), 1, 0))))
+      dplyr::mutate(iycf_mixmf = dplyr::case_when(
+        .data$iycf_4 == 1 & (.data$iycf_6b == 1 | .data$iycf_6c == 1) ~ 1,
+        .data$iycf_4 != 1 | (.data$iycf_6b != 1 & .data$iycf_6c != 1) ~ 0,
+        .data$age_months >= 6 | is.na(.data$age_months) | is.na(.data$iycf_4) | is.na(.data$iycf_6b) | is.na(.data$iycf_6b) ~ NA_integer_
+      ))
+
 
   }
 
@@ -329,20 +370,45 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df[c("iycf_4", "age_months")] <- sapply(df[c("iycf_4", "age_months")], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(iycf_cbf = ifelse(is.na(.data$age_months) | .data$age_months < 12 | .data$age_months >23, NA, ifelse(is.na(.data$iycf_4), 0, ifelse(.data$iycf_4 == 1, 1, 0))))
+      dplyr::mutate(iycf_cbf = dplyr::case_when(
+        .data$iycf_4 == 1 ~ 1,
+        .data$iycf_4 != 1 ~ 0,
+        .data$age_months < 12 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_4) ~ NA_integer_
+      ))
 
   }
 
   # "IYCF Indicator 7: Introduction of Solid, Semi-Solid, or Soft Foods (ISSSF)
 
-  if(length(setdiff(isssf_vars, colnames(df)))==0) {
+  ebf_foods <- c("iycf_7a", "iycf_7b", "iycf_7c", "iycf_7d", "iycf_7e", "iycf_7f", "iycf_7g", "iycf_7h", "iycf_7i", "iycf_7j", "iycf_7k", "iycf_7l", "iycf_7m", "iycf_7n", "iycf_7o", "iycf_7p", "iycf_7q", "iycf_7r")
 
-    df[isssf_vars] <- sapply(df[isssf_vars], as.numeric)
+  a <- length(setdiff(c("age_months"), names(df)))
+  b <- length(setdiff(ebf_foods, names(df)))
+
+  if(a == 0 & b < 18) {
+
+    ebf_foods <- intersect(ebf_foods, names(df))
+    a <- length(ebf_foods)
+    df$count_no_foods <- apply(df[c(ebf_foods)], 1, function(x) sum(x == "2"))
+
+    if(length(ebf_foods) != length(a)) {
+      print("Warning: Your dataset appears not to have all the foods from the standard IYCF 2021 question sequence. It is advised you ask about all recommended liquids or there is a risk of overestimating ISSSF.  ")
+      print(paste0("Missing the following variables ", setdiff(ebf_foods, names(df))))
+    }
+
+    ebf_foods <- intersect(ebf_foods, names(df))
+    a <- length(ebf_foods)
+    df$count_foods <- apply(df[c(ebf_foods)], 1, function(x) sum(x == "1"))
+
+    df[c("age_months", ebf_foods)] <- sapply(df[c("age_months", ebf_foods)], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(iycf_isssf = ifelse(is.na(.data$age_months) | .data$age_months < 6 | .data$age_months >8, NA, ifelse(is.na(.data$iycf_7a) | is.na(.data$iycf_7b) | is.na(.data$iycf_7c) | is.na(.data$iycf_7d) | is.na(.data$iycf_7e) | is.na(.data$iycf_7f) | is.na(.data$iycf_7g) | is.na(.data$iycf_7h) | is.na(.data$iycf_7i) | is.na(.data$iycf_7j) | is.na(.data$iycf_7k) | is.na(.data$iycf_7l) | is.na(.data$iycf_7m) | is.na(.data$iycf_7n) | is.na(.data$iycf_7o) | is.na(.data$iycf_7p) | is.na(.data$iycf_7q) | is.na(.data$iycf_7r), 0,
-                                                                                                ifelse(.data$iycf_7a == 1 | .data$iycf_7b == 1 | .data$iycf_7c == 1 | .data$iycf_7d == 1 | .data$iycf_7e == 1 | .data$iycf_7f == 1 | .data$iycf_7g == 1 | .data$iycf_7h == 1 | .data$iycf_7i == 1 | .data$iycf_7j == 1 | .data$iycf_7k == 1 | .data$iycf_7l == 1 | .data$iycf_7m == 1 | .data$iycf_7n == 1 | .data$iycf_7o == 1 | .data$iycf_7p == 1 | .data$iycf_7q == 1 | .data$iycf_7r == 1, 1, 0))))
-
+      dplyr::mutate(
+        iycf_isssf = dplyr::case_when(
+        .data$count_foods > 0 ~ 1,
+        .data$count_foods == 0 ~ 0,
+        .data$age_months < 6 | .data$age_months > 8 | is.na(.data$age_months) ~ NA_integer_
+      ))
   }
 
   # "IYCF Indicator 8: Minimum Dietary Diversity 6-23 months (MDD);
@@ -352,32 +418,36 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df[mdd_vars] <- sapply(df[mdd_vars], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(mdd1 = ifelse(is.na(.data$iycf_4), NA, ifelse(.data$iycf_4 == 1, 1, 0)),
-             mdd2 = ifelse(is.na(.data$iycf_7b), NA, ifelse(.data$iycf_7b == 1, 1, 0)),
-             mdd2 = ifelse(is.na(.data$iycf_7d) & is.na(.data$mdd2), NA, ifelse(is.na(.data$iycf_7d), .data$mdd2, ifelse(.data$iycf_7d == 1, 1, ifelse(is.na(.data$mdd2), 0, .data$mdd2)))),
-             mdd3 = ifelse(is.na(.data$iycf_7n), NA, ifelse(.data$iycf_7n == 1, 1, 0)),
-             mdd4 = ifelse(is.na(.data$iycf_6b), NA, ifelse(.data$iycf_6b == 1, 1, 0)),
-             mdd4 = ifelse(is.na(.data$iycf_6c) & is.na(.data$mdd4), NA, ifelse(is.na(.data$iycf_6c), .data$mdd4, ifelse(.data$iycf_6c == 1, 1, ifelse(is.na(.data$mdd4), 0, .data$mdd4)))),
-             mdd4 = ifelse(is.na(.data$iycf_6d) & is.na(.data$mdd4), NA, ifelse(is.na(.data$iycf_6d), .data$mdd4, ifelse(.data$iycf_6d == 1, 1, ifelse(is.na(.data$mdd4), 0, .data$mdd4)))),
-             mdd4 = ifelse(is.na(.data$iycf_7a) & is.na(.data$mdd4), NA, ifelse(is.na(.data$iycf_7a), .data$mdd4, ifelse(.data$iycf_7a == 1, 1, ifelse(is.na(.data$mdd4), 0, .data$mdd4)))),
-             mdd4 = ifelse(is.na(.data$iycf_7o) & is.na(.data$mdd4), NA, ifelse(is.na(.data$iycf_7o), .data$mdd4, ifelse(.data$iycf_7o == 1, 1, ifelse(is.na(.data$mdd4), 0, .data$mdd4)))),
-             mdd5 = ifelse(is.na(.data$iycf_7i), NA, ifelse(.data$iycf_7i == 1, 1, 0)),
-             mdd5 = ifelse(is.na(.data$iycf_7j) & is.na(.data$mdd5), NA, ifelse(is.na(.data$iycf_7j), .data$mdd5, ifelse(.data$iycf_7j == 1, 1, ifelse(is.na(.data$mdd5), 0, .data$mdd5)))),
-             mdd5 = ifelse(is.na(.data$iycf_7k) & is.na(.data$mdd5), NA, ifelse(is.na(.data$iycf_7k), .data$mdd5, ifelse(.data$iycf_7k == 1, 1, ifelse(is.na(.data$mdd5), 0, .data$mdd5)))),
-             mdd5 = ifelse(is.na(.data$iycf_7m) & is.na(.data$mdd5), NA, ifelse(is.na(.data$iycf_7m), .data$mdd5, ifelse(.data$iycf_7m == 1, 1, ifelse(is.na(.data$mdd5), 0, .data$mdd5)))),
-             mdd6 = ifelse(is.na(.data$iycf_7l), NA, ifelse(.data$iycf_7l == 1, 1, 0)),
-             mdd7 = ifelse(is.na(.data$iycf_7c), NA, ifelse(.data$iycf_7c == 1, 1, 0)),
-             mdd7 = ifelse(is.na(.data$mdd7) & is.na(.data$iycf_7e), NA, ifelse(is.na(.data$iycf_7e), .data$mdd7, ifelse(.data$iycf_7e == 1, 1, ifelse(is.na(.data$mdd7), 0, .data$mdd7)))),
-             mdd7 = ifelse(is.na(.data$mdd7) & is.na(.data$iycf_7g), NA, ifelse(is.na(.data$iycf_7g), .data$mdd7, ifelse(.data$iycf_7g == 1, 1, ifelse(is.na(.data$mdd7), 0, .data$mdd7)))),
-             mdd8 = ifelse(is.na(.data$iycf_7f), NA, ifelse(.data$iycf_7f == 1, 1, 0)),
-             mdd8 = ifelse(is.na(.data$iycf_7h) & is.na(.data$mdd8), NA, ifelse(is.na(.data$iycf_7h), .data$mdd8, ifelse(.data$iycf_7h == 1, 1, ifelse(is.na(.data$mdd8), 0, .data$mdd8))))) %>%
+      dplyr::mutate(mdd1 = dplyr::case_when(.data$iycf_4 == 1 ~ 1,
+                                            .data$iycf_4 != 1 ~ 0,
+                                            is.na(.data$iycf_4) ~ NA_integer_),
+                    mdd2 = dplyr::case_when(.data$iycf_7b == 1 | iycf_7b == 1 ~ 1,
+                                            .data$iycf_7b != 1 & iycf_7b != 1 ~ 0,
+                                            TRUE ~ NA_integer_),
+                    mdd3 = dplyr::case_when(.data$iycf_7n == 1 ~ 1,
+                                            .data$iycf_7n != 1 ~ 0,
+                                            TRUE ~ NA_integer_),
+                    mdd4 = dplyr::case_when(.data$iycf_6b == 1 | .data$iycf_6c == 1 | .data$iycf_6d == 1 | .data$iycf_7a == 1 | .data$iycf_7o == 1 ~ 1,
+                                            .data$iycf_6b != 1 & .data$iycf_6c != 1 & .data$iycf_6d != 1 & .data$iycf_7a != 1 & .data$iycf_7o != 1 ~ 0,
+                                            TRUE ~ NA_integer_),
+                    mdd5 = dplyr::case_when(.data$iycf_7i == 1 | .data$iycf_7j == 1 | .data$iycf_7k == 1 | .data$iycf_7m == 1 ~ 1,
+                                            .data$iycf_7i != 1 & .data$iycf_7j != 1 & .data$iycf_7k != 1 & .data$iycf_7m != 1 ~ 0,
+                                            TRUE ~ NA_integer_),
+                    mdd6 = dplyr::case_when(.data$iycf_7l == 1 ~ 1,
+                                            .data$iycf_7l != 1 ~ 0,
+                                            TRUE ~ NA_integer_),
+                    mdd7 = dplyr::case_when(.data$iycf_7c == 1 | .data$iycf_7e == 1 | .data$iycf_7g == 1 ~ 1,
+                                            .data$iycf_7c != 1 & .data&iycf_7e != 1 & .data$iycf_7g != 1 ~ 0,
+                                            TRUE ~ NA_integer_),
+                    mdd8 = dplyr::case_when(.data$iycf_7f == 1 | .data$iycf_7h == 1 ~ 1,
+                                            .data$iycf_7f != 1 & .data$iycf_7h != 1 ~ 0,
+                                            TRUE ~ NA_integer_)) %>%
       dplyr::rowwise() %>%
       dplyr::mutate(iycf_mdd_score = sum(c(.data$mdd1, .data$mdd2, .data$mdd3, .data$mdd4, .data$mdd5, .data$mdd6, .data$mdd7, .data$mdd8), na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(iycf_mdd_cat = ifelse(is.na(.data$age_months) | .data$age_months <6 | .data$age_months >23, NA, ifelse(.data$iycf_mdd_score >=5 & .data$iycf_mdd_score <10, 1, 0)),
-      )
-
-
+      dplyr::mutate(iycf_mdd_cat = dplyr::case_when(.data$age_months >= 6 & .data$age_months < 24 & .data$iycf_mdd_score >= 5 ~ 1,
+                                                    .data$age_months >= 6 & .data$age_months < 24 & .data$iycf_mdd_score < 5 ~ 0,
+                                                    .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$iycf_mdd_score) ~ NA_integer_))
 
   }
 
@@ -388,22 +458,24 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df[mmf_vars] <- sapply(df[mmf_vars], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(mmf_bf_6to8months = ifelse(is.na(.data$age_months) | .data$age_months <6 | .data$age_months >8, NA, ifelse(is.na(.data$iycf_4) | is.na(.data$iycf_8), 0, ifelse(.data$iycf_4 == 1 & .data$age_months >5 & .data$age_months <9 & .data$iycf_8 >=2, 1, 0))),
-             mmf_bf_9to23months = ifelse(is.na(.data$age_months) | .data$age_months <9 | .data$age_months >23, NA, ifelse(is.na(.data$iycf_4) | is.na(.data$iycf_8), 0, ifelse(.data$iycf_4 == 1 & .data$age_months >8 & .data$age_months <24 & .data$iycf_8 >=3, 1, 0)))) %>%
+      dplyr::mutate(
+        mmf_bf_6to8months = dplyr::case_when(
+          .data$iycf_4 == 1 & .data$iycf_8 >= 2 ~ 1,
+          .data$iycf_4 != 1 | .data$iycf_8 <2 ~ 0,
+          .data$age_months < 6 | .data$age_months >= 8 | is.na(.data$age_months) | is.na(.data$iycf_4) | is.na(.data$iycf_8) ~ NA_integer_),
+        mmf_bf_9to23months = dplyr::case_when(
+          .data$iycf_4 == 1 & .data$iycf_8 >= 3 ~ 1,
+          .data$iycf_4 != 1 | .data$iycf_8 < 3 ~ 0,
+          .data$age_months < 9 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_4) | is.na(.data$iycf_8) ~ NA_integer_)) %>%
       dplyr::rowwise() %>%
       dplyr::mutate(count_6b_6c_6d_8 = sum(c(.data$iycf_6b_num, .data$iycf_6c_num, .data$iycf_6d_num, .data$iycf_8), na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(mmf_nonbf_6to23months = ifelse(is.na(.data$age_months) | .data$age_months <6 | .data$age_months >23, NA, ifelse(is.na(.data$iycf_4) | .data$iycf_4 == 1, NA, ifelse(is.na(.data$count_6b_6c_6d_8) | is.na(.data$iycf_8), 0, ifelse(.data$iycf_4 == 2 & .data$age_months >5 & .data$age_months <24 & .data$count_6b_6c_6d_8 >=4 & .data$iycf_8 >=1, 1, 0)))),
-             iycf_mmf = ifelse(is.na(.data$age_months) | .data$age_months < 6 | .data$age_months >23, NA,
-                               ifelse(.data$mmf_bf_6to8months == 1 & is.na(.data$mmf_bf_9to23months) & is.na(.data$mmf_nonbf_6to23months), 1,
-                                      ifelse( is.na(.data$mmf_bf_6to8months) & .data$mmf_bf_9to23months == 1 & is.na(.data$mmf_nonbf_6to23months), 1,
-                                              ifelse( is.na(.data$mmf_bf_6to8months) & is.na(.data$mmf_bf_9to23months) & .data$mmf_nonbf_6to23months == 1, 1, 0))))
-      )
-
-
-
-
-
+      dplyr::mutate(
+        mmf_nonbf_6to23months = dplyr::case_when(
+          .data$iycf_4 != 1 & .data$count_6b_6c_6d_8 >= 4 & .data$iycf_8 >= 1 ~ 1,
+          .data$iycf_4 == 1 | .data$count_6b_6c_6d_8 < 4 | .data$iycf_8 < 1 ~ 0,
+          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_4) | is.na(.data$iycf_6b_num) | is.na(.data$iycf_6c_num) | is.na(.data$iycf_6d_num) | is.na(.data$iycf_8) ~ NA_integer_
+        ))
   }
 
   # "IYCF Indicator 10: Minimum Milk Feeding Frequency For Non-Breastfed Children 6-23 months (MMFF);
@@ -416,24 +488,28 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       dplyr::rowwise() %>%
       dplyr::mutate(count_dairy = sum(c(.data$iycf_6b_num, .data$iycf_6c_num, .data$iycf_6d_num, .data$iycf_7a_num), na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(iycf_mmff = ifelse(is.na(.data$age_months) | .data$age_months < 6 | .data$age_months >23 | is.na(.data$iycf_4) | .data$iycf_4 == 1, NA, ifelse(.data$iycf_4 != 1 & .data$count_dairy >= 2, 1, 0)))
-
+      dplyr::mutate(
+        iycf_mmff = dplyr::case_when(
+          .data$iycf_4 != 1 & .data$count_dairy >= 2 ~ 1,
+          .data$iycf_4 == 1 | .data$count_dairy < 2 ~ 0,
+          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_6b_num) | is.na(.data$iycf_6c_num) | is.na(.data$iycf_6d_num) | is.na(.data$iycf_7a_num) ~ NA_integer_
+        ))
   }
 
-  # "IYCF Indicator 11: Minimum Acceptable Diet 6-23 months (MAD); YES"
+  # "IYCF Indicator 11: Minimum Acceptable Diet 6-23 months (MAD);"
 
   if(length(setdiff(c("iycf_mmf", "iycf_mdd_cat", "iycf_mmff", "age_months"), colnames(df)))==0) {
 
     df[c("iycf_mmf", "iycf_mdd_cat", "iycf_mmff", "age_months")] <- sapply(df[c("iycf_mmf", "iycf_mdd_cat", "iycf_mmff", "age_months")], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(iycf_mad = ifelse(is.na(.data$age_months) | .data$age_months < 6 | .data$age_months > 23, NA, ifelse(.data$iycf_mmf == 1 & .data$iycf_mdd_cat == 1 & (.data$iycf_4 == 1 | .data$iycf_mmff == 1), 1, 0)),
-
+      dplyr::mutate(
+        iycf_mad = dplyr::case_when(
+          .data$iycf_mdd_cat == 1 & .data$iycf_mmf == 1 & (.data$iycf_4 == 1 | .data$iycf_mmff == 1) ~ 1,
+          .data$iycf_mdd_cat != 1 | .data$iycf_mmf != 1 | (.data$iycf_4 != 1 & .data$iycf_mmff != 1) ~ 0,
+          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_mdd_cat) | is.na(.data$iycf_mmf) | is.na(.data$iycf_mmff) | is.na(.data$iycf_4) ~ NA_integer_
+        )
       )
-
-
-
-
   }
 
   # "IYCF Indicator 12: Eggs & Flesh Foods Consumption 6-23 months (EFF);
@@ -443,10 +519,9 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df[c("iycf_7i", "iycf_7j", "iycf_7k", "iycf_7l", "iycf_7m", "age_months")] <- sapply(df[c("iycf_7i", "iycf_7j", "iycf_7k", "iycf_7l", "iycf_7m", "age_months")], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(iycf_eff = ifelse(is.na(.data$age_months) | .data$age_months < 6 | .data$age_months > 23, NA, ifelse(.data$iycf_7i == 1 | .data$iycf_7j == 1 | .data$iycf_7k == 1 | .data$iycf_7l == 1 | .data$iycf_7m == 1, 1, 0)),
-      )
-
-
+      dplyr::mutate(iycf_eff = dplyr::case_when(.data$iycf_7i == 1 | .data$iycf_7j == 1 | .data$iycf_7k == 1 | .data$iycf_7l == 1 | .data$iycf_7m == 1 ~ 1,
+                                                .data$iycf_7i != 1 & .data$iycf_7j != 1 & .data$iycf_7k != 1 & .data$iycf_7l != 1 & .data$iycf_7m != 1 ~ 0,
+                                                .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) ~ NA_integer_))
 
   }
 
@@ -456,12 +531,15 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
 
     df[c("iycf_6c_swt", "iycf_6d_swt", "iycf_6e", "iycf_6f", "iycf_6g", "iycf_6h_swt", "iycf_6j_swt", "age_months")] <- sapply(df[c("iycf_6c_swt", "iycf_6d_swt", "iycf_6e", "iycf_6f", "iycf_6g", "iycf_6h_swt", "iycf_6j_swt", "age_months")], as.numeric)
 
+
     df <- df %>%
-      dplyr::mutate(iycf_swb = ifelse(is.na(.data$iycf_6c_swt) | is.na(.data$iycf_6d_swt) | is.na(.data$iycf_6e) | is.na(.data$iycf_6f) | is.na(.data$iycf_6g) | is.na(.data$iycf_6h_swt) | is.na(.data$iycf_6j_swt) | .data$age_months < 6 | .data$age_months > 23, NA, ifelse(.data$iycf_6c_swt == 1 | .data$iycf_6d_swt == 1 | .data$iycf_6e == 1 | .data$iycf_6f == 1 | .data$iycf_6g == 1 | .data$iycf_6h_swt == 1 | .data$iycf_6j_swt == 1, 1, 0)),
+      dplyr::mutate(
+        iycf_swb = dplyr::case_when(
+          .data$iycf_6c_swt == 1 | .data$iycf_6d_swt == 1 | .data$iycf_6e == 1 | .data$iycf_6f == 1 | .data$iycf_6g == 1 | .data$iycf_6h_swt == 1 | .data$iycf_6j_swt == 1 ~ 1,
+          .data$iycf_6c_swt != 1 & .data$iycf_6d_swt != 1 & .data$iycf_6e != 1 & .data$iycf_6f != 1 & .data$iycf_6g != 1 & .data$iycf_6h_swt != 1 & .data$iycf_6j_swt != 1 ~ 0,
+          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_6c_swt) | is.na(.data$iycf_6d_swt) | is.na(.data$iycf_6e) | is.na(.data$iycf_6f) | is.na(.data$iycf_6g) ~ NA_integer_
+        )
       )
-
-
-
   }
 
   # "IYCF Indicator 14: Unhealthy Food Consumption (UFC)
@@ -471,11 +549,12 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df[c("iycf_7p", "iycf_7q", "age_months")] <- sapply(df[c("iycf_7p", "iycf_7q", "age_months")], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(iycf_ufc = ifelse(is.na(.data$iycf_7p) | is.na(.data$iycf_7q) | .data$age_months < 6 | .data$age_months > 23, NA, ifelse(.data$iycf_7p == 1 | .data$iycf_7q == 1, 1, 0)),
-      )
-
-
-
+      dplyr::mutate(
+        iycf_ufc = dplyr::case_when(
+          .data$iycf_7p == 1 | .data$iycf_7q == 1 ~ 1,
+          .data$iycf_7p != 1 & .data$iycf_7q != 1 ~ 0,
+          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_7p) | is.na(.data$iycf_7q) ~ NA_integer_
+        ))
   }
 
   # "IYCF Indicator 15: Zero Vegetable or Fruit Consumption 6-23 months (ZVF)
@@ -485,19 +564,27 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df[c("iycf_7c", "iycf_7e", "iycf_7f", "iycf_7g" , "iycf_7h", "age_months")] <- sapply(df[c("iycf_7c", "iycf_7e", "iycf_7f", "iycf_7g" , "iycf_7h", "age_months")], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(zvf1 = ifelse(is.na(.data$iycf_7c), 0, ifelse(.data$iycf_7c == 2, 1, 0)),
-             zvf2 = ifelse(is.na(.data$iycf_7e), 0, ifelse(.data$iycf_7e == 2, 1, 0)),
-             zvf3 = ifelse(is.na(.data$iycf_7f), 0, ifelse(.data$iycf_7f == 2, 1, 0)),
-             zvf4 = ifelse(is.na(.data$iycf_7g), 0, ifelse(.data$iycf_7g == 2, 1, 0)),
-             zvf5 = ifelse(is.na(.data$iycf_7h), 0, ifelse(.data$iycf_7h == 2, 1, 0))) %>%
+      dplyr::mutate(zvf1 = dplyr::case_when(.data$iycf_7c == 2 ~ 1,
+                                             .data$iycf_7c != 2 ~ 0,
+                                             TRUE ~ NA_integer_),
+                    zvf2 = dplyr::case_when(.data$iycf_7e == 2 ~ 1,
+                                             .data$iycf_7e != 2 ~ 0,
+                                             TRUE ~ NA_integer_),
+                    zvf3 = dplyr::case_when(.data$iycf_7f == 2 ~ 1,
+                                             .data$iycf_7f != 2 ~ 0,
+                                             TRUE ~ NA_integer_),
+                    zvf4 = dplyr::case_when(.data$iycf_7g == 2 ~ 1,
+                                             .data$iycf_7g != 2 ~ 0,
+                                             TRUE ~ NA_integer_),
+                    zvf5 = dplyr::case_when(.data$iycf_7h == 2 ~ 1,
+                                             .data$iycf_7h != 2 ~ 0,
+                                             TRUE ~ NA_integer_)) %>%
       dplyr::rowwise() %>%
       dplyr::mutate(zvf_sum = sum(c(.data$zvf1, .data$zvf2, .data$zvf3, .data$zvf4, .data$zvf5), na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(iycf_zvf = ifelse(is.na(.data$zvf_sum), 0, ifelse(.data$zvf_sum == 5, 1, 0)),
-             iycf_zvf = ifelse(is.na(.data$age_months) | .data$age_months <6 | .data$age_months >23, NA, .data$iycf_zvf))
-
-
-
+      dplyr::mutate(iycf_zvf = dplyr::case_when(.data$zvf_sum == 5 ~ 1,
+                                                .data$zvf_sum < 5 ~ 0,
+                                                .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$zvf1) | is.na(.data$zvf2) | is.na(.data$zvf3) | is.na(.data$zvf4) | is.na(.data$zvf5) ~ NA_integer_))
   }
 
   # "IYCF Indicator 16: Bottle Feeding 0-23 months
@@ -507,8 +594,12 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df[c("iycf_5", "age_months")] <- sapply(df[c("iycf_5", "age_months")], as.numeric)
 
     df <- df %>%
-      dplyr::mutate(iycf_bof = ifelse(is.na(.data$iycf_5) | .data$age_months < 6 | .data$age_months > 23, NA, ifelse(.data$iycf_5 == 1, 1, 0)))
-
+      dplyr::mutate(
+        iycf_bof = dplyr::case_when(
+          .data$iycf_5 == 1 ~ 1,
+          .data$iycf_5 != 1 ~ 0,
+          .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_5) ~ NA_integer_
+        ))
   }
 
   # Calculate Food Consumption Scores
@@ -516,6 +607,8 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
   fcs_vars <- c("fcs_cereal", "fcs_legumes", "fcs_dairy", "fcs_meat", "fcs_veg", "fcs_fruit", "fcs_oil", "fcs_sugar")
 
   if(length(setdiff(fcs_vars, colnames(df)))==0) {
+
+    df[fcs_vars] <- sapply(df[fcs_vars], as.numeric)
 
     cutoffs <- c("1", "2")
     print("Now calculating Food Consumption Score (FCS) indicator:")
@@ -532,7 +625,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
              fcs_weight_dairy3 = ifelse(is.na(.data$fcs_dairy), NA, .data$fcs_dairy*4) ,
              fcs_weight_meat4 = ifelse(is.na(.data$fcs_meat), NA, .data$fcs_meat*4),
              fcs_weight_veg5 = ifelse(is.na(.data$fcs_veg), NA, .data$fcs_veg*1),
-             fcs_weight_fruit6 =ifelse(is.na(.data$fcs_fruit), NA, .data$fcs_fruit*1) ,
+             fcs_weight_fruit6 = ifelse(is.na(.data$fcs_fruit), NA, .data$fcs_fruit*1) ,
              fcs_weight_oil7 = ifelse(is.na(.data$fcs_oil), NA, .data$fcs_oil*0.5),
              fcs_weight_sugar8 = ifelse(is.na(.data$fcs_sugar), NA, .data$fcs_sugar*0.5)
       ) %>%
@@ -602,7 +695,16 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       ) %>% dplyr::rowwise() %>%
       dplyr::mutate(hhs_score = sum(.data$hhs_comp1, .data$hhs_comp2, .data$hhs_comp3, na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(hhs_cat = ifelse(is.na(.data$hhs_score), NA, ifelse(.data$hhs_score == 0, "None", ifelse(.data$hhs_score <=1, "Little", ifelse(.data$hhs_score<=3, "Moderate", ifelse(.data$hhs_score<=4, "Severe", ifelse(.data$hhs_score<=6, "Very Severe", NA)))))))
+      dplyr::mutate(hhs_cat_ipc = dplyr::case_when(.data$hhs_score == 0 ~ "None",
+                                                   .data$hhs_score == 1 ~ "Little",
+                                                   .data$hhs_score == 2 | .data$hhs_score == 3 ~ "Moderate",
+                                                   .data$hhs_score == 4 ~ "Severe",
+                                                   .data$hhs_score == 5 | .data$hhs_score == 6 ~ "Very Severe",
+                                                   TRUE ~ NA_character_),
+                    hhs_cat = dplyr::case_when(.data$hhs_score == 0 | .data$hhs_score == 1 ~ "No or Little",
+                                               .data$hhs_score == 2 | .data$hhs_score == 3 ~ "Moderate",
+                                               .data$hhs_score == 4 | .data$hhs_score == 5 | .data$hhs_score == 6 ~ "Severe",
+                                               TRUE ~ NA_character_))
 
   }
 
@@ -621,73 +723,79 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       dplyr::rowwise() %>%
       dplyr::mutate(rcsi_score = sum(.data$rcsi_weight1, .data$rcsi_weight2, .data$rcsi_weight3, .data$rcsi_weight4, .data$rcsi_weight5, na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(rcsi_cat = ifelse(is.na(.data$rcsi_score), NA, ifelse(.data$rcsi_score <=3, "No to Low", ifelse(.data$rcsi_score>=4 & .data$rcsi_score<=18, "Medium", ifelse(.data$rcsi_score>18 & .data$rcsi_score <=1000, "Severe", NA)))),
+      dplyr::mutate(rcsi_cat = ifelse(is.na(.data$rcsi_score), NA, ifelse(.data$rcsi_score <=3, "No to Low", ifelse(.data$rcsi_score>=4 & .data$rcsi_score<=18, "Medium", ifelse(.data$rcsi_score>18 & .data$rcsi_score <=1000, "High", NA)))),
       )
 
   }
 
   # Livelihood Coping Strategies
 
-  lcs_vars <- c("lcs_emergency", "lcs_crisis", "lcs_stress")
+  lcs_vars <- c("lcs_emergency", "lcs_crisis", "lcs_stress",
+                "lcs_stress_yes", "lcs_crisis_yes", "lcs_emergency_yes",
+                "lcs_stress_exhaust", "lcs_crisis_exhaust", "lcs_emergency_exhaust")
 
   if(length(setdiff(lcs_vars, colnames(df)))==0) {
 
+    df[lcs_vars] <- lapply(df[lcs_vars], as.numeric)
+
     df <- df %>%
-      dplyr::mutate(lcs_cat = ifelse(.data$lcs_emergency == 1, "Emergency", ifelse(.data$lcs_crisis == 1, "Crisis", ifelse(.data$lcs_stress == 1, "Stress", ifelse(.data$lcs_stress == 0 & .data$lcs_crisis == 0 & .data$lcs_emergency == 0, "None", NA)))))
+      dplyr::mutate(lcs_cat = ifelse(.data$lcs_emergency == 1, "Emergency", ifelse(.data$lcs_crisis == 1, "Crisis", ifelse(.data$lcs_stress == 1, "Stress", ifelse(.data$lcs_stress == 0 & .data$lcs_crisis == 0 & .data$lcs_emergency == 0, "None", NA)))),
+                    lcs_cat_yes = dplyr::case_when(.data$lcs_emergency_yes == 1 ~ "Emergency", .data$lcs_crisis_yes == 1 ~ "Crisis", .data$lcs_stress_yes == 1 ~ "Stress", .data$lcs_cat == "None" ~ "None", TRUE ~ NA_character_ ),
+                    lcs_cat_exhaust = dplyr::case_when(.data$lcs_emergency_exhaust == 1 ~ "Emergency", .data$lcs_crisis_exhaust == 1 ~ "Crisis", .data$lcs_stress_exhaust == 1 ~ "Stress", .data$lcs_cat == "None" ~ "None", TRUE ~ NA_character_ ))
 
   }
 
   # Calculating FEWSNET Food Consumption Matrix
 
-  fews_vars <- c("fcs_cat", "rcsi_cat", "hhs_cat")
+  fews_vars <- c("fcs_cat", "rcsi_cat", "hhs_cat_ipc")
 
   if(length(setdiff(fews_vars, colnames(df)))==0) {
 
-    df <- df %>% dplyr::mutate(fc_cell = ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "None" & .data$rcsi_cat == "No to Low", 1,
-                                         ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "Little" & .data$rcsi_cat == "No to Low", 2,
-                                                ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "Moderate" & .data$rcsi_cat == "No to Low", 3,
-                                                       ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "Severe" & .data$rcsi_cat == "No to Low", 4,
-                                                              ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "Very Severe" & .data$rcsi_cat == "No to Low", 5,
-                                                                     ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "None" & .data$rcsi_cat == "No to Low", 6,
-                                                                            ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "Little" & .data$rcsi_cat == "No to Low", 7,
-                                                                                   ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "Moderate" & .data$rcsi_cat == "No to Low", 8,
-                                                                                          ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "Severe" & .data$rcsi_cat == "No to Low", 9,
-                                                                                                 ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "Very Severe" & .data$rcsi_cat == "No to Low", 10,
-                                                                                                        ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "None" & .data$rcsi_cat == "No to Low", 11,
-                                                                                                               ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "Little" & .data$rcsi_cat == "No to Low", 12,
-                                                                                                                      ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "Moderate" & .data$rcsi_cat == "No to Low", 13,
-                                                                                                                             ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "Severe" & .data$rcsi_cat == "No to Low", 14,
-                                                                                                                                    ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "Very Severe" & .data$rcsi_cat == "No to Low", 15,
-                                                                                                                                           ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "None" & .data$rcsi_cat == "Medium", 16,
-                                                                                                                                                  ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "Little" & .data$rcsi_cat == "Medium", 17,
-                                                                                                                                                         ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "Moderate" & .data$rcsi_cat == "Medium", 18,
-                                                                                                                                                                ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "Severe" & .data$rcsi_cat == "Medium", 19,
-                                                                                                                                                                       ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "Very Severe" & .data$rcsi_cat == "Medium", 20,
-                                                                                                                                                                              ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "None" & .data$rcsi_cat == "Medium", 21,
-                                                                                                                                                                                     ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "Little" & .data$rcsi_cat == "Medium", 22,
-                                                                                                                                                                                            ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "Moderate" & .data$rcsi_cat == "Medium", 23,
-                                                                                                                                                                                                   ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "Severe" & .data$rcsi_cat == "Medium", 24,
-                                                                                                                                                                                                          ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "Very Severe" & .data$rcsi_cat == "Medium", 25,
-                                                                                                                                                                                                                 ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "None" & .data$rcsi_cat == "Medium", 26,
-                                                                                                                                                                                                                        ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "Little" & .data$rcsi_cat == "Medium", 27,
-                                                                                                                                                                                                                               ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "Moderate" & .data$rcsi_cat == "Medium", 28,
-                                                                                                                                                                                                                                      ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "Severe" & .data$rcsi_cat == "Medium", 29,
-                                                                                                                                                                                                                                             ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "Very Severe" & .data$rcsi_cat == "Medium", 30,
-                                                                                                                                                                                                                                                    ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "None" & .data$rcsi_cat == "Severe", 31,
-                                                                                                                                                                                                                                                           ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "Little" & .data$rcsi_cat == "Severe", 32,
-                                                                                                                                                                                                                                                                  ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "Moderate" & .data$rcsi_cat == "Severe", 33,
-                                                                                                                                                                                                                                                                         ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "Severe" & .data$rcsi_cat == "Severe", 34,
-                                                                                                                                                                                                                                                                                ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat == "Very Severe" & .data$rcsi_cat == "Severe", 35,
-                                                                                                                                                                                                                                                                                       ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "None" & .data$rcsi_cat == "Severe", 36,
-                                                                                                                                                                                                                                                                                              ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "Little" & .data$rcsi_cat == "Severe", 37,
-                                                                                                                                                                                                                                                                                                     ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "Moderate" & .data$rcsi_cat == "Severe", 38,
-                                                                                                                                                                                                                                                                                                            ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "Severe" & .data$rcsi_cat == "Severe", 39,
-                                                                                                                                                                                                                                                                                                                   ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat == "Very Severe" & .data$rcsi_cat == "Severe", 40,
-                                                                                                                                                                                                                                                                                                                          ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "None" & .data$rcsi_cat == "Severe", 41,
-                                                                                                                                                                                                                                                                                                                                 ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "Little" & .data$rcsi_cat == "Severe", 42,
-                                                                                                                                                                                                                                                                                                                                        ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "Moderate" & .data$rcsi_cat == "Severe", 43,
-                                                                                                                                                                                                                                                                                                                                               ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "Severe" & .data$rcsi_cat == "Severe", 44,
-                                                                                                                                                                                                                                                                                                                                                      ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat == "Very Severe" & .data$rcsi_cat == "Severe", 45, NA))))))))))))))))))))))))))))))))))))))))))))))
+    df <- df %>% dplyr::mutate(fc_cell = ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "None" & .data$rcsi_cat == "No to Low", 1,
+                                         ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "Little" & .data$rcsi_cat == "No to Low", 2,
+                                                ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "Moderate" & .data$rcsi_cat == "No to Low", 3,
+                                                       ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "Severe" & .data$rcsi_cat == "No to Low", 4,
+                                                              ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "Very Severe" & .data$rcsi_cat == "No to Low", 5,
+                                                                     ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "None" & .data$rcsi_cat == "No to Low", 6,
+                                                                            ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "Little" & .data$rcsi_cat == "No to Low", 7,
+                                                                                   ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "Moderate" & .data$rcsi_cat == "No to Low", 8,
+                                                                                          ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "Severe" & .data$rcsi_cat == "No to Low", 9,
+                                                                                                 ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "Very Severe" & .data$rcsi_cat == "No to Low", 10,
+                                                                                                        ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "None" & .data$rcsi_cat == "No to Low", 11,
+                                                                                                               ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "Little" & .data$rcsi_cat == "No to Low", 12,
+                                                                                                                      ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "Moderate" & .data$rcsi_cat == "No to Low", 13,
+                                                                                                                             ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "Severe" & .data$rcsi_cat == "No to Low", 14,
+                                                                                                                                    ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "Very Severe" & .data$rcsi_cat == "No to Low", 15,
+                                                                                                                                           ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "None" & .data$rcsi_cat == "Medium", 16,
+                                                                                                                                                  ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "Little" & .data$rcsi_cat == "Medium", 17,
+                                                                                                                                                         ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "Moderate" & .data$rcsi_cat == "Medium", 18,
+                                                                                                                                                                ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "Severe" & .data$rcsi_cat == "Medium", 19,
+                                                                                                                                                                       ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "Very Severe" & .data$rcsi_cat == "Medium", 20,
+                                                                                                                                                                              ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "None" & .data$rcsi_cat == "Medium", 21,
+                                                                                                                                                                                     ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "Little" & .data$rcsi_cat == "Medium", 22,
+                                                                                                                                                                                            ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "Moderate" & .data$rcsi_cat == "Medium", 23,
+                                                                                                                                                                                                   ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "Severe" & .data$rcsi_cat == "Medium", 24,
+                                                                                                                                                                                                          ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "Very Severe" & .data$rcsi_cat == "Medium", 25,
+                                                                                                                                                                                                                 ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "None" & .data$rcsi_cat == "Medium", 26,
+                                                                                                                                                                                                                        ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "Little" & .data$rcsi_cat == "Medium", 27,
+                                                                                                                                                                                                                               ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "Moderate" & .data$rcsi_cat == "Medium", 28,
+                                                                                                                                                                                                                                      ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "Severe" & .data$rcsi_cat == "Medium", 29,
+                                                                                                                                                                                                                                             ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "Very Severe" & .data$rcsi_cat == "Medium", 30,
+                                                                                                                                                                                                                                                    ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "None" & .data$rcsi_cat == "Severe", 31,
+                                                                                                                                                                                                                                                           ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "Little" & .data$rcsi_cat == "Severe", 32,
+                                                                                                                                                                                                                                                                  ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "Moderate" & .data$rcsi_cat == "Severe", 33,
+                                                                                                                                                                                                                                                                         ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "Severe" & .data$rcsi_cat == "Severe", 34,
+                                                                                                                                                                                                                                                                                ifelse(.data$fcs_cat == "Acceptable" & .data$hhs_cat_ipc == "Very Severe" & .data$rcsi_cat == "Severe", 35,
+                                                                                                                                                                                                                                                                                       ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "None" & .data$rcsi_cat == "Severe", 36,
+                                                                                                                                                                                                                                                                                              ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "Little" & .data$rcsi_cat == "Severe", 37,
+                                                                                                                                                                                                                                                                                                     ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "Moderate" & .data$rcsi_cat == "Severe", 38,
+                                                                                                                                                                                                                                                                                                            ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "Severe" & .data$rcsi_cat == "Severe", 39,
+                                                                                                                                                                                                                                                                                                                   ifelse(.data$fcs_cat == "Borderline" & .data$hhs_cat_ipc == "Very Severe" & .data$rcsi_cat == "Severe", 40,
+                                                                                                                                                                                                                                                                                                                          ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "None" & .data$rcsi_cat == "Severe", 41,
+                                                                                                                                                                                                                                                                                                                                 ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "Little" & .data$rcsi_cat == "Severe", 42,
+                                                                                                                                                                                                                                                                                                                                        ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "Moderate" & .data$rcsi_cat == "Severe", 43,
+                                                                                                                                                                                                                                                                                                                                               ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "Severe" & .data$rcsi_cat == "Severe", 44,
+                                                                                                                                                                                                                                                                                                                                                      ifelse(.data$fcs_cat == "Poor" & .data$hhs_cat_ipc == "Very Severe" & .data$rcsi_cat == "Severe", 45, NA))))))))))))))))))))))))))))))))))))))))))))))
 
     df <- df %>% dplyr::mutate(fc_phase = ifelse(.data$fc_cell == 1 | .data$fc_cell == 6, "Phase 1 FC",
                                           ifelse(.data$fc_cell == 2 |.data$fc_cell == 3|.data$fc_cell == 7|.data$fc_cell == 11|.data$fc_cell == 12|.data$fc_cell == 16|.data$fc_cell == 17|.data$fc_cell == 18|.data$fc_cell == 21|.data$fc_cell == 22|.data$fc_cell == 26|.data$fc_cell == 31|.data$fc_cell == 32|.data$fc_cell == 36, "Phase 2 FC",
@@ -703,29 +811,29 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
 
   if(length(setdiff(fews_lcs_vars, colnames(df)))==0) {
 
-    df <- df %>% dplyr::mutate(fclc_phase = ifelse(.data$fc_phase == "Phase 1 FC" & .data$lcs_cat == "None", "Phase 1 - FCLC",
-                                            ifelse(.data$fc_phase == "Phase 1 FC" & .data$lcs_cat == "Stress", "Phase 1 - FCLC",
-                                                   ifelse(.data$fc_phase == "Phase 1 FC" & .data$lcs_cat == "Crisis", "Phase 2 - FCLC",
-                                                          ifelse(.data$fc_phase == "Phase 1 FC" & .data$lcs_cat == "Emergency", "Phase 3 - FCLC",
-                                                                 ifelse(.data$fc_phase == "Phase 2 FC" & .data$lcs_cat == "None", "Phase 2 - FCLC",
-                                                                        ifelse(.data$fc_phase == "Phase 2 FC" & .data$lcs_cat == "Stress", "Phase 2 - FCLC",
-                                                                               ifelse(.data$fc_phase == "Phase 2 FC" & .data$lcs_cat == "Crisis", "Phase 3 - FCLC",
-                                                                                      ifelse(.data$fc_phase == "Phase 2 FC" & .data$lcs_cat == "Emergency", "Phase 3 - FCLC",
-                                                                                             ifelse(.data$fc_phase == "Phase 3 FC" & .data$lcs_cat == "None", "Phase 3 - FCLC",
-                                                                                                    ifelse(.data$fc_phase == "Phase 3 FC" & .data$lcs_cat == "Stress", "Phase 3 - FCLC",
-                                                                                                           ifelse(.data$fc_phase == "Phase 3 FC" & .data$lcs_cat == "Crisis", "Phase 3 - FCLC",
-                                                                                                                  ifelse(.data$fc_phase == "Phase 3 FC" & .data$lcs_cat == "Emergency", "Phase 4 - FCLC",
-                                                                                                                         ifelse(.data$fc_phase == "Phase 4 FC" & .data$lcs_cat == "None", "Phase 4 - FCLC",
-                                                                                                                                ifelse(.data$fc_phase == "Phase 4 FC" & .data$lcs_cat == "Stress", "Phase 4 - FCLC",
-                                                                                                                                       ifelse(.data$fc_phase == "Phase 4 FC" & .data$lcs_cat == "Crisis", "Phase 4 - FCLC",
-                                                                                                                                              ifelse(.data$fc_phase == "Phase 4 FC" & .data$lcs_cat == "Emergency", "Phase 5 - FCLC",
+    df <- df %>% dplyr::mutate(fclc_phase = ifelse(.data$fc_phase == "Phase 1 FC" & .data$lcs_cat_yes == "None", "Phase 1 - FCLC",
+                                            ifelse(.data$fc_phase == "Phase 1 FC" & .data$lcs_cat_yes == "Stress", "Phase 1 - FCLC",
+                                                   ifelse(.data$fc_phase == "Phase 1 FC" & .data$lcs_cat_yes == "Crisis", "Phase 2 - FCLC",
+                                                          ifelse(.data$fc_phase == "Phase 1 FC" & .data$lcs_cat_yes == "Emergency", "Phase 3 - FCLC",
+                                                                 ifelse(.data$fc_phase == "Phase 2 FC" & .data$lcs_cat_yes == "None", "Phase 2 - FCLC",
+                                                                        ifelse(.data$fc_phase == "Phase 2 FC" & .data$lcs_cat_yes == "Stress", "Phase 2 - FCLC",
+                                                                               ifelse(.data$fc_phase == "Phase 2 FC" & .data$lcs_cat_yes == "Crisis", "Phase 3 - FCLC",
+                                                                                      ifelse(.data$fc_phase == "Phase 2 FC" & .data$lcs_cat_yes == "Emergency", "Phase 3 - FCLC",
+                                                                                             ifelse(.data$fc_phase == "Phase 3 FC" & .data$lcs_cat_yes == "None", "Phase 3 - FCLC",
+                                                                                                    ifelse(.data$fc_phase == "Phase 3 FC" & .data$lcs_cat_yes == "Stress", "Phase 3 - FCLC",
+                                                                                                           ifelse(.data$fc_phase == "Phase 3 FC" & .data$lcs_cat_yes == "Crisis", "Phase 3 - FCLC",
+                                                                                                                  ifelse(.data$fc_phase == "Phase 3 FC" & .data$lcs_cat_yes == "Emergency", "Phase 4 - FCLC",
+                                                                                                                         ifelse(.data$fc_phase == "Phase 4 FC" & .data$lcs_cat_yes == "None", "Phase 4 - FCLC",
+                                                                                                                                ifelse(.data$fc_phase == "Phase 4 FC" & .data$lcs_cat_yes == "Stress", "Phase 4 - FCLC",
+                                                                                                                                       ifelse(.data$fc_phase == "Phase 4 FC" & .data$lcs_cat_yes == "Crisis", "Phase 4 - FCLC",
+                                                                                                                                              ifelse(.data$fc_phase == "Phase 4 FC" & .data$lcs_cat_yes == "Emergency", "Phase 4 - FCLC",
                                                                                                                                                      ifelse(.data$fc_phase == "Phase 5 FC", "Phase 5 - FCLC", NA))))))))))))))))))
 
   }
 
   # Calculating Severe and Catastrophic Health Expenditures
 
-  if(!is.null(monthly_expenditures) & (c("health_exp_col") %in% names(df))) {
+  if(!is.null(monthly_expenditures) & (c("health_exp") %in% names(df))) {
 
     if(!is.null(period_expenditures) & !is.null(num_period_months)) {
 
@@ -758,6 +866,43 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     }
 
   }
+
+  # Calculating Food Expenditures Share
+
+  if(!is.null(monthly_expenditures) & (c("food_exp") %in% names(df))) {
+
+    if(!is.null(period_expenditures) & !is.null(num_period_months)) {
+
+      df[monthly_expenditures] <- lapply(df[monthly_expenditures], as.numeric)
+      df[period_expenditures] <- lapply(df[period_expenditures], as.numeric)
+
+      df$month_exp1 <- rowSums(df[,monthly_expenditures], na.rm = TRUE)
+      df$month_exp2 <- rowSums(df[,period_expenditures], na.rm = TRUE) / as.numeric(num_period_months)
+
+      df$total_monthly_exp <- rowSums(df[,c("month_exp1", "month_exp2")])
+
+
+      df <- df %>%
+        dplyr::mutate(food_exp = ifelse(is.na(.data$health_exp), 0, .data$health_exp / as.numeric(num_period_months)),
+                      prop_food_exp = ifelse(is.na(.data$total_monthly_exp), NA , .data$health_exp / .data$total_monthly_exp) ,
+                      food_exp_share = dplyr::case_when(prop_food_exp < 0.5 ~ "1", prop_food_exp >= 0.5 & prop_food_exp <0.65 ~ "2", prop_food_exp >= 0.65 & prop_food_exp < 0.75 ~ "3", prop_food_exp >= 0.75 ~ "4", TRUE ~ NA_character_ )
+                      )
+
+    } else {
+
+      df[monthly_expenditures] <- lapply(df[monthly_expenditures], as.numeric)
+      df$total_monthly_exp <- rowSums(df[,monthly_expenditures], na.rm = TRUE)
+
+      df <- df %>%
+        dplyr::mutate(food_exp = ifelse(is.na(.data$health_exp), 0, .data$health_exp),
+                      prop_food_exp = ifelse(is.na(.data$total_monthly_exp), NA , .data$health_exp / .data$total_monthly_exp) ,
+                      food_exp_share =  dplyr::case_when(prop_food_exp < 0.5 ~ "1", prop_food_exp >= 0.5 & prop_food_exp <0.65 ~ "2", prop_food_exp >= 0.65 & prop_food_exp < 0.75 ~ "3", prop_food_exp >= 0.75 ~ "4", TRUE ~ NA_character_ )
+                      )
+
+    }
+
+  }
+
 
   # Calculating Childhood Vaccination Indicators
 

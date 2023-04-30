@@ -6,6 +6,7 @@
 #'
 #' @format A data frame with 3780 rows and 47 variables:
 #' \describe{
+#'   \item{id}{Unique record level identifier}
 #'   \item{hh_id}{Unique household survey identifier}
 #'   \item{date_dc}{Date of data collection, the original input into healthyr function.}
 #'   \item{date_recall}{Date of recall event associated with mortality survey, the original input into healthyr function}
@@ -18,8 +19,9 @@
 #'   \item{left}{Yes (1)/No(NA) if the individual left the household after the recall event}
 #'   \item{birth}{Yes (1)/No(NA) if the child was born into the household after the recall event}
 #'   \item{death}{Yes (1)/No(NA) if the individual died since the recall event}
-#'   \item{death_cause}{Categorical responses for causes of death.
-#'   Typically categorized into illness/disease related deaths (1), injury/trauma deaths (2), or other causes (97).}
+#'   \item{death_cause}{Categorical responses for causes of death.}
+#'   \item{death_cause_smart}{Categorical response for cause of death coded in line with ENA.}
+#'   \item{death_location_smart}{Categorical response for location of death coded in line with ENA.}
 #'   \item{death_location}{Categorical variable for location of death. Typically categorized into
 #'   died at current location (1), died during migration (2), died at previous residence (3), or other location (97).}
 #'   \item{date_dc_date}{Date of data collection, as a date type variable}

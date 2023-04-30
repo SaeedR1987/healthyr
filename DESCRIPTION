@@ -4,7 +4,7 @@ Version: 1.0.0
 Authors@R: 
     person("Saeed", "Rahman", , "saeed.rahman@reach-initiative.org", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: Facilitates the analysis of standard nutrition and health technical survey indicators for REACH Initiative assessment teams globally. 
+Description: Facilitates the analysis of standard nutrition and health technical survey indicators for IMPACT/REACH Initiative assessment teams globally. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -48,7 +48,8 @@ Suggests:
     apyramid,
     janitor,
     srvyr,
-    praise
+    praise,
+    testthat (>= 3.0.0)
 Remotes: 
     nutriverse/zscorer,
     nutriverse/nipnTK,
@@ -56,3 +57,4 @@ Remotes:
 Depends: 
     R (>= 2.10)
 LazyData: true
+Config/testthat/edition: 3

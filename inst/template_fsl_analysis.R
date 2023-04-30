@@ -11,12 +11,15 @@ rm(list = ls())
 
 # remotes::install_github("SaeedR1987/healthyr")
 
-library(tidyverse)
-library(healthyr)
+# library(tidyverse)
+# library(healthyr)
+
+devtools::load_all()
 
 # Step 1: Load your Dataset ####
 
 df <- raw_fsl1
+df2 <- proc_fsl1
 
 # Step 2: Format Your Dataset ####
 

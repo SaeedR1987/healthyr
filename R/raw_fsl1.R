@@ -68,10 +68,37 @@
 #'   \item{lcs10}{Input for lcs_variables, a EMERGENCY Level Livelihood Coping. Yes(1), No, didn't do (2), No, didn't do because strategy exhausted (3), or Not applicable (4)
 #'   if the household used Livelihood Coping Strategy #10.}
 #'   \item{KEY}{Unique household identifier.}
+#'   \item{exp_comms}{Input for an estimated household expenditure on communications in the last 30 days.}
+#'   \item{exp_food}{Input for an estimated household expenditure on food in the last 30 days.}
+#'   \item{exp_water}{Input for an estimated household expenditure on water in the last 30 days.}
+#'   \item{exp_fuel}{Input for an estimated household expenditure on fuel in the last 30 days.}
+#'   \item{exp_nfi_monthly}{Input for an estimated household expenditure on montly non-food item costs in the last 30 days.}
+#'   \item{exp_rent}{Input for an estimated household expenditure on rent in the last 30 days.}
+#'   \item{exp_transport}{Input for an estimated household expenditure on transportation in the last 30 days.}
+#'   \item{exp_utilities}{Input for an estimated household expenditure on utilities in the last 30 days.}
+#'   \item{exp_other_monthly}{Input for an estimated household expenditure on other expenses in the last 30 days.}
+#'   \item{exp_shelter}{Input for an estimated household expenditure on shelter in the last 6 months.}
+#'   \item{exp_health}{Input for an estimated household expenditure on health in the last 6 months.}
+#'   \item{exp_debt}{Input for an estimated household expenditure on debt in the last 6 months.}
+#'   \item{exp_education}{Input for an estimated household expenditure on education costs in the last 6 months.}
+#'   \item{exp_nfi_infrequent}{Input for an estimated household expenditure on infrequent non-food items in the last 6 months.}
+#'   \item{exp_other_infrequent}{Input for an estimated household expenditure on other infrequent costs in the last 6 months.}
+#'   \item{income_salaried}{Input for estimated income in last 30 days from SALARIED work}
+#'   \item{income_casual}{Input for estimated income in last 30 days from CASUAL labor work}
+#'   \item{income_trade}{Input for estimated income in last 30 days from TRADE}
+#'   \item{income_livestock}{Input for estimated income in last 30 days from sale of LIVESTOCK or livestock products }
+#'   \item{income_loans_family}{Input for estimated income in last 30 days from LOANS from friends and family}
+#'   \item{income_loans_community}{Input for estimated income in last 30 days from LOANS from community members}
+#'   \item{income_own_production}{Input for estimated income in last 30 days from OWN PRODUCTION or sale of crops}
+#'   \item{income_remittances}{Input for estimated income in last 30 days from REMITTANCES}
+#'   \item{income_rent}{Input for estimated income in last 30 days from RENT PAYMENTS}
+#'   \item{income_social_benefits}{Input for estimated income in last 30 days from GOVT or SOCIAL BENEFIT PROGRAMS}
+#'   \item{income_humanitarian_assistance}{Input for estimated income in last 30 days from HUMANITARIAN ASSISTANCE}
+#'   \item{income_other}{Input for estimated income in last 30 days from OTHER SOURCES}
 #'
 #' }
 #'
-#' @source SMART Survey August 2019.
+#' @source SMART Survey August 2019 + generated expense and income data.
 #'
 #' @examples
 #' data(raw_fsl1)

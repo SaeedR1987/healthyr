@@ -7,6 +7,9 @@ R/run_monitoring_dashboard.R
 R/check_which_analysis_var.R
 R/ridge_plotly_dashboard.R
 R/plot_date_runner.R
+R/plot_iycf_areagraph.R
+R/run_fsl_monitoring_dashboard.R
+testing/
 
 ~$test_this_3.xlsx
 mort_analysis.R

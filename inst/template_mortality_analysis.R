@@ -9,8 +9,6 @@
 
 rm(list = ls())
 
-remotes::install_github("SaeedR1987/healthyr")
-
 library(tidyverse)
 library(healthyr)
 
@@ -61,8 +59,6 @@ df2 <- format_mortality_current_census(date_recall_event = "21/04/2019",
                                        death_cause = "death_cause", # cause of death
                                        death_location = "death_location" # location of death
                                        )
-
-
 
 # Step 3: Create a Quality Summary Report ####
 # Ratio is (prevalence / (1 - prevalence))

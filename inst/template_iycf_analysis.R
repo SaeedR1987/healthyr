@@ -18,16 +18,25 @@ library(healthyr)
 
 df <- raw_anthro_iycf2
 
+
+test <- select_non_numeric_cols(df)
+
+setdiff(names(test), names(df))
+setdiff(names(df), names(test))
+head(test)
+head(df[setdiff(names(df), names(test))])
+
+
 # Step 2: Format Your Dataset ####
 
 df2 <- format_nut_health_indicators(df = df, use_flags_yn = "yes",
 
                                     hhid = "household_id",
-                                    date_of_dc = "date_of_interview",
+                                    # date_of_dc = "date_of_interview",
                                     enum = "team_number",
                                     cluster = "cluster_id",
 
-                                    date_of_birth = "date_of_birth_of_name",
+                                    # date_of_birth = "date_of_birth_of_name",
                                     age_months_var = "interview_section_n1_j_childage",
                                     sex_var = "sex_of_name",
 
@@ -79,7 +88,7 @@ df2 <- format_nut_health_indicators(df = df, use_flags_yn = "yes",
 # Step 3: Review a Quality Summary Report ####
 # Ratio is (prevalence / (1 - prevalence))
 
-(create_iycf_quality_report(df = df2,
+t(create_iycf_quality_report(df = df,
                             short_report = FALSE,
                             exp_prevalence_mad = 0.05,
                             exp_sex_ratio = 1,

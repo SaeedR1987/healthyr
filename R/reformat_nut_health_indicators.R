@@ -9,6 +9,10 @@
 #' @param df Inputs a data frame directly from the format_nut_health_indicators function.
 #' @param health_barriers Inputs a character vector of column names for self-reported health barriers.
 #' @param lcs_variables Inputs a character vector of column names for livelihood coping strategies.
+#' @param livelihood_variables Inputs a character vector of column names specifying all the livelihood activities
+#' for which income is received. These should be numerical columns with estimated income per livelihood activity.
+#' As per MSNA core indicator bank 2023.
+#' @param value_map Inputs a value map which is generated from other heatlhyr functions to facilitate recoding.
 #'
 #' @return Returns a dataframe with standardized values for specific columns, that can then be used to calculate composite or other indicators.
 #' @export
@@ -19,7 +23,11 @@
 #' c("lcs_colname1", "lcs_colname2", ...))}
 #'
 #' @importFrom rlang .data
-reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_variables = NULL) {
+reformat_nut_health_indicators <- function(df,
+                                           health_barriers = NULL,
+                                           lcs_variables = NULL,
+                                           livelihood_variables = NULL,
+                                           value_map) {
 
   # reformatting sex
 
@@ -28,6 +36,8 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
     sex_codes <- unique(df$sex)
     ideal_codes <- c("1", "2")
     sex_recodes <- c("1", "2", "NA")
+
+
 
     if(length(setdiff(sex_codes, ideal_codes))==0) {
       print("Good - Sex coded as 1/2 for male/female")
@@ -39,13 +49,8 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
           a <- readline(cat(paste0("\n RE-FORMATTING VARIABLE : SEX \n Invalid input. ", "How is '", sex_codes[[i]], "' coded? Please input either\n '1' for male, \n '2' for 'female' or \n 'NA' for missing. ")))
         }
 
-        cat("\014") #clears the console
-        print(paste("The input ", a, " is replacing", sex_codes[[i]]))
-
-        if(!is.na(sex_codes[[i]])){
-          if(a == "NA") {df <- df %>% dplyr::mutate(sex = ifelse(.data$sex == sex_codes[[i]], NA, .data$sex))
-          } else {df <- df %>% dplyr::mutate(sex = ifelse(.data$sex == sex_codes[[i]], a, .data$sex))}
-        }
+        df <- healthyr::recode_helper_data(df = df, column = "sex", old_val = sex_codes[[i]], new_val = a)
+        value_map <- healthyr::recode_helper_map(df = value_map, column = "sex", old_val = sex_codes[[i]], new_val = a)
 
       }
     }
@@ -665,6 +670,116 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
 
   }
 
+  ### reformatting livelihoods ####
+
+  if(!is.null(livelihood_variables)) {
+
+    df <- df %>%
+      dplyr::mutate(livelihood_salaried = "0",
+                    livelihood_casual = "0",
+                    livelihood_business = "0",
+                    livelihood_own_prod = "0",
+                    livelihood_govt_benefits = "0",
+                    livelihood_rent = "0",
+                    livelihood_remittances = "0",
+                    livelihood_loans_family = "0",
+                    livelihood_loans_community = "0",
+                    livelihood_hum_assistance = "0",
+                    livelihood_other = "0",
+                    livelihood_crops = "0",
+                    livelihood_livestock = "0")
+
+    df[livelihood_variables] <- lapply(df[livelihood_variables], as.numeric)
+    livelihood_recodes <- c("1", "2","3","4", "5", "6", "7", "8", "9", "10", "11", "12")
+
+    for (z in 1:length(livelihood_variables)) {
+
+      a <- readline(cat(paste0("Which livelihood category does <<",livelihood_variables[[z]], ">> correspond to? Please choose either:
+                               \n '1' for Salaried
+                               \n '2' for Casual Labour,
+                               \n '3' for Business or Trade,
+                               \n '4' for Own production (agriculture, livestock, fishing, food processing, home manufacture, etc.),
+                               \n '5' for Government social benefits or assistance,
+                               \n '6' for Income from Rent,
+                               \n '7' for Remittances,
+                               \n '8' for Loans or support from family and friends (not remittances),
+                               \n '9' for Loans, support or charitable donations from from community members,
+                               \n '10' for Humanitarian Assistance,
+                               \n '11' for Other
+                               \n '12' for Not Applicable.")))
+
+      while(length(setdiff(a, livelihood_recodes))==1) {
+        a <- readline(cat(paste0("Which livelihood category does <<",livelihood_variables[[z]], ">> correspond to? Please choose either:
+                               \n '1' for Salaried
+                               \n '2' for Casual Labour,
+                               \n '3' for Business or Trade,
+                               \n '4' for Own production (agriculture, livestock, fishing, food processing, home manufacture, etc.),
+                               \n '5' for Government social benefits or assistance,
+                               \n '6' for Income from Rent,
+                               \n '7' for Remittances,
+                               \n '8' for Loans or support from family and friends (not remittances),
+                               \n '9' for Loans, support or charitable donations from from community members,
+                               \n '10' for Humanitarian Assistance,
+                               \n '11' for Other
+                               \n '12' for Not Applicable.")))
+      }
+
+      if(a == "1") {df <- df %>% dplyr::mutate(livelihood_salaried = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_salaried))}
+      if(a == "2") {df <- df %>% dplyr::mutate(livelihood_casual = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_casual))}
+      if(a == "3") {df <- df %>% dplyr::mutate(livelihood_business = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_business))}
+      # Own production coding, and additional coding for agricultural or livestock
+      if(a == "4") {
+
+        # Updates Livelihood Own Production
+        df <- df %>% dplyr::mutate(livelihood_own_prod = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_own_prod))
+
+        yn_recodes <- c("1", "2", "3")
+
+        # Checks Additionally if it is agriculture related, and makes additional columns to use for data quality flags.
+        k <- readline(cat(paste0("Is <<",livelihood_variables[[z]], ">> specific to agriculture or crops? Please choose either:
+                               \n '1' for YES
+                               \n '2' for NO
+                               \n '3' for DONT KNOW")))
+
+        while(length(setdiff(k, yn_recodes))==1) {
+          k <- readline(cat(paste0("Invalid input, try again. Is <<",livelihood_variables[[z]], ">> specific to agriculture or crops? Please choose either:
+                               \n '1' for YES
+                               \n '2' for NO
+                               \n '3' for DONT KNOW")))
+        }
+
+        if(k == "1") {df <- df %>% dplyr::mutate(livelihood_crops = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_crops))}
+
+        # Checks Additionally if it is agriculture or livestock related, and makes additional columns to use for data quality flags.
+
+        k <- readline(cat(paste0("Is <<",livelihood_variables[[z]], ">> specific to raising and selling livestock, or products from livestock (milk, meat, etc.)? Please choose either:
+                               \n '1' for YES
+                               \n '2' for NO
+                               \n '3' for DONT KNOW")))
+
+        while(length(setdiff(k, yn_recodes))==1) {
+          k <- readline(cat(paste0("Invalid input, try again. Is <<",livelihood_variables[[z]], ">> specific to raising and selling livestock, or products from livestock (milk, meat, etc.)? Please choose either:
+                               \n '1' for YES
+                               \n '2' for NO
+                               \n '3' for DONT KNOW")))
+        }
+
+        if(k == "1") {df <- df %>% dplyr::mutate(livelihood_livestock = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_livestock))}
+
+        }
+      if(a == "5") {df <- df %>% dplyr::mutate(livelihood_govt_benefits = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_govt_benefits))}
+      if(a == "6") {df <- df %>% dplyr::mutate(livelihood_rent = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_rent))}
+      if(a == "7") {df <- df %>% dplyr::mutate(livelihood_remittances = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_remittances))}
+      if(a == "8") {df <- df %>% dplyr::mutate(livelihood_loans_family = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_loans_family))}
+      if(a == "9") {df <- df %>% dplyr::mutate(livelihood_loans_community = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_loans_community))}
+      if(a == "10") {df <- df %>% dplyr::mutate(livelihood_hum_assistance = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_hum_assistance))}
+      if(a == "11") {df <- df %>% dplyr::mutate(livelihood_other = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_other))}
+      # if(a == "12") {df <- df %>% dplyr::mutate(livelihood_salaried = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_salaried))}
+
+    }
+
+  }
+
   ### reformatting LCS ####
 
   if(!is.null(lcs_variables)) {
@@ -674,6 +789,16 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
              lcs_crisis = "0",
              lcs_emergency = "0",
              lcs_other = "0",
+             lcs_stress_yes = "0",
+             lcs_crisis_yes = "0",
+             lcs_emergency_yes = "0",
+             lcs_other_yes = "0",
+             lcs_stress_exhaust = "0",
+             lcs_crisis_exhaust = "0",
+             lcs_emergency_exhaust = "0",
+             lcs_other_exhaust = "0",
+             lcs_livestock_yn = "0",
+             lcs_agriculture_yn = "0"
       )
 
     # for recoding all barriers, assumes they are all coded the same way
@@ -728,6 +853,48 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
       if(a == "2") {df <- df %>% dplyr::mutate(lcs_crisis = ifelse(!!rlang::sym(lcs_variables[[z]]) == "3", "1", .data$lcs_crisis))}
       if(a == "3") {df <- df %>% dplyr::mutate(lcs_emergency = ifelse(!!rlang::sym(lcs_variables[[z]]) == "3", "1", .data$lcs_emergency))}
       if(a == "9") {df <- df %>% dplyr::mutate(lcs_other = ifelse(!!rlang::sym(lcs_variables[[z]]) == "3", "1", .data$lcs_other))}
+
+      if(a == "1") {df <- df %>% dplyr::mutate(lcs_stress_yes = ifelse(!!rlang::sym(lcs_variables[[z]]) == "1", "1", .data$lcs_stress_yes))}
+      if(a == "2") {df <- df %>% dplyr::mutate(lcs_crisis_yes = ifelse(!!rlang::sym(lcs_variables[[z]]) == "1", "1", .data$lcs_crisis_yes))}
+      if(a == "3") {df <- df %>% dplyr::mutate(lcs_emergency_yes = ifelse(!!rlang::sym(lcs_variables[[z]]) == "1", "1", .data$lcs_emergency_yes))}
+      if(a == "9") {df <- df %>% dplyr::mutate(lcs_other_yes = ifelse(!!rlang::sym(lcs_variables[[z]]) == "1", "1", .data$lcs_other_yes))}
+
+      if(a == "1") {df <- df %>% dplyr::mutate(lcs_stress_exhaust = ifelse(!!rlang::sym(lcs_variables[[z]]) == "3", "1", .data$lcs_stress_exhaust))}
+      if(a == "2") {df <- df %>% dplyr::mutate(lcs_crisis_exhaust = ifelse(!!rlang::sym(lcs_variables[[z]]) == "3", "1", .data$lcs_crisis_exhaust))}
+      if(a == "3") {df <- df %>% dplyr::mutate(lcs_emergency_exhaust = ifelse(!!rlang::sym(lcs_variables[[z]]) == "3", "1", .data$lcs_emergency_exhaust))}
+      if(a == "9") {df <- df %>% dplyr::mutate(lcs_other_exhaust = ifelse(!!rlang::sym(lcs_variables[[z]]) == "3", "1", .data$lcs_other_exhaust))}
+
+      # Check if it is an agriculture or livestock dependent coping strategy
+      # Selling more livestock than usual, selling last female cattle, etc.
+
+      yn_recodes <- c("1", "2", "3")
+
+      a <- readline(cat(paste0("Is the livelihood coping strategy <<",lcs_variables[[z]], ">> dependent on LIVESTOCK? Please choose either:
+                               \n '1' for YES
+                               \n '2' for NO
+                               \n '3' for DONT KNOW")))
+
+      while(length(setdiff(a, yn_recodes))==1) {
+        a <- readline(cat(paste0("Invalid Input, try again. Is the livelihood coping strategy <<",lcs_variables[[z]], ">> dependent on LIVESTOCK? Please choose either:
+                               \n '1' for YES
+                               \n '2' for NO
+                               \n '3' for DONT KNOW")))
+      }
+      if(a == "1") {df <- df %>% dplyr::mutate(lcs_livestock_yn = ifelse(!!rlang::sym(lcs_variables[[z]]) == "1", "1", .data$lcs_livestock_yn))}
+
+      a <- readline(cat(paste0("Is the livelihood coping strategy <<",lcs_variables[[z]], ">> dependent on AGRICULTURE, FARMING, CROPS? Please choose either:
+                               \n '1' for YES
+                               \n '2' for NO
+                               \n '3' for DONT KNOW")))
+
+      # checking if agriculture dependent
+      while(length(setdiff(a, yn_recodes))==1) {
+        a <- readline(cat(paste0("Invalid Input, try again. Is the livelihood coping strategy <<",lcs_variables[[z]], ">> dependent on AGRICULTURE, FARMING, CROPS? Please choose either:
+                               \n '1' for YES
+                               \n '2' for NO
+                               \n '3' for DONT KNOW")))
+      }
+      if(a == "1") {df <- df %>% dplyr::mutate(lcs_agriculture_yn = ifelse(!!rlang::sym(lcs_variables[[z]]) == "1", "1", .data$lcs_agriculture_yn))}
 
     }
 
@@ -941,6 +1108,6 @@ reformat_nut_health_indicators <- function(df, health_barriers = NULL, lcs_varia
   }
 
 
-  return(df)
+  return(list(df, value_map))
 
 }

@@ -15,7 +15,7 @@
 #' @importFrom rlang .data
 flag_nut_health_issues <- function(df, use_flags = NULL) {
 
-    # Washington Group Flags
+  # Washington Group Flags ####
 
   if(length(setdiff(c("wgss_sco_score", "age_years"), names(df)))==0) {
     df <- df %>%
@@ -46,7 +46,7 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
 
   }
 
-  # IYCF flags
+  # IYCF flags ####
 
   liquids <- c("iycf_6a", "iycf_6b", "iycf_6c", "iycf_6d", "iycf_6e", "iycf_6f", "iycf_6g", "iycf_6h", "iycf_6i", "iycf_6j")
   liquids_to_check <- intersect(liquids, colnames(df))
@@ -176,42 +176,37 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
                     iycf_mmf = ifelse(is.na(.data$flag_some_foods_no_meal), .data$iycf_mmf, ifelse(.data$flag_some_foods_no_meal == 1, 0, .data$iycf_mmf)))
   }
 
-
-
-  # FSL flags
+  # FSL flags ####
 
   fcs_vars <- c("fcs_cereal", "fcs_legumes", "fcs_dairy", "fcs_meat", "fcs_veg", "fcs_fruit", "fcs_oil", "fcs_sugar")
   if(length(setdiff(fcs_vars, colnames(df)))==0) {
+
+    df[fcs_vars] <- lapply(df[fcs_vars], as.numeric)
 
     # All 0s or 7s for FCS vars
     # Much higher meats than cereals
     df <- df %>%
       dplyr::mutate(flag_above7_fcs = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal > 7 | .data$fcs_legumes  > 7 | .data$fcs_dairy  > 7 | .data$fcs_meat  > 7 | .data$fcs_veg  > 7 | .data$fcs_fruit  > 7 | .data$fcs_oil  > 7 | .data$fcs_sugar > 7, 1, 0)),
-                    flag_meat_cereal_ratio = ifelse(is.na(.data$fcs_cereal), NA, ifelse(as.numeric(.data$fcs_cereal) <= 4 & ( as.numeric(.data$fcs_meat) >= 6  | as.numeric(.data$fcs_dairy) >= 6 ), 1, 0 )),
+                    flag_meat_cereal_ratio = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal < .data$fcs_meat, 1, 0)),
                     flag_zero_fcs = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal == 0 & .data$fcs_legumes == 0 & .data$fcs_dairy == 0 & .data$fcs_meat == 0 & .data$fcs_veg == 0 & .data$fcs_fruit == 0 & .data$fcs_oil == 0 & .data$fcs_sugar == 0, 1, 0)),
                     flag_all_fcs = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal == 7 & .data$fcs_legumes == 7 & .data$fcs_dairy == 7 & .data$fcs_meat == 7 & .data$fcs_veg == 7 & .data$fcs_fruit == 7 & .data$fcs_oil == 7 & .data$fcs_sugar == 7, 1, 0)),
-                    flag_low_cereal_oil = ifelse(is.na(.data$fcs_cereal), NA, ifelse( .data$fcs_cereal <= 4 | .data$fcs_oil <= 4, 1, 0)),
-    )
+                    flag_low_cereal = ifelse(is.na(.data$fcs_cereal), NA, ifelse( .data$fcs_cereal < 7, 1, 0)),
+                    flag_low_oil = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_oil < 7, 1, 0))) %>%
+      dplyr::rowwise() %>%
+      dplyr::mutate(sd_foods = sd(c(.data$fcs_cereal, .data$fcs_legumes, .data$fcs_dairy, .data$fcs_meat, .data$fcs_veg, .data$fcs_fruit, .data$fcs_oil, .data$fcs_sugar), na.rm = TRUE),
+                    flag_sd_foodgroup = dplyr::case_when(.data$sd_foods < 0.8 ~ 1, TRUE ~ 0)) %>%
+      dplyr::ungroup()
 
-    if(length(setdiff(c(fcs_vars, "rcsi_score"), colnames(df)))==0) {
-
-      df <- df %>%
-        dplyr::mutate(flag_proteins_rcsi = ifelse(is.na(.data$fcs_dairy), NA, ifelse(is.na(.data$fcs_meat), NA, ifelse(is.na(rcsi_score), NA, ifelse( (.data$rcsi_score >= 19 & as.numeric(.data$fcs_dairy) >= 6) | (.data$rcsi_score >= 19 & as.numeric(.data$fcs_meat) >= 6), 1, 0))))
-        )
-
-    }
 
     # Extreme FCS_score ( <3 or >60 )
     if(c("fcs_score") %in% colnames(df)) {
 
       df <- df %>%
-        dplyr::mutate(flag_low_fcs = ifelse(is.na(.data$fcs_score), NA, ifelse(.data$fcs_score < 5, 1, 0)),
-                      flag_high_fcs = ifelse(is.na(.data$fcs_score), NA, ifelse(.data$fcs_score > 60, 1, 0)))
+        dplyr::mutate(flag_low_fcs = ifelse(is.na(.data$fcs_score), NA, ifelse(.data$fcs_score < 7, 1, 0)),
+                      flag_high_fcs = ifelse(is.na(.data$fcs_score), NA, ifelse(.data$fcs_score > 56, 1, 0)),
+                      flag_protein_fcs = ifelse(is.na(.data$fcs_score), NA, ifelse(.data$fcs_score < 21 & (.data$fcs_meat >= 5 | .data$fcs_dairy >= 5), 1, 0)))
 
     }
-
-    df <- df %>%
-      dplyr::mutate(flag_fcs_extreme = ifelse(is.na(.data$fcs_score), NA, ifelse(.data$fcs_score < 3 | .data$fcs_score > 60, 1, 0)))
 
   }
 
@@ -223,9 +218,11 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
   if(length(setdiff(hhs_vars, colnames(df)))==0) {
     # All day night without food, but no food in the household issue.
 
-    if(length(setdiff(c("hhs_comp1", "hhs_comp3"), colnames(df)))==0) {
+    if(length(setdiff(hhs_vars, colnames(df)))==0) {
       df <- df %>%
-        dplyr::mutate(flag_hhs_nofoodhh_noeat = ifelse(is.na(.data$hhs_comp1), NA, ifelse(.data$hhs_comp1 == 0 & .data$hhs_comp3 > 0, 1, 0 )))
+        dplyr::mutate(flag_hhs_no1 = dplyr::case_when(.data$hhs_nofoodhh_1 != "1" & !is.na(.data$hhs_nofoodhh_1a) ~ 1, TRUE ~ 0),
+                      flag_hhs_no2 = dplyr::case_when(.data$hhs_sleephungry_2 != "1" & !is.na(.data$hhs_sleephungry_2a) ~ 1, TRUE ~ 0),
+                      flag_hhs_no3 = dplyr::case_when(.data$hhs_alldaynight_3 != "1" & !is.na(.data$hhs_alldaynight_3a) ~ 1, TRUE ~ 0))
 
     }
     # Very Severe HHS scores
@@ -250,7 +247,7 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
       df <- df %>%
         dplyr::mutate(flag_low_hdds = ifelse(is.na(.data$hdds_score), NA, ifelse(.data$hdds_score <2, 1, 0)),
                flag_high_hdds = ifelse(is.na(.data$hdds_score), NA, ifelse(.data$hdds_score >9, 1, 0)),
-               flag_low_sugar_oil_hdds = ifelse(is.na(.data$hdds_score), NA, ifelse( (.data$hdds_score <= 2 & .data$hdds_sugars == 1 & .data$hdds_condiments == 1) | (.data$hdds_score <= 1 & .data$hdds_sugars == 1) | (.data$hdds_score <= 1 & .data$hdds_condiments == 1), 1, 0)))
+               flag_low_sugar_cond_hdds = ifelse(is.na(.data$hdds_score), NA, ifelse( (.data$hdds_score <= 2 & .data$hdds_sugars == 1 & .data$hdds_condiments == 1) | (.data$hdds_score <= 1 & .data$hdds_sugars == 1) | (.data$hdds_score <= 1 & .data$hdds_condiments == 1), 1, 0)))
 
   }
 
@@ -261,16 +258,24 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
   if(length(setdiff(rcsi_vars, colnames(df)))==0) {
 
     df <- df %>%
-      dplyr::mutate(flag_high_rcsi = ifelse(is.na(.data$rcsi_score), NA, ifelse(.data$rcsi_score >= 50, 1, 0)))
+      dplyr::mutate(flag_high_rcsi = ifelse(is.na(.data$rcsi_score), NA, ifelse(.data$rcsi_score >= 43, 1, 0))) %>%
+      dplyr::rowwise() %>%
+      dplyr::mutate(sd_rcsicoping = sd(c(.data$rcsi_lesspreferred_1, .data$rcsi_borrowfood_2, .data$rcsi_limitportion_3, .data$rcsi_restrict_4, .data$rcsi_reducemeals5), na.rm = TRUE)) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(flag_sd_rcsicoping = dplyr::case_when(.data$sd_rcsicoping < 0.8 & .data$rcsi_score < 4 ~ 1, TRUE ~ 0))
 
   }
 
   if(length(setdiff(c(fcs_vars, "rcsi_score"), colnames(df)))==0) {
 
     df <- df %>%
-      dplyr::mutate(flag_protein_high_rcsi = ifelse( is.na(.data$rcsi_score), NA,
+      dplyr::mutate(flag_protein_rcsi = ifelse( is.na(.data$rcsi_score), NA,
                                                      ifelse(is.na(.data$fcs_cereal), NA,
-                                                            ifelse(.data$rcsi_score >= 19 & ( as.numeric(.data$fcs_dairy) >= 6 | as.numeric(.data$fcs_meat) >= 6), 1, 0 ))))
+                                                            ifelse(.data$rcsi_score >= 19 & ( as.numeric(.data$fcs_dairy) >= 5 | as.numeric(.data$fcs_meat) >= 5), 1, 0 ))),
+                    flag_fcs_rcsi = ifelse(is.na(.data$rcsi_score), NA,
+                                           ifelse(is.na(.data$fcs_score), NA,
+                                                  ifelse(.data$fcs_score < 35 & .data$rcsi_score <= 4, 1, 0 ))),
+                    flag_fcsrcsi_box = dplyr::case_when(rcsi_score >= 18 & fcs_score >= 56 ~ 1, TRUE ~ 0))
 
   }
 
@@ -281,7 +286,32 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
   if(length(setdiff(lcs_vars, colnames(df)))==0) {
 
     df <- df %>%
-      dplyr::mutate(flag_lcs_severity = ifelse(is.na(.data$lcs_emergency), NA, ifelse( (.data$lcs_emergency == 1 & .data$lcs_stress == 0) | (.data$lcs_emergency == 1 & .data$lcs_crisis == 0) | (.data$lcs_crisis == 1 & .data$lcs_stress == 0), 1, 0)))
+      dplyr::mutate(flag_lcsi_coherence = ifelse(is.na(.data$lcs_emergency), NA, ifelse( (.data$lcs_emergency == 1 & .data$lcs_stress == 0) | (.data$lcs_emergency == 1 & .data$lcs_crisis == 0) | (.data$lcs_crisis == 1 & .data$lcs_stress == 0), 1, 0)))
+
+  }
+
+  if(length(setdiff(c("lcs1", "lcs2", "lcs3", "lcs4", "lcs5", "lcs6", "lcs7", "lcs8", "lcs9", "lcs10"), names(df)))==0) {
+
+    df$lcs.count.na <- apply(df[c("lcs1", "lcs2", "lcs3", "lcs4", "lcs5", "lcs6", "lcs7", "lcs8", "lcs9", "lcs10")], 1, function(x) sum(x == "4"))
+
+    df <- df %>%
+      dplyr::mutate(flag_lcs_na = dplyr::case_when(lcs.count.na == 10 ~ 1, TRUE ~ 0))
+
+  }
+
+  # Checking Livelihood vs. LCS
+
+  if(length(setdiff(c("livelihood_livestock", "lcs_livestock_yn"), colnames(df)))==0) {
+
+    df <- df %>%
+      dplyr::mutate(flag_lcsi_liv_livestock = dplyr::case_when(livelihood_livestock == "0" & lcs_livestock_yn == "1" ~ 1, TRUE ~ 0))
+
+  }
+
+  if(length(setdiff(c("livelihood_crops", "lcs_agriculture_yn"), colnames(df)))==0) {
+
+    df <- df %>%
+      dplyr::mutate(flag_lcsi_liv_agriculture = dplyr::case_when(livelihood_crops == "0" & lcs_agriculture_yn == "1" ~ 1, TRUE ~ 0))
 
   }
 
@@ -298,6 +328,8 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
       dplyr::mutate(flag_fc_cell = ifelse(is.na(.data$fc_cell), NA, ifelse(.data$fc_cell == 3 | .data$fc_cell == 4 | .data$fc_cell == 5 | .data$fc_cell == 8 | .data$fc_cell == 9 | .data$fc_cell == 10, 1, 0)))
 
   }
+
+
 
   # Vaccination Flags
   # to be added

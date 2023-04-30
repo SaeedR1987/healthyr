@@ -7,7 +7,9 @@
 reformat_nut_health_indicators(
   df,
   health_barriers = NULL,
-  lcs_variables = NULL
+  lcs_variables = NULL,
+  livelihood_variables = NULL,
+  value_map
 )
 }
 \arguments{
@@ -16,6 +18,12 @@ reformat_nut_health_indicators(
 \item{health_barriers}{Inputs a character vector of column names for self-reported health barriers.}
 
 \item{lcs_variables}{Inputs a character vector of column names for livelihood coping strategies.}
+
+\item{livelihood_variables}{Inputs a character vector of column names specifying all the livelihood activities
+for which income is received. These should be numerical columns with estimated income per livelihood activity.
+As per MSNA core indicator bank 2023.}
+
+\item{value_map}{Inputs a value map which is generated from other heatlhyr functions to facilitate recoding.}
 }
 \value{
 Returns a dataframe with standardized values for specific columns, that can then be used to calculate composite or other indicators.
