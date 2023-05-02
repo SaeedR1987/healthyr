@@ -360,8 +360,8 @@ format_nut_health_indicators <- function(df, #dataframe
            delivery_location = {{delivery_location}},
            birth_assistant = {{birth_assistant}},
            # Health and Food expenditures
-           main_income_source = {{main_income_source}},
-           monthly_income = {{monthly_income}},
+           # main_income_source = {{main_income_source}},
+           # monthly_income = {{monthly_income}},
            food_exp = {{food_exp_col}},
            health_exp = {{health_exp_col}}
 

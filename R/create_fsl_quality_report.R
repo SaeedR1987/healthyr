@@ -71,7 +71,18 @@ create_fsl_quality_report <- function(df, grouping = NULL, short_report = NULL, 
     results2 <- df %>%
       dplyr::group_by(!!rlang::sym(grouping)) %>%
       dplyr::summarise(mean_rcsi = round(mean(.data$rcsi_score, na.rm = TRUE),2),
-                       sd_rcsi = round(stats::sd(.data$rcsi_score, na.rm = TRUE),2))
+                       sd_rcsi = round(stats::sd(.data$rcsi_score, na.rm = TRUE),2),
+                       mean_rcsi_lesspreferred_1 = round(mean(.data$rcsi_lesspreferred_1, na.rm = TRUE),2),
+                       sd_rcsi_lesspreferred_1 = round(stats::sd(.data$rcsi_lesspreferred_1, na.rm = TRUE), 2),
+                       mean_rcsi_borrowfood_2 = round(mean(.data$rcsi_borrowfood_2, na.rm = TRUE),2),
+                       sd_rcsi_borrowfood_2 = round(stats::sd(.data$rcsi_borrowfood_2, na.rm = TRUE),2),
+                       mean_rcsi_limitportion_3 = round(mean(.data$rcsi_limitportion_3, na.rm = TRUE),2),
+                       sd_rcsi_limitportion_3 = round(stats::sd(.data$rcsi_limitportion_3, na.rm = TRUE), 2),
+                       mean_rcsi_restrict_4 = round(mean(.data$rcsi_restrict_4, na.rm = TRUE), 2),
+                       sd_rcsi_restrict_4 = round(stats::sd(.data$rcsi_restrict_4),2),
+                       mean_rcsi_reducemeals5 = round(mean(.data$rcsi_reducemeals5, na.rm = TRUE), 2),
+                       sd_rcsi_reducemeals5 = round(stats::sd(.data$rcsi_reducemeals5, na.rm = TRUE), 2)
+                       )
 
     if(!exists("results")) {results <- results2} else {results <- merge(results, results2)}
 
@@ -220,11 +231,27 @@ create_fsl_quality_report <- function(df, grouping = NULL, short_report = NULL, 
       ) %>%
       dplyr::group_by(!!rlang::sym(grouping)) %>%
       dplyr::summarise(prop_fc_flags = sum(.data$flag_fc_cell, na.rm = TRUE) /sum(!is.na(.data$fc_cell), na.rm = TRUE),
-                       fews_p1 = sum(.data$p1, na.rm = TRUE) / sum(!is.na(.data$fc_cell)),
-                       fews_p2 = sum(.data$p2, na.rm = TRUE) / sum(!is.na(.data$fc_cell)),
-                       fews_p3 = sum(.data$p3, na.rm = TRUE) / sum(!is.na(.data$fc_cell)),
-                       fews_p4 = sum(.data$p4, na.rm = TRUE) / sum(!is.na(.data$fc_cell)),
-                       fews_p5 = sum(.data$p5, na.rm = TRUE) / sum(!is.na(.data$fc_cell)))
+                       fews_p1 = round(sum(.data$p1, na.rm = TRUE) / sum(!is.na(.data$fc_cell)),2),
+                       fews_p2 = round(sum(.data$p2, na.rm = TRUE) / sum(!is.na(.data$fc_cell)),2),
+                       fews_p3 = round(sum(.data$p3, na.rm = TRUE) / sum(!is.na(.data$fc_cell)),2),
+                       fews_p4 = round(sum(.data$p4, na.rm = TRUE) / sum(!is.na(.data$fc_cell)),2),
+                       fews_p5 = round(sum(.data$p5, na.rm = TRUE) / sum(!is.na(.data$fc_cell)),2))
+
+    if(!exists("results")) {results <- results2} else {results <- merge(results, results2)}
+
+    results <- results %>% dplyr::select(c(1, .data$n, dplyr::everything()))
+
+  }
+
+  if(c("food_exp_share") %in% names(df)) {
+
+    results2 <- df %>%
+      dplyr::group_by(!!rlang::sym(grouping)) %>%
+      dplyr::summarise(prop_fc_flags = sum(.data$flag_fc_cell, na.rm = TRUE) /sum(!is.na(.data$fc_cell), na.rm = TRUE),
+                       fes_1 = round(sum(.data$food_exp_share == "1", na.rm = TRUE) / sum(!is.na(.data$food_exp_share)),2),
+                       fes_2 = round(sum(.data$food_exp_share == "2", na.rm = TRUE) / sum(!is.na(.data$food_exp_share)),2),
+                       fes_3 = round(sum(.data$food_exp_share == "3", na.rm = TRUE) / sum(!is.na(.data$food_exp_share)),2),
+                       fes_4 = round(sum(.data$food_exp_share == "4", na.rm = TRUE) / sum(!is.na(.data$food_exp_share)),2))
 
     if(!exists("results")) {results <- results2} else {results <- merge(results, results2)}
 
@@ -236,8 +263,9 @@ create_fsl_quality_report <- function(df, grouping = NULL, short_report = NULL, 
 
   a <- c("n",
          "fews_p1", "fews_p2", "fews_p3", "fews_p4", "fews_p5",
-         "prop_fc_flags", "flag_severe_hhs",
-         "fsl_plaus_score", "fsl_plaus_cat")
+         "flag_severe_hhs", "flag_lcsi_severity",
+         "plaus_fcs", "plaus_rcsi", "plaus_hhs", "plaus_lcsi", "plaus_other_fsl",
+         "plaus_fsl_score", "plaus_fsl_cat")
 
   b <- intersect(a, colnames(results))
 

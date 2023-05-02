@@ -881,6 +881,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
 
       df$total_monthly_exp <- rowSums(df[,c("month_exp1", "month_exp2")])
 
+      # food exp share categorizations are in line with CARI
 
       df <- df %>%
         dplyr::mutate(food_exp = ifelse(is.na(.data$health_exp), 0, .data$health_exp / as.numeric(num_period_months)),

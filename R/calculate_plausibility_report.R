@@ -230,7 +230,7 @@ calculate_plausibility_report <- function(df) {
 
   # Food Security Plausibility Criteria ####
 
-  # FCS PLAUS CHECKS
+  # FCS PLAUS CHECKS ####
   if(c("sd_fcs") %in% names(df)) {
 
     df <- df %>%
@@ -299,7 +299,7 @@ calculate_plausibility_report <- function(df) {
 
   }
 
-  # rCSI PLAUS CHECKS
+  # rCSI PLAUS CHECKS ####
 
   if(c("flag_high_rcsi") %in% names(df)) {
 
@@ -329,17 +329,17 @@ calculate_plausibility_report <- function(df) {
                                                      .data$sd_rcsi >= 16 ~ 6, TRUE ~ 0))
   }
 
-  if(c("flag_proteins_rcsi") %in% names(df)) {
+  if(c("flag_protein_rcsi") %in% names(df)) {
 
     df <- df %>%
-      dplyr::mutate(plaus_flag_proteins_rcsi = dplyr::case_when(.data$flag_proteins_rcsi < 2 ~ 0,
-                                                                .data$flag_proteins_rcsi >= 2 & .data$flag_proteins_rcsi < 4 ~ 1,
-                                                                .data$flag_proteins_rcsi >= 4 & .data$flag_proteins_rcsi < 10 ~ 2,
-                                                                .data$flag_proteins_rcsi >= 10 ~ 3, TRUE ~ 0))
+      dplyr::mutate(plaus_flag_protein_rcsi = dplyr::case_when(.data$flag_protein_rcsi < 2 ~ 0,
+                                                                .data$flag_protein_rcsi >= 2 & .data$flag_protein_rcsi < 4 ~ 1,
+                                                                .data$flag_protein_rcsi >= 4 & .data$flag_protein_rcsi < 10 ~ 2,
+                                                                .data$flag_protein_rcsi >= 10 ~ 3, TRUE ~ 0))
 
   }
 
-  rcsi_plaus_vars <- c("plaus_flag_proteins_rcsi", "plaus_flag_sd_rcsicoping", "plaus_flag_high_rcsi", "plaus_sd_rcsi")
+  rcsi_plaus_vars <- c("plaus_flag_protein_rcsi", "plaus_flag_sd_rcsicoping", "plaus_flag_high_rcsi", "plaus_sd_rcsi")
 
   if(length(setdiff(c(rcsi_plaus_vars), names(df))) < 4) {
 
@@ -352,28 +352,28 @@ calculate_plausibility_report <- function(df) {
 
   }
 
-  # HHS PLAUS CHECKS
+  # HHS PLAUS CHECKS ####
 
   if(c("flag_severe_hhs") %in% names(df)) {
 
     df <- df %>%
       dplyr::mutate(plaus_flag_severe_hhs = dplyr::case_when(.data$flag_severe_hhs < 1 ~ 0,
-                                                             .data$flag_severe_hhs >= 1 & .data$flag_severe_hhs < 5 ~ 4,
-                                                             .data$flag_severe_hhs >= 5 & .data$flag_severe_hhs < 10 ~ 6,
-                                                             .data$flag_severe_hhs >= 10 ~ 8, TRUE ~ 0))
+                                                             .data$flag_severe_hhs >= 1 & .data$flag_severe_hhs < 5 ~ 6,
+                                                             .data$flag_severe_hhs >= 5 & .data$flag_severe_hhs < 10 ~ 8,
+                                                             .data$flag_severe_hhs >= 10 ~ 10, TRUE ~ 0))
   }
 
-  if(c("poisson_pvalues.hhs_very_severe") %in% names(df)) {
+  if(c("poisson_pvalues.hhs_severe") %in% names(df)) {
 
     df <- df %>%
-      dplyr::mutate(plaus_poisson.hhs = ifelse(is.na(.data$poisson_pvalues.hhs_very_severe), 0 ,
-                                               ifelse(.data$poisson_pvalues.hhs_very_severe >= 0.05, 0,
-                                                      ifelse(.data$poisson_pvalues.hhs_very_severe >= 0.01 & .data$poisson_pvalues.hhs_very_severe < 0.05, 4,
-                                                             ifelse(.data$poisson_pvalues.hhs_very_severe >= 0.001 & .data$poisson_pvalues.hhs_very_severe < 0.01, 6,
-                                                                    ifelse(.data$poisson_pvalues.hhs_very_severe < 0.001, 8, 0))))))
+      dplyr::mutate(plaus_poisson.hhs_severe = ifelse(is.na(.data$poisson_pvalues.hhs_severe), 0 ,
+                                               ifelse(.data$poisson_pvalues.hhs_severe >= 0.05, 0,
+                                                      ifelse(.data$poisson_pvalues.hhs_severe >= 0.01 & .data$poisson_pvalues.hhs_severe < 0.05, 6,
+                                                             ifelse(.data$poisson_pvalues.hhs_severe >= 0.001 & .data$poisson_pvalues.hhs_severe < 0.01, 8,
+                                                                    ifelse(.data$poisson_pvalues.hhs_severe < 0.001, 10, 0))))))
   }
 
-  hhs_plaus_vars <- c("plaus_flag_severe_hhs", "poisson_pvalues.hhs_very_severe")
+  hhs_plaus_vars <- c("plaus_flag_severe_hhs", "plaus_poisson.hhs_severe")
 
   if(length(setdiff(c(hhs_plaus_vars), names(df))) < 2) {
 
@@ -386,7 +386,7 @@ calculate_plausibility_report <- function(df) {
 
   }
 
-  # LCSI PLAUS CHECKS
+  # LCSI PLAUS CHECKS ####
 
   if(c("flag_lcsi_liv_livestock") %in% names(df)) {
     df <- df %>% dplyr::mutate(plaus_flag_lcsi_liv_livestock = dplyr::case_when(.data$flag_lcsi_liv_livestock < 2 ~ 0,
@@ -457,7 +457,7 @@ calculate_plausibility_report <- function(df) {
 
   }
 
-  # Overall FSL PLAUS CHECKS
+  # Overall FSL PLAUS CHECKS ####
 
   if(length(setdiff(c("corr.fcs_rcsi", "corr.fcs_rcsi.pvalue"), names(df)))==0) {
 
@@ -544,10 +544,9 @@ calculate_plausibility_report <- function(df) {
       dplyr::mutate(plaus_fsl_score = sum(!!!rlang::syms(plaus_nms), na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(plaus_fsl_cat = dplyr::case_when(
-        .data$plaus_fsl_score < 35 ~ "Excellent",
-        .data$plaus_fsl_score >= 35 & .data$plaus_fsl_score < 50 ~ "Good",
-        .data$plaus_fsl_score >= 50 & .data$plaus_fsl_score < 70 ~ "Acceptable",
-        .data$plaus_fsl_score >= 70 ~ "Problematic"
+        .data$plaus_fsl_score < 20 ~ "Good",
+        .data$plaus_fsl_score >= 20 & .data$plaus_fsl_score < 40 ~ "Moderate",
+        .data$plaus_fsl_score >= 40 ~ "Problematic"
       ))
 
   }
@@ -573,16 +572,6 @@ calculate_plausibility_report <- function(df) {
                                                                      ifelse(.data$prop_flag_high_mdd_low_mmf >= 0.1, 20, 0)))))
 
   }
-
-  # if(length(setdiff(c("sex_ratio.pvalue", "mad_ratio.pvalue"), names(df)))==0) {
-  #
-  #   df <- df %>%
-  #     dplyr::mutate(plaus_sex_ratio.pvalue = ifelse(.data$sex_ratio.pvalue > 0.05, 0,
-  #                                            ifelse(.data$sex_ratio.pvalue > 0.01, 2,
-  #                                                   ifelse(.data$sex_ratio.pvalue > 0.001, 5,
-  #                                                          ifelse(.data$sex_ratio.pvalue <= 0.001, 10, 0)))))
-  #
-  # }
 
   if(c("age_ratio_under6m_6to23m.pvalue") %in% colnames(df)) {
 

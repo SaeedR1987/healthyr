@@ -286,6 +286,14 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
   if(length(setdiff(lcs_vars, colnames(df)))==0) {
 
     df <- df %>%
+      dplyr::mutate(flag_lcsi_severity = dplyr::case_when(.data$lcs_emergency == 1 ~ 1,
+                                                          TRUE ~ 0))
+
+  }
+
+  if(length(setdiff(lcs_vars, colnames(df)))==0) {
+
+    df <- df %>%
       dplyr::mutate(flag_lcsi_coherence = ifelse(is.na(.data$lcs_emergency), NA, ifelse( (.data$lcs_emergency == 1 & .data$lcs_stress == 0) | (.data$lcs_emergency == 1 & .data$lcs_crisis == 0) | (.data$lcs_crisis == 1 & .data$lcs_stress == 0), 1, 0)))
 
   }
@@ -295,7 +303,7 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
     df$lcs.count.na <- apply(df[c("lcs1", "lcs2", "lcs3", "lcs4", "lcs5", "lcs6", "lcs7", "lcs8", "lcs9", "lcs10")], 1, function(x) sum(x == "4"))
 
     df <- df %>%
-      dplyr::mutate(flag_lcs_na = dplyr::case_when(lcs.count.na == 10 ~ 1, TRUE ~ 0))
+      dplyr::mutate(flag_lcsi_na = dplyr::case_when(lcs.count.na == 10 ~ 1, TRUE ~ 0))
 
   }
 
