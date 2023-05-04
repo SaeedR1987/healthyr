@@ -1,7 +1,7 @@
 # TEMPLATE HEALHTYR ANALYSIS DOCUMENT for Infant and Young Child Feeding (IYCF v2021) Data
 #
 # For use by REACH Initiative HQ and Country Teams
-# Drafted 18 April 2022 by Cluster Support Unit (CSU)
+# Drafted 04 May 2022 by Public Health Unit HQ
 # If any issues with the scripts or troubleshooting needed,
 # please contact saeed.rahman@reach-initiative.org
 
@@ -9,23 +9,13 @@
 
 rm(list = ls())
 
-# remotes::install_github("SaeedR1987/healthyr")
-
 library(tidyverse)
 library(healthyr)
+# remotes::install_github("SaeedR1987/healthyr")
 
 # Step 1: Load your Dataset ####
 
 df <- raw_anthro_iycf2
-
-
-test <- select_non_numeric_cols(df)
-
-setdiff(names(test), names(df))
-setdiff(names(df), names(test))
-head(test)
-head(df[setdiff(names(df), names(test))])
-
 
 # Step 2: Format Your Dataset ####
 
@@ -88,7 +78,10 @@ df2 <- format_nut_health_indicators(df = df, use_flags_yn = "yes",
 # Step 3: Review a Quality Summary Report ####
 # Ratio is (prevalence / (1 - prevalence))
 
-t(create_iycf_quality_report(df = df,
+t(create_iycf_quality_report(df = df2,
+                             short_report = FALSE))
+
+t(create_iycf_quality_report(df = df2,
                             short_report = FALSE,
                             exp_prevalence_mad = 0.05,
                             exp_sex_ratio = 1,
@@ -108,10 +101,6 @@ t(create_iycf_quality_report(df = df,
 
 (plot_age_months_distribution(df2, by_group = "county_admin2"))
 
-(g <- plot_iycf_areagraph(df2))
-
-(g <- plot_iycf_areagraph(df2 %>% filter(enum == 1)))
-
 # Step 5: Export Flagged Records to Cleaning Log + Cleaning ####
 
 (flag_summary <- flag_summary_table(df = df2, grouping = "enum"))
@@ -129,7 +118,9 @@ View(cl)
                                strata = "county_admin2",
                                   cluster = "cluster",
 
-                                  proportions = c("iycf_evbf","iycf_eibf", "iycf_ebf2d", "iycf_ebf", "iycf_mixmf",
+                                  proportions = c("iycf_evbf","iycf_eibf", "iycf_ebf2d",
+                                                  "iycf_ebf",
+                                                  "iycf_mixmf",
                                                   "iycf_cbf", "iycf_isssf", "mmf_bf_6to8months", "mmf_bf_9to23months",
                                                   "iycf_mdd_cat", "mmf_nonbf_6to23months", "iycf_mmf", "iycf_mmff",
                                                   "iycf_mad", "iycf_eff", "iycf_ufc","iycf_zvf", "iycf_bof"),

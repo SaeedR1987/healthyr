@@ -271,7 +271,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df <- df %>%
       dplyr::mutate(iycf_evbf = dplyr::case_when(.data$iycf_1 == 1 ~ 1,
                                                  .data$iycf_1 != 1 ~ 0,
-                                                 .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_1) ~ NA_integer_))
+                                                 .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_1) ~ NA_real_))
   }
 
   # "IYCF Indicator 2: Early Initiation of Breastfeeding;
@@ -283,7 +283,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df <- df %>%
       dplyr::mutate(iycf_eibf = dplyr::case_when(.data$iycf_2 == 1 | .data$iycf_2 == 2 ~ 1,
                                                  .data$iycf_2 != 1 & .data$iycf_2 != 2 ~ 0,
-                                                 .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_2) ~ NA_integer_))
+                                                 .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_2) ~ NA_real_))
 
 
   }
@@ -297,7 +297,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df <- df %>%
       dplyr::mutate(iycf_ebf2d = dplyr::case_when(.data$iycf_3 == 2 ~ 1,
                                                   .data$iycf_3 != 2 ~ 0,
-                                                  .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_3) ~ NA_integer_))
+                                                  .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_3) ~ NA_real_))
 
   }
 
@@ -308,8 +308,8 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
   ebf_liquids <- c("iycf_6a", "iycf_6b", "iycf_6c", "iycf_6d", "iycf_6e", "iycf_6f", "iycf_6g", "iycf_6h", "iycf_6i", "iycf_6j")
 
   a <- length(setdiff(c("age_months", "iycf_4"), names(df)))
-  b <- length(setdiff(ebf_foods, names(df)))
-  c <- length(setdiff(ebf_liquids, names(df)))
+  b <- length(intersect(ebf_foods, names(df)))
+  c <- length(intersect(ebf_liquids, names(df)))
 
   if(a == 0 & b > 0 & c > 0) {
 
@@ -330,21 +330,21 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       print("Warning: Your dataset appears not to have all the liquids from the standard IYCF 2021 question sequence. It is advised you ask about all recommended liquids or there is a risk of overestimating EBF.  ")
       print(paste0("Missing the following variables ", setdiff(ebf_liquids, names(df))))
 
-      }
+    }
+
 
     df[c("iycf_4", ebf_foods, ebf_liquids)] <- sapply(df[c("iycf_4", ebf_foods, ebf_liquids)], as.numeric)
 
     df <- df %>%
       dplyr::mutate(
         count_foods = a - .data$count_no_foods,
-        count_foods = b - .data$count_no_liquids,
+        count_liquids = b - .data$count_no_liquids,
         iycf_ebf = dplyr::case_when(
           .data$iycf_4 == 1 & .data$count_foods == 0 & .data$count_liquids == 0 ~ 1,
           .data$iycf_4 != 1 | .data$count_foods > 0 | .data$count_liquids > 0 ~ 0,
-          .data$age_months >= 6 | is.na(.data$age_months) | is.na(.data$iycf_4) ~ NA_integer_
+          .data$age_months >= 6 | is.na(.data$age_months) | is.na(.data$iycf_4) ~ NA_real_
 
       ))
-
   }
 
   # "IYCF Indicator 5: Mixed Milk Feeding (MIxMF)
@@ -357,7 +357,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       dplyr::mutate(iycf_mixmf = dplyr::case_when(
         .data$iycf_4 == 1 & (.data$iycf_6b == 1 | .data$iycf_6c == 1) ~ 1,
         .data$iycf_4 != 1 | (.data$iycf_6b != 1 & .data$iycf_6c != 1) ~ 0,
-        .data$age_months >= 6 | is.na(.data$age_months) | is.na(.data$iycf_4) | is.na(.data$iycf_6b) | is.na(.data$iycf_6b) ~ NA_integer_
+        .data$age_months >= 6 | is.na(.data$age_months) | is.na(.data$iycf_4) | is.na(.data$iycf_6b) | is.na(.data$iycf_6b) ~ NA_real_
       ))
 
 
@@ -373,7 +373,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
       dplyr::mutate(iycf_cbf = dplyr::case_when(
         .data$iycf_4 == 1 ~ 1,
         .data$iycf_4 != 1 ~ 0,
-        .data$age_months < 12 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_4) ~ NA_integer_
+        .data$age_months < 12 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_4) ~ NA_real_
       ))
 
   }
@@ -407,7 +407,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
         iycf_isssf = dplyr::case_when(
         .data$count_foods > 0 ~ 1,
         .data$count_foods == 0 ~ 0,
-        .data$age_months < 6 | .data$age_months > 8 | is.na(.data$age_months) ~ NA_integer_
+        .data$age_months < 6 | .data$age_months > 8 | is.na(.data$age_months) ~ NA_real_
       ))
   }
 
@@ -420,34 +420,34 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df <- df %>%
       dplyr::mutate(mdd1 = dplyr::case_when(.data$iycf_4 == 1 ~ 1,
                                             .data$iycf_4 != 1 ~ 0,
-                                            is.na(.data$iycf_4) ~ NA_integer_),
+                                            is.na(.data$iycf_4) ~ NA_real_),
                     mdd2 = dplyr::case_when(.data$iycf_7b == 1 | iycf_7b == 1 ~ 1,
                                             .data$iycf_7b != 1 & iycf_7b != 1 ~ 0,
-                                            TRUE ~ NA_integer_),
+                                            TRUE ~ NA_real_),
                     mdd3 = dplyr::case_when(.data$iycf_7n == 1 ~ 1,
                                             .data$iycf_7n != 1 ~ 0,
-                                            TRUE ~ NA_integer_),
+                                            TRUE ~ NA_real_),
                     mdd4 = dplyr::case_when(.data$iycf_6b == 1 | .data$iycf_6c == 1 | .data$iycf_6d == 1 | .data$iycf_7a == 1 | .data$iycf_7o == 1 ~ 1,
                                             .data$iycf_6b != 1 & .data$iycf_6c != 1 & .data$iycf_6d != 1 & .data$iycf_7a != 1 & .data$iycf_7o != 1 ~ 0,
-                                            TRUE ~ NA_integer_),
+                                            TRUE ~ NA_real_),
                     mdd5 = dplyr::case_when(.data$iycf_7i == 1 | .data$iycf_7j == 1 | .data$iycf_7k == 1 | .data$iycf_7m == 1 ~ 1,
                                             .data$iycf_7i != 1 & .data$iycf_7j != 1 & .data$iycf_7k != 1 & .data$iycf_7m != 1 ~ 0,
-                                            TRUE ~ NA_integer_),
+                                            TRUE ~ NA_real_),
                     mdd6 = dplyr::case_when(.data$iycf_7l == 1 ~ 1,
                                             .data$iycf_7l != 1 ~ 0,
-                                            TRUE ~ NA_integer_),
+                                            TRUE ~ NA_real_),
                     mdd7 = dplyr::case_when(.data$iycf_7c == 1 | .data$iycf_7e == 1 | .data$iycf_7g == 1 ~ 1,
-                                            .data$iycf_7c != 1 & .data&iycf_7e != 1 & .data$iycf_7g != 1 ~ 0,
-                                            TRUE ~ NA_integer_),
+                                            .data$iycf_7c != 1 & .data$iycf_7e != 1 & .data$iycf_7g != 1 ~ 0,
+                                            TRUE ~ NA_real_),
                     mdd8 = dplyr::case_when(.data$iycf_7f == 1 | .data$iycf_7h == 1 ~ 1,
                                             .data$iycf_7f != 1 & .data$iycf_7h != 1 ~ 0,
-                                            TRUE ~ NA_integer_)) %>%
+                                            TRUE ~ NA_real_)) %>%
       dplyr::rowwise() %>%
       dplyr::mutate(iycf_mdd_score = sum(c(.data$mdd1, .data$mdd2, .data$mdd3, .data$mdd4, .data$mdd5, .data$mdd6, .data$mdd7, .data$mdd8), na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(iycf_mdd_cat = dplyr::case_when(.data$age_months >= 6 & .data$age_months < 24 & .data$iycf_mdd_score >= 5 ~ 1,
                                                     .data$age_months >= 6 & .data$age_months < 24 & .data$iycf_mdd_score < 5 ~ 0,
-                                                    .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$iycf_mdd_score) ~ NA_integer_))
+                                                    .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$iycf_mdd_score) ~ NA_real_))
 
   }
 
@@ -462,11 +462,11 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
         mmf_bf_6to8months = dplyr::case_when(
           .data$iycf_4 == 1 & .data$iycf_8 >= 2 ~ 1,
           .data$iycf_4 != 1 | .data$iycf_8 <2 ~ 0,
-          .data$age_months < 6 | .data$age_months >= 8 | is.na(.data$age_months) | is.na(.data$iycf_4) | is.na(.data$iycf_8) ~ NA_integer_),
+          .data$age_months < 6 | .data$age_months >= 8 | is.na(.data$age_months) | is.na(.data$iycf_4) | is.na(.data$iycf_8) ~ NA_real_),
         mmf_bf_9to23months = dplyr::case_when(
           .data$iycf_4 == 1 & .data$iycf_8 >= 3 ~ 1,
           .data$iycf_4 != 1 | .data$iycf_8 < 3 ~ 0,
-          .data$age_months < 9 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_4) | is.na(.data$iycf_8) ~ NA_integer_)) %>%
+          .data$age_months < 9 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_4) | is.na(.data$iycf_8) ~ NA_real_)) %>%
       dplyr::rowwise() %>%
       dplyr::mutate(count_6b_6c_6d_8 = sum(c(.data$iycf_6b_num, .data$iycf_6c_num, .data$iycf_6d_num, .data$iycf_8), na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
@@ -474,8 +474,11 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
         mmf_nonbf_6to23months = dplyr::case_when(
           .data$iycf_4 != 1 & .data$count_6b_6c_6d_8 >= 4 & .data$iycf_8 >= 1 ~ 1,
           .data$iycf_4 == 1 | .data$count_6b_6c_6d_8 < 4 | .data$iycf_8 < 1 ~ 0,
-          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_4) | is.na(.data$iycf_6b_num) | is.na(.data$iycf_6c_num) | is.na(.data$iycf_6d_num) | is.na(.data$iycf_8) ~ NA_integer_
-        ))
+          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_4) | is.na(.data$iycf_6b_num) | is.na(.data$iycf_6c_num) | is.na(.data$iycf_6d_num) | is.na(.data$iycf_8) ~ NA_real_
+        )) %>%
+      dplyr::mutate(iycf_mmf = dplyr::case_when(.data$mmf_bf_6to8months == 1 | .data$mmf_nonbf_6to23months == 1 | .data$mmf_bf_9to23months == 1 ~ 1,
+                                                .data$mmf_bf_6to8months != 1 & .data$mmf_nonbf_6to23months != 1 & .data$mmf_bf_9to23months != 1 ~ 0,
+                                                .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_4) | is.na(.data$iycf_6b_num) | is.na(iycf_6c_num) | is.na(.data$iycf_6d_num) | is.na(.data$iycf_8) ~ NA_real_))
   }
 
   # "IYCF Indicator 10: Minimum Milk Feeding Frequency For Non-Breastfed Children 6-23 months (MMFF);
@@ -492,7 +495,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
         iycf_mmff = dplyr::case_when(
           .data$iycf_4 != 1 & .data$count_dairy >= 2 ~ 1,
           .data$iycf_4 == 1 | .data$count_dairy < 2 ~ 0,
-          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_6b_num) | is.na(.data$iycf_6c_num) | is.na(.data$iycf_6d_num) | is.na(.data$iycf_7a_num) ~ NA_integer_
+          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_6b_num) | is.na(.data$iycf_6c_num) | is.na(.data$iycf_6d_num) | is.na(.data$iycf_7a_num) ~ NA_real_
         ))
   }
 
@@ -507,7 +510,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
         iycf_mad = dplyr::case_when(
           .data$iycf_mdd_cat == 1 & .data$iycf_mmf == 1 & (.data$iycf_4 == 1 | .data$iycf_mmff == 1) ~ 1,
           .data$iycf_mdd_cat != 1 | .data$iycf_mmf != 1 | (.data$iycf_4 != 1 & .data$iycf_mmff != 1) ~ 0,
-          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_mdd_cat) | is.na(.data$iycf_mmf) | is.na(.data$iycf_mmff) | is.na(.data$iycf_4) ~ NA_integer_
+          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_mdd_cat) | is.na(.data$iycf_mmf) | is.na(.data$iycf_mmff) | is.na(.data$iycf_4) ~ NA_real_
         )
       )
   }
@@ -521,7 +524,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df <- df %>%
       dplyr::mutate(iycf_eff = dplyr::case_when(.data$iycf_7i == 1 | .data$iycf_7j == 1 | .data$iycf_7k == 1 | .data$iycf_7l == 1 | .data$iycf_7m == 1 ~ 1,
                                                 .data$iycf_7i != 1 & .data$iycf_7j != 1 & .data$iycf_7k != 1 & .data$iycf_7l != 1 & .data$iycf_7m != 1 ~ 0,
-                                                .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) ~ NA_integer_))
+                                                .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) ~ NA_real_))
 
   }
 
@@ -537,7 +540,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
         iycf_swb = dplyr::case_when(
           .data$iycf_6c_swt == 1 | .data$iycf_6d_swt == 1 | .data$iycf_6e == 1 | .data$iycf_6f == 1 | .data$iycf_6g == 1 | .data$iycf_6h_swt == 1 | .data$iycf_6j_swt == 1 ~ 1,
           .data$iycf_6c_swt != 1 & .data$iycf_6d_swt != 1 & .data$iycf_6e != 1 & .data$iycf_6f != 1 & .data$iycf_6g != 1 & .data$iycf_6h_swt != 1 & .data$iycf_6j_swt != 1 ~ 0,
-          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_6c_swt) | is.na(.data$iycf_6d_swt) | is.na(.data$iycf_6e) | is.na(.data$iycf_6f) | is.na(.data$iycf_6g) ~ NA_integer_
+          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_6c_swt) | is.na(.data$iycf_6d_swt) | is.na(.data$iycf_6e) | is.na(.data$iycf_6f) | is.na(.data$iycf_6g) ~ NA_real_
         )
       )
   }
@@ -553,7 +556,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
         iycf_ufc = dplyr::case_when(
           .data$iycf_7p == 1 | .data$iycf_7q == 1 ~ 1,
           .data$iycf_7p != 1 & .data$iycf_7q != 1 ~ 0,
-          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_7p) | is.na(.data$iycf_7q) ~ NA_integer_
+          .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_7p) | is.na(.data$iycf_7q) ~ NA_real_
         ))
   }
 
@@ -566,25 +569,25 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
     df <- df %>%
       dplyr::mutate(zvf1 = dplyr::case_when(.data$iycf_7c == 2 ~ 1,
                                              .data$iycf_7c != 2 ~ 0,
-                                             TRUE ~ NA_integer_),
+                                             TRUE ~ NA_real_),
                     zvf2 = dplyr::case_when(.data$iycf_7e == 2 ~ 1,
                                              .data$iycf_7e != 2 ~ 0,
-                                             TRUE ~ NA_integer_),
+                                             TRUE ~ NA_real_),
                     zvf3 = dplyr::case_when(.data$iycf_7f == 2 ~ 1,
                                              .data$iycf_7f != 2 ~ 0,
-                                             TRUE ~ NA_integer_),
+                                             TRUE ~ NA_real_),
                     zvf4 = dplyr::case_when(.data$iycf_7g == 2 ~ 1,
                                              .data$iycf_7g != 2 ~ 0,
-                                             TRUE ~ NA_integer_),
+                                             TRUE ~ NA_real_),
                     zvf5 = dplyr::case_when(.data$iycf_7h == 2 ~ 1,
                                              .data$iycf_7h != 2 ~ 0,
-                                             TRUE ~ NA_integer_)) %>%
+                                             TRUE ~ NA_real_)) %>%
       dplyr::rowwise() %>%
       dplyr::mutate(zvf_sum = sum(c(.data$zvf1, .data$zvf2, .data$zvf3, .data$zvf4, .data$zvf5), na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(iycf_zvf = dplyr::case_when(.data$zvf_sum == 5 ~ 1,
                                                 .data$zvf_sum < 5 ~ 0,
-                                                .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$zvf1) | is.na(.data$zvf2) | is.na(.data$zvf3) | is.na(.data$zvf4) | is.na(.data$zvf5) ~ NA_integer_))
+                                                .data$age_months < 6 | .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$zvf1) | is.na(.data$zvf2) | is.na(.data$zvf3) | is.na(.data$zvf4) | is.na(.data$zvf5) ~ NA_real_))
   }
 
   # "IYCF Indicator 16: Bottle Feeding 0-23 months
@@ -598,7 +601,7 @@ calculate_nut_health_indicators <- function(df, monthly_expenditures = NULL, per
         iycf_bof = dplyr::case_when(
           .data$iycf_5 == 1 ~ 1,
           .data$iycf_5 != 1 ~ 0,
-          .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_5) ~ NA_integer_
+          .data$age_months >= 24 | is.na(.data$age_months) | is.na(.data$iycf_5) ~ NA_real_
         ))
   }
 
