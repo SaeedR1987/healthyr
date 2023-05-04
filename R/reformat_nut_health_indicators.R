@@ -735,19 +735,17 @@ reformat_nut_health_indicators <- function(df,
         # Updates Livelihood Own Production
         df <- df %>% dplyr::mutate(livelihood_own_prod = ifelse(!!rlang::sym(livelihood_variables[[z]]) > 0 & !!rlang::sym(livelihood_variables[[z]]) != -999, "1", .data$livelihood_own_prod))
 
-        yn_recodes <- c("1", "2", "3")
+        yn_recodes <- c("1", "2")
 
         # Checks Additionally if it is agriculture related, and makes additional columns to use for data quality flags.
         k <- readline(cat(paste0("Is <<",livelihood_variables[[z]], ">> specific to agriculture or crops? Please choose either:
                                \n '1' for YES
-                               \n '2' for NO
-                               \n '3' for DONT KNOW")))
+                               \n '2' for NO")))
 
         while(length(setdiff(k, yn_recodes))==1) {
           k <- readline(cat(paste0("Invalid input, try again. Is <<",livelihood_variables[[z]], ">> specific to agriculture or crops? Please choose either:
                                \n '1' for YES
-                               \n '2' for NO
-                               \n '3' for DONT KNOW")))
+                               \n '2' for NO")))
         }
 
         cat("\014") #clears the console
@@ -758,14 +756,12 @@ reformat_nut_health_indicators <- function(df,
 
         k <- readline(cat(paste0("Is <<",livelihood_variables[[z]], ">> specific to raising and selling livestock, or products from livestock (milk, meat, etc.)? Please choose either:
                                \n '1' for YES
-                               \n '2' for NO
-                               \n '3' for DONT KNOW")))
+                               \n '2' for NO")))
 
         while(length(setdiff(k, yn_recodes))==1) {
           k <- readline(cat(paste0("Invalid input, try again. Is <<",livelihood_variables[[z]], ">> specific to raising and selling livestock, or products from livestock (milk, meat, etc.)? Please choose either:
                                \n '1' for YES
-                               \n '2' for NO
-                               \n '3' for DONT KNOW")))
+                               \n '2' for NO")))
         }
 
         cat("\014") #clears the console
@@ -872,18 +868,16 @@ reformat_nut_health_indicators <- function(df,
       # Check if it is an agriculture or livestock dependent coping strategy
       # Selling more livestock than usual, selling last female cattle, etc.
 
-      yn_recodes <- c("1", "2", "3")
+      yn_recodes <- c("1", "2")
 
       a <- readline(cat(paste0("Is the livelihood coping strategy <<",lcs_variables[[z]], ">> dependent on LIVESTOCK? Please choose either:
                                \n '1' for YES
-                               \n '2' for NO
-                               \n '3' for DONT KNOW")))
+                               \n '2' for NO")))
 
       while(length(setdiff(a, yn_recodes))==1) {
         a <- readline(cat(paste0("Invalid Input, try again. Is the livelihood coping strategy <<",lcs_variables[[z]], ">> dependent on LIVESTOCK? Please choose either:
                                \n '1' for YES
-                               \n '2' for NO
-                               \n '3' for DONT KNOW")))
+                               \n '2' for NO")))
       }
 
       cat("\014") #clears the console
@@ -892,15 +886,13 @@ reformat_nut_health_indicators <- function(df,
 
       a <- readline(cat(paste0("Is the livelihood coping strategy <<",lcs_variables[[z]], ">> dependent on AGRICULTURE, FARMING, CROPS? Please choose either:
                                \n '1' for YES
-                               \n '2' for NO
-                               \n '3' for DONT KNOW")))
+                               \n '2' for NO")))
 
       # checking if agriculture dependent
       while(length(setdiff(a, yn_recodes))==1) {
         a <- readline(cat(paste0("Invalid Input, try again. Is the livelihood coping strategy <<",lcs_variables[[z]], ">> dependent on AGRICULTURE, FARMING, CROPS? Please choose either:
                                \n '1' for YES
-                               \n '2' for NO
-                               \n '3' for DONT KNOW")))
+                               \n '2' for NO")))
       }
 
       cat("\014") #clears the console
