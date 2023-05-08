@@ -1,3 +1,14 @@
+#' Recode Helper Data
+#'
+#' @param df The dataframe
+#' @param column The column name to change
+#' @param old_val The old value
+#' @param new_val The new value
+#'
+#' @return A recoded dataframe.
+#' @export
+#'
+#' @examples
 recode_helper_data <- function(df, column, old_val, new_val) {
 
   df <- df %>% dplyr::mutate_at(

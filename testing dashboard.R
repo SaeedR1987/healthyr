@@ -23,3 +23,22 @@ cols <- intersect(c("fcs_cereal", "fcs_legumes", "fcs_dairy", "fcs_meat", "fcs_v
 plot_ridge_distribution(df = df3, numeric_cols = cols)
 
 run_fsl_monitoring_dashboard(df = df2, grouping_var = "enum")
+
+
+
+df3 <- proc_anthro_iycf2
+
+library(healthyr)
+library(shiny)
+library(shinydashboard)
+library(shinythemes)
+library(shinyWidgets)
+library(plotly)
+library(DT)
+
+run_iycf_monitoring_dashboard(df = df3, grouping_var = "enum")
+
+df4 <- proc_mortality1
+
+run_mortality_monitoring_dashboard(df = df4, grouping_var = "enum")
+

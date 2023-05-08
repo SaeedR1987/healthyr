@@ -19,7 +19,9 @@ df <- raw_anthro_iycf2
 
 # Step 2: Format Your Dataset ####
 
-df2 <- format_nut_health_indicators(df = df, use_flags_yn = "yes",
+df2 <- format_nut_health_indicators(df = df,
+
+                                    use_flags_yn = "yes",
 
                                     hhid = "household_id",
                                     # date_of_dc = "date_of_interview",
@@ -81,7 +83,9 @@ df2 <- format_nut_health_indicators(df = df, use_flags_yn = "yes",
 t(create_iycf_quality_report(df = df2,
                              short_report = FALSE))
 
-t(create_iycf_quality_report(df = df2,
+
+
+(a <- create_iycf_quality_report(df = df2,
                             short_report = FALSE,
                             exp_prevalence_mad = 0.05,
                             exp_sex_ratio = 1,
