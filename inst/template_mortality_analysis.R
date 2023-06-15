@@ -63,6 +63,10 @@ df2 <- format_mortality_current_census(date_recall_event = "21/04/2019",
 # Step 3: Create a Quality Summary Report ####
 # Ratio is (prevalence / (1 - prevalence))
 
+df2 <- healthyr::proc_mortality1
+
+(run_mortality_monitoring_dashboard(df = df2, grouping_var = "enum", filter_var1 = "admin2"))
+
 (t(create_mortality_quality_report(df2,
                                    short_report = TRUE,
                                    exp_sex_ratio = 1,
@@ -89,7 +93,7 @@ df2 <- format_mortality_current_census(date_recall_event = "21/04/2019",
 
 (t(create_mortality_quality_report(df2,
                                  grouping = "enum",
-                                 short_report = TR,
+                                 short_report = FALSE,
                                  exp_sex_ratio = 1,
                                  exp_ratio_0_4 = (0.19 / 1 - 0.19),
                                  exp_ratio_2_5 = (0.4 / (1 - 0.4)),

@@ -21,7 +21,7 @@ df <- raw_fsl1
 
 # Step 2: Format Your Dataset ####
 
-df2 <- format_nut_health_indicators(df = df,
+df3 <- format_nut_health_indicators(df = raw_fsl1,
                                     cluster = "cluster_id",
                                     enum = "enum",
                                     date_of_dc = "today",
@@ -88,7 +88,7 @@ library(shinyWidgets)
 library(plotly)
 library(DT)
 
-healthyr::run_fsl_monitoring_dashboard(df = df2, grouping_var = "enum", filter_var1 = "date_dc")
+healthyr::run_fsl_monitoring_dashboard(df = df2, grouping_var = "enum", filter_var1 = "cluster")
 
 # Step 5: Export Flagged Records to Cleaning Log + Cleaning ####
 
