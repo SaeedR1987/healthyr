@@ -12,7 +12,6 @@
 #' @param livelihood_variables Inputs a character vector of column names specifying all the livelihood activities
 #' for which income is received. These should be numerical columns with estimated income per livelihood activity.
 #' As per MSNA core indicator bank 2023.
-#' @param value_map Inputs a value map which is generated from other heatlhyr functions to facilitate recoding.
 #'
 #' @return Returns a dataframe with standardized values for specific columns, that can then be used to calculate composite or other indicators.
 #' @export
@@ -26,8 +25,7 @@
 reformat_nut_health_indicators <- function(df,
                                            health_barriers = NULL,
                                            lcs_variables = NULL,
-                                           livelihood_variables = NULL,
-                                           value_map) {
+                                           livelihood_variables = NULL) {
 
   # reformatting sex
 
@@ -50,7 +48,7 @@ reformat_nut_health_indicators <- function(df,
         }
 
         df <- healthyr::recode_helper_data(df = df, column = "sex", old_val = sex_codes[[i]], new_val = a)
-        value_map <- healthyr::recode_helper_map(df = value_map, column = "sex", old_val = sex_codes[[i]], new_val = a)
+        # value_map <- healthyr::recode_helper_map(df = value_map, column = "sex", old_val = sex_codes[[i]], new_val = a)
 
       }
     }
@@ -1111,6 +1109,6 @@ reformat_nut_health_indicators <- function(df,
   }
 
 
-  return(list(df, value_map))
+  return(df)
 
 }

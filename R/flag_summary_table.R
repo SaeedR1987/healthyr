@@ -38,9 +38,9 @@ flag_summary_table <- function(df, grouping = NULL) {
       dplyr::group_by(.data$group) %>%
       dplyr::summarise_all(sum, na.rm = TRUE)
 
-    df1 <- as.data.frame(t(df1))
-    colnames(df1) <- as.factor(df1[1,])
-    df1 <- df1[-1,]
+    # df1 <- as.data.frame(t(df1))
+    # colnames(df1) <- as.factor(df1[1,])
+    # df1 <- df1[-1,]
 
   }
 

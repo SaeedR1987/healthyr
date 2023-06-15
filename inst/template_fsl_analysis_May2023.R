@@ -33,12 +33,12 @@ df3 <- format_nut_health_indicators(df = raw_fsl1,
                                     rcsi_lesspreferred_1 = "rcsi1", rcsi_borrowfood_2 = "rcsi2", rcsi_limitportion_3 = "rcsi3", rcsi_restrict_4 = "rcsi4", rcsi_reducemeals5 = "rcsi5",
 
                                     # Livelihood Coping Strategy Indicators
-                                    lcs_variables = c("lcs1", "lcs2", "lcs3", "lcs4", "lcs5", "lcs6", "lcs7", "lcs8", "lcs9", "lcs10"),
-
-                                    # Income variables as in MSNA Indicator Bank
-                                    livelihood_variables = c("income_salaried", "income_casual", "income_trade", "income_own_production", "income_social_benefits",
-                                                             "income_rent", "income_remittances", "income_loans_family", "income_loans_community",
-                                                             "income_humanitarian_assistance", "income_other"),
+                                    # lcs_variables = c("lcs1", "lcs2", "lcs3", "lcs4", "lcs5", "lcs6", "lcs7", "lcs8", "lcs9", "lcs10"),
+                                    #
+                                    # # Income variables as in MSNA Indicator Bank
+                                    # livelihood_variables = c("income_salaried", "income_casual", "income_trade", "income_own_production", "income_social_benefits",
+                                    #                          "income_rent", "income_remittances", "income_loans_family", "income_loans_community",
+                                    #                          "income_humanitarian_assistance", "income_other"),
 
                                     # Expenditure Indicators as in MSNA Indicator Bank
                                     food_exp_col = "exp_food",
@@ -52,7 +52,7 @@ df3 <- format_nut_health_indicators(df = raw_fsl1,
 
 # Step 3: Review a Quality Summary Report ####
 
-(create_fsl_quality_report(df = df2, short_report = TRUE))
+(create_fsl_quality_report(df = df3, short_report = TRUE))
 
 (create_fsl_quality_report(df = df2, short_report = FALSE))
 
@@ -88,31 +88,12 @@ library(shinyWidgets)
 library(plotly)
 library(DT)
 
-healthyr::run_fsl_monitoring_dashboard(df = df2, grouping_var = "enum", filter_var1 = "cluster")
+healthyr::run_fsl_monitoring_dashboard(df = df3, grouping_var = "enum", filter_var1 = "cluster")
 
-# Step 5: Export Flagged Records to Cleaning Log + Cleaning ####
+# Step 5: Flag summary ####
 
-(flag_summary <- flag_summary_table(df = df2, grouping = "enum"))
+(flag_summary <- flag_summary_table(df = df3, grouping = "enum"))
 
-cl <- create_cleaning_log_flags(df = df2, uuid_col = "KEY")
-View(cl)
-
-# Step 6: Analyse Survey Results ####
-# if cluster survey, use sample_design = "two_stage_cluster"
-# if not cluster and multiple areas, use sample_design = "two_stage_stratified"
-
-(res <- analyse_survey_results(df = df2 %>% dplyr::mutate(food_exp_share = as.numeric(food_exp_share)),
-
-                                  # aggregation = "enum",
-
-                                  # sample_design = "two_stage_cluster",
-                                  sample_design = "two_stage_stratified",
-                                  cluster = "cluster",
-
-                                  proportions = c("fcs_cat", "hhs_cat", "hdds_cat", "rcsi_cat", "lcs_cat",
-                                                  "fc_phase", "fclc_phase"),
-
-                                  means = c("fcs_score", "hhs_score", "rcsi_score", "food_exp_share")))
 
 
 

@@ -231,7 +231,7 @@ format_nut_health_indicators <- function(df, #dataframe
 
   # Step 1: Create initial map of categorical and character columns.
 
-  df_map <- create_value_map(df)
+  # df_map <- create_value_map(df)
 
   # Step 4: Carry throughout the current formatting functions and add mapped values
   # use an "appending" function to add on variable names and values
@@ -368,19 +368,19 @@ format_nut_health_indicators <- function(df, #dataframe
 
     )
 
-  new_variable <- names(df)
-
-  changed_names <- data.frame(
-    variable,
-    new_variable
-  ) %>%
-    dplyr::filter(variable != new_variable)
-
-  df_map <- df_map %>%
-    dplyr::filter(variable %in% changed_names$variable) %>%
-    dplyr::left_join(changed_names, by = "variable")
-
-  map_object <- list(changed_names, df_map)
+  # new_variable <- names(df)
+  #
+  # changed_names <- data.frame(
+  #   variable,
+  #   new_variable
+  # ) %>%
+  #   dplyr::filter(variable != new_variable)
+  #
+  # df_map <- df_map %>%
+  #   dplyr::filter(variable %in% changed_names$variable) %>%
+  #   dplyr::left_join(changed_names, by = "variable")
+  #
+  # map_object <- list(changed_names, df_map)
 
 
   # input checks for anthropometry
@@ -714,9 +714,9 @@ format_nut_health_indicators <- function(df, #dataframe
 
   # Passing to the reformatting and calculation functions
 
-  return_reformat <- reformat_nut_health_indicators(df, health_barriers = health_barriers, lcs_variables = lcs_variables, livelihood_variables = livelihood_variables, value_map = df_map)
-  df <- return_reformat[[1]]
-  df_map <- return_reformat[[2]]
+  df <- reformat_nut_health_indicators(df, health_barriers = health_barriers, lcs_variables = lcs_variables, livelihood_variables = livelihood_variables)
+  # df <- return_reformat[[1]]
+  # df_map <- return_reformat[[2]]
 
   if(is.null(use_flags_yn)) {use_flags_yn <- "no"} else {use_flags_yn <- use_flags_yn}
 
