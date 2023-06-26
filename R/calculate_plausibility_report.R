@@ -235,19 +235,19 @@ calculate_plausibility_report <- function(df) {
 
     df <- df %>%
       dplyr::mutate(plaus_sd_fcs = dplyr::case_when(.data$sd_fcs < 8 ~ 5,
-                                                                   .data$sd_fcs >= 8 & .data$sd_fcs < 9 ~ 2.5,
+                                                                   .data$sd_fcs >= 8 & .data$sd_fcs < 9 ~ 2,
                                                                    .data$sd_fcs >= 9 & .data$sd_fcs < 14 ~ 0,
-                                                                   .data$sd_fcs >= 14 & .data$sd_fcs <16 ~ 2.5,
-                                                                   .data$sd_fcs >= 16 ~ 5, TRUE ~ 0))
+                                                                   .data$sd_fcs >= 14 & .data$sd_fcs <16 ~ 2,
+                                                                   .data$sd_fcs >= 16 ~ 3, TRUE ~ 0))
   }
 
   if(c("flag_low_fcs") %in% names(df)) {
 
     df <- df %>%
       dplyr::mutate(plaus_flag_low_fcs = dplyr::case_when(.data$flag_low_fcs < 2 ~ 0,
-                                                          .data$flag_low_fcs >= 2 & .data$flag_low_fcs < 4 ~ 1,
-                                                          .data$flag_low_fcs >= 4 & .data$flag_low_fcs < 10 ~ 2,
-                                                          .data$flag_low_fcs >= 10 ~ 3, TRUE ~ 0))
+                                                          .data$flag_low_fcs >= 2 & .data$flag_low_fcs < 4 ~ 1.5,
+                                                          .data$flag_low_fcs >= 4 & .data$flag_low_fcs < 10 ~ 2.5,
+                                                          .data$flag_low_fcs >= 10 ~ 3.5, TRUE ~ 0))
   }
 
   if(c("flag_high_fcs") %in% names(df)) {
@@ -272,9 +272,9 @@ calculate_plausibility_report <- function(df) {
 
     df <- df %>%
       dplyr::mutate(plaus_flag_meat_cereal_ratio = dplyr::case_when(.data$flag_meat_cereal_ratio < 2 ~ 0,
-                                                                    .data$flag_meat_cereal_ratio >= 2 & .data$flag_meat_cereal_ratio < 4 ~ 0.5,
-                                                                    .data$flag_meat_cereal_ratio >= 4 & .data$flag_meat_cereal_ratio < 10 ~ 1,
-                                                                    .data$flag_meat_cereal_ratio >= 10 ~ 2, TRUE ~ 0))
+                                                                    .data$flag_meat_cereal_ratio >= 2 & .data$flag_meat_cereal_ratio < 4 ~ 1.5,
+                                                                    .data$flag_meat_cereal_ratio >= 4 & .data$flag_meat_cereal_ratio < 10 ~ 2.5,
+                                                                    .data$flag_meat_cereal_ratio >= 10 ~ 3.5, TRUE ~ 0))
   }
 
   if(c("flag_protein_fcs") %in% names(df)) {
@@ -322,11 +322,11 @@ calculate_plausibility_report <- function(df) {
   if(c("sd_rcsi") %in% names(df)) {
 
     df <- df %>%
-      dplyr::mutate(plaus_sd_rcsi = dplyr::case_when(.data$sd_rcsi < 8 ~ 6,
-                                                     .data$sd_rcsi >= 8 & .data$sd_rcsi < 9 ~ 3,
+      dplyr::mutate(plaus_sd_rcsi = dplyr::case_when(.data$sd_rcsi < 8 ~ 3,
+                                                     .data$sd_rcsi >= 8 & .data$sd_rcsi < 9 ~ 2,
                                                      .data$sd_rcsi >= 9 & .data$sd_rcsi < 14 ~ 0,
-                                                     .data$sd_rcsi >= 14 & .data$sd_rcsi <16 ~ 3,
-                                                     .data$sd_rcsi >= 16 ~ 6, TRUE ~ 0))
+                                                     .data$sd_rcsi >= 14 & .data$sd_rcsi <16 ~ 2,
+                                                     .data$sd_rcsi >= 16 ~ 3, TRUE ~ 0))
   }
 
   if(c("flag_protein_rcsi") %in% names(df)) {
@@ -464,10 +464,10 @@ calculate_plausibility_report <- function(df) {
     df <- df %>%
       dplyr::mutate(plaus_corr.fcs_rcsi = ifelse(.data$corr.fcs_rcsi < -0.2 & .data$corr.fcs_rcsi.pvalue < 0.05, 0,
                                                  ifelse(.data$corr.fcs_rcsi < -0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 1,
-                                                        ifelse(.data$corr.fcs_rcsi >= -0.2 & .data$corr.fcs_rcsi < 0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 1.5,
-                                                               ifelse(.data$corr.fcs_rcsi >= -0.2 & .data$corr.fcs_rcsi < 0.2 & .data$corr.fcs_rcsi.pvalue < 0.05, 2,
-                                                                      ifelse(.data$corr.fcs_rcsi >= 0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 2.5,
-                                                                             ifelse(.data$corr.fcs_rcsi >= 0.2 & .data$corr.fcs_rcsi.pvalue < 0.05, 3, 0)))))))
+                                                        ifelse(.data$corr.fcs_rcsi >= -0.2 & .data$corr.fcs_rcsi < 0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 2,
+                                                               ifelse(.data$corr.fcs_rcsi >= -0.2 & .data$corr.fcs_rcsi < 0.2 & .data$corr.fcs_rcsi.pvalue < 0.05, 3,
+                                                                      ifelse(.data$corr.fcs_rcsi >= 0.2 & .data$corr.fcs_rcsi.pvalue >= 0.05, 4,
+                                                                             ifelse(.data$corr.fcs_rcsi >= 0.2 & .data$corr.fcs_rcsi.pvalue < 0.05, 5, 0)))))))
   }
   if(length(setdiff(c("corr.fcs_hhs", "corr.fcs_hhs.pvalue"), names(df)))==0) {
 
@@ -502,9 +502,9 @@ calculate_plausibility_report <- function(df) {
 
     df <- df %>%
       dplyr::mutate(plaus_flag_fcsrcsi_box = dplyr::case_when(.data$flag_fcsrcsi_box < 2 ~ 0,
-                                                              .data$flag_fcsrcsi_box >= 2 & .data$flag_fcsrcsi_box < 4 ~ 1,
-                                                              .data$flag_fcsrcsi_box >= 4 & .data$flag_fcsrcsi_box < 10 ~ 2,
-                                                              .data$flag_fcsrcsi_box >= 10 ~ 3, TRUE ~ 0))
+                                                              .data$flag_fcsrcsi_box >= 2 & .data$flag_fcsrcsi_box < 4 ~ 2,
+                                                              .data$flag_fcsrcsi_box >= 4 & .data$flag_fcsrcsi_box < 10 ~ 4,
+                                                              .data$flag_fcsrcsi_box >= 10 ~ 6, TRUE ~ 0))
 
   }
 
@@ -513,8 +513,8 @@ calculate_plausibility_report <- function(df) {
     df <- df %>%
       dplyr::mutate(plaus_flag_fcs_rcsi = dplyr::case_when(.data$flag_fcs_rcsi < 2 ~ 0,
                                                            .data$flag_fcs_rcsi >= 2 & .data$flag_fcs_rcsi < 4 ~ 1,
-                                                           .data$flag_fcs_rcsi >= 4 & .data$flag_fcs_rcsi < 10 ~ 1.5,
-                                                           .data$flag_fcs_rcsi >= 10 ~ 2, TRUE ~ 0))
+                                                           .data$flag_fcs_rcsi >= 4 & .data$flag_fcs_rcsi < 10 ~ 2,
+                                                           .data$flag_fcs_rcsi >= 10 ~ 3, TRUE ~ 0))
 
   }
 

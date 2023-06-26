@@ -187,15 +187,50 @@ run_mortality_monitoring_dashboard <- function(df,
 
       output$test_plot9 <- renderPlot({
 
-        # Causes, Locations, Healthseeking Behaviours, etc.
+        # Death Causes, Locations, Healthseeking Behaviours, etc.
+        g <- ggplot2::ggplot(data = reactive_db() %>% dplyr::filter(death_cause != ""), aes(x = factor(death_cause), fill = factor(death_cause))) + ggplot2::geom_bar(stat = "count") + theme_minimal() + theme(legend.position = "none") + xlab("Enumerator ID")
+
+        g1 <- ggplot2::ggplot(data = reactive_db() %>% dplyr::filter(death_cause != ""), aes(x = factor(enum), fill = factor(death_cause))) + ggplot2::geom_bar(stat = "count") + theme_minimal()  + theme(legend.position = "bottom", title = element_blank()) + xlab("Enumerator ID")
+
+        gridExtra::grid.arrange(g, g1, nrow = 2)
 
 
       })
 
       output$test_plot10 <- renderPlot({
 
-        # Date over Time Period of Deaths Reports
+        # Death Locations
 
+        g2 <- ggplot2::ggplot(data = reactive_db() %>% dplyr::filter(death_cause != ""), aes(x = factor(death_cause), fill = factor(death_cause))) + ggplot2::geom_bar(stat = "count") + theme_minimal() + theme(legend.position = "none") + xlab("Enumerator ID")
+
+        g3 <- ggplot2::ggplot(data = reactive_db() %>% dplyr::filter(death_cause != ""), aes(x = factor(enum), fill = factor(death_cause))) + ggplot2::geom_bar(stat = "count") + theme_minimal()  + theme(legend.position = "bottom", title = element_blank()) + xlab("Enumerator ID")
+
+        gridExtra::grid.arrange(g2, g3, nrow = 2)
+
+
+      })
+
+      output$test_plot11 <- renderPlot({
+
+        # Death Health Care Seeking
+        g4 <- ggplot2::ggplot(data = df4 %>% dplyr::filter(!is.na(lieu_recherche_soins)), aes(x = factor(enum), fill = factor(lieu_recherche_soins))) + ggplot2::geom_bar(stat = "count")
+
+        g5 <- ggplot2::ggplot(data = reactive_db() %>% dplyr::filter(!is.na(lieu_recherche_soins)), aes(x = factor(enum), fill = factor(lieu_recherche_soins))) + ggplot2::geom_bar(stat = "count") + theme_minimal()  + theme(legend.position = "bottom", title = element_blank()) + xlab("Enumerator ID")
+
+        gridExtra::grid.arrange(g4, g5, nrow = 2)
+
+
+
+      })
+
+      output$test_plot12 <- renderPlot({
+
+        # Death Barriers
+        g6 <- ggplot2::ggplot(data = df4 %>% dplyr::filter(!is.na(renonce_soins_raison)), aes(x = factor(enum), fill = factor(renonce_soins_raison))) + ggplot2::geom_bar(stat = "count")
+
+        g7 <- ggplot2::ggplot(data = reactive_db() %>% dplyr::filter(!is.na(renonce_soins_raison)), aes(x = factor(enum), fill = factor(renonce_soins_raison))) + ggplot2::geom_bar(stat = "count") + theme_minimal()  + theme(legend.position = "bottom", title = element_blank()) + xlab("Enumerator ID")
+
+        gridExtra::grid.arrange(g6, g7, nrow = 2)
 
       })
 

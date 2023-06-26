@@ -709,7 +709,6 @@ format_nut_health_indicators <- function(df, #dataframe
   if(c("penta_count") %in% names(df)) {
     if(all(varhandle::check.numeric(df$penta_count))) {} else {stop("There is a non-numeric value for penta_count The input must be a number. Please check your input.")}
 
-
   }
 
   # Passing to the reformatting and calculation functions
@@ -721,7 +720,7 @@ format_nut_health_indicators <- function(df, #dataframe
   if(is.null(use_flags_yn)) {use_flags_yn <- "no"} else {use_flags_yn <- use_flags_yn}
 
   df <- healthyr::calculate_nut_health_indicators(df, monthly_expenditures = period_expenditures, period_expenditures = period_expenditures, num_period_months = num_period_months)
-  df <- healthyr::flag_nut_health_issues(df, use_flags = use_flags_yn)
+  df <- healthyr::flag_nut_health_issues(df, use_flags = use_flags_yn, lcs_variables = lcs_variables)
 
   new_names <- setdiff(names(df), variable)
   print(paste0("The following columns have been added to the dataset:"))

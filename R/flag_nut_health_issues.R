@@ -5,6 +5,7 @@
 #' calculate_nut_health_indicators functions. This function is not intended to be run directly, and instead is called automatically
 #' within the format_nut_health_indicators function.
 #' @param use_flags Optional input to specify if IYCF flags should be automatically blanked in the numerator.
+#' @param lcs_variables Optional input passing livelihood coping strategy names to calculate indicator specific flags.
 #'
 #' @return Returns a dataframe with additional columns of flags/data quality checks for individual records.
 #' @export
@@ -13,7 +14,7 @@
 #' \dontrun{flag_nut_health_issues(df)}
 #'
 #' @importFrom rlang .data
-flag_nut_health_issues <- function(df, use_flags = NULL) {
+flag_nut_health_issues <- function(df, use_flags = NULL, lcs_variables = NULL) {
 
   # Washington Group Flags ####
 
@@ -190,8 +191,8 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
                     flag_meat_cereal_ratio = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal < .data$fcs_meat, 1, 0)),
                     flag_zero_fcs = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal == 0 & .data$fcs_legumes == 0 & .data$fcs_dairy == 0 & .data$fcs_meat == 0 & .data$fcs_veg == 0 & .data$fcs_fruit == 0 & .data$fcs_oil == 0 & .data$fcs_sugar == 0, 1, 0)),
                     flag_all_fcs = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_cereal == 7 & .data$fcs_legumes == 7 & .data$fcs_dairy == 7 & .data$fcs_meat == 7 & .data$fcs_veg == 7 & .data$fcs_fruit == 7 & .data$fcs_oil == 7 & .data$fcs_sugar == 7, 1, 0)),
-                    flag_low_cereal = ifelse(is.na(.data$fcs_cereal), NA, ifelse( .data$fcs_cereal < 7, 1, 0)),
-                    flag_low_oil = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_oil < 7, 1, 0))) %>%
+                    flag_low_cereal = ifelse(is.na(.data$fcs_cereal), NA, ifelse( .data$fcs_cereal < 5, 1, 0)),
+                    flag_low_oil = ifelse(is.na(.data$fcs_cereal), NA, ifelse(.data$fcs_oil < 5, 1, 0))) %>%
       dplyr::rowwise() %>%
       dplyr::mutate(sd_foods = sd(c(.data$fcs_cereal, .data$fcs_legumes, .data$fcs_dairy, .data$fcs_meat, .data$fcs_veg, .data$fcs_fruit, .data$fcs_oil, .data$fcs_sugar), na.rm = TRUE),
                     flag_sd_foodgroup = dplyr::case_when(.data$sd_foods < 0.8 ~ 1, TRUE ~ 0)) %>%
@@ -298,9 +299,9 @@ flag_nut_health_issues <- function(df, use_flags = NULL) {
 
   }
 
-  if(length(setdiff(c("lcs1", "lcs2", "lcs3", "lcs4", "lcs5", "lcs6", "lcs7", "lcs8", "lcs9", "lcs10"), names(df)))==0) {
+  if(length(setdiff(c(lcs_variables), names(df)))==0) {
 
-    df$lcs.count.na <- apply(df[c("lcs1", "lcs2", "lcs3", "lcs4", "lcs5", "lcs6", "lcs7", "lcs8", "lcs9", "lcs10")], 1, function(x) sum(x == "4"))
+    df$lcs.count.na <- apply(df[c(lcs_variables)], 1, function(x) sum(x == "4"))
 
     df <- df %>%
       dplyr::mutate(flag_lcsi_na = dplyr::case_when(lcs.count.na == 10 ~ 1, TRUE ~ 0))
